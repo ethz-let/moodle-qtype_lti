@@ -206,10 +206,10 @@ function qtype_lti_update_grade($ltiinstance, $userid, /*$launchid*/ $attemptid,
             'dateupdated' => time(),
             'gradepercent' => $gradeval,
             'originalgrade' => $gradeval,
-            /*'launchid' => $launchid,*/
             'attemptid' => $attemptid,
             'state' => 1
         ));
+
     }
 
     return $status == GRADE_UPDATE_OK;

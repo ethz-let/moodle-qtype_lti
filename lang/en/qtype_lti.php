@@ -260,7 +260,7 @@ Tools listed on this page are separated into three categories:
         Moodle instance. Teachers may still use tools from these providers if they have a consumer key and shared secret, or if none is required.';
 $string['manage_external_tools'] = 'Manage LTI Qtype External tools';
 $string['manage_tools'] = 'Manage LTI qtype preconfigured tools';
-$string['manage_tool_proxies'] = 'Manage LTI qtype external tool registrations';
+$string['manage_tool_proxies'] = 'Manage LTI qtype external tool Proxies';
 $string['manuallyaddtype'] = 'Alternatively, you can <a href="{$a}">configure a tool manually</a>.';
 $string['miscellaneous'] = 'Miscellaneous';
 $string['misconfiguredtools'] = 'Misconfigured tool instances were detected';

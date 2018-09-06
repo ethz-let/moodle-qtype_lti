@@ -60,6 +60,7 @@ class qtype_lti extends question_type {
         $context = $question->context;
         $question->grade = 100; //Default.
         $question->timecreated = time();
+        $question->timemodified = $question->timecreated;
 
         if (!$options) { // Insertion.
             if (!isset($question->toolurl)) {
@@ -73,15 +74,12 @@ class qtype_lti extends question_type {
 
         } else { // Update.
             if ($question->typeid == 0 && isset($question->urlmatchedtypeid)) {
-                $question->typeid = $lti->urlmatchedtypeid;
+            	$question->typeid = $question->urlmatchedtypeid;
             }
         }
 
-
+        
         qtype_lti_load_tool_if_cartridge($question);
-
-        $question->timemodified = $question->timecreated;
-
 
         qtype_lti_force_type_config_settings($question, qtype_lti_get_type_config_by_instance($question));
 
