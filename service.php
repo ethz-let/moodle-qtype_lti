@@ -53,7 +53,7 @@ class service_exception_handler {
      * @var string
      */
     protected $id = '';
-
+    
     /**
      * The LTI service message type, if known.
      *
@@ -141,7 +141,6 @@ if ($logrequests) {
 $lti_headers = lti\OAuthUtil::get_headers();
 foreach ($lti_headers as $name => $value) {
     if ($name === 'Authorization') {
-        // TODO: Switch to core oauthlib once implemented - MDL-30149.
         $oauthparams = lti\OAuthUtil::split_header($value);
         $consumerkey = $oauthparams['oauth_consumer_key'];
         break;
@@ -149,7 +148,7 @@ foreach ($lti_headers as $name => $value) {
 }
 
 if (empty($consumerkey)) {
-   // throw new Exception('Consumer key is missing.');
+   throw new Exception('Consumer key is missing, or Authorization header is not readable by the server.');
 }
 $returnedsecret = qtype_lti_get_shared_secrets_by_key($consumerkey);
 
