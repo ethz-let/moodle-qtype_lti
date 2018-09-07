@@ -215,7 +215,7 @@ function qtype_lti_update_grade($ltiinstance, $userid, /*$launchid*/ $attemptid,
     return $status == GRADE_UPDATE_OK;
 }
 
-function qtype_lti_read_grade($ltiinstance, $userid) {
+function qtype_lti_read_grade($ltiinstance, $userid, $attemptid) {
     global $CFG, $DB;
     require_once($CFG->libdir . '/gradelib.php');
 
@@ -226,14 +226,15 @@ function qtype_lti_read_grade($ltiinstance, $userid) {
 
     $submission_grade = $DB->get_record('qtype_lti_submission', array(
         'ltiid' => $ltiinstance->id,
-        'userid' => $userid
+        'userid' => $userid,
+    	'attemptid' => $attemptid
         ));
 
     if($submission_grade) {
 
         return $submission_grade->gradepercent; // / $ltigrade;
     }
-    return 0;
+    return null;
     /* */
     if (!empty($ltigrade) && isset($grades) && isset($grades->items[0]) && is_array($grades->items[0]->grades)) {
         foreach ($grades->items[0]->grades as $agrade) {
@@ -245,20 +246,38 @@ function qtype_lti_read_grade($ltiinstance, $userid) {
     }
 }
 
-function qtype_lti_delete_grade($ltiinstance, $userid) {
+function qtype_lti_delete_grade($ltiinstance, $userid, $attemptid) {
     global $CFG, $DB;
-    require_once($CFG->libdir . '/gradelib.php');
-
+ /*  
     $grade = new stdClass();
     $grade->userid   = $userid;
     $grade->rawgrade = null;
 
     //$status = grade_update(QTYPE_LTI_SOURCE, $ltiinstance->course, QTYPE_LTI_ITEM_TYPE, QTYPE_LTI_ITEM_MODULE, $ltiinstance->id, 0, $grade);
 
-    $DB->delete_record('qtype_lti_submission', array(
-        'ltiid' => $ltiinstance->id,
-        ));
+*/
+    $record = $DB->get_record('qtype_lti_submission', array('ltiid' => $ltiinstance->id, 'userid' => $userid, 'attemptid' => $attemptid), 'id');
+    
+    if($record){
+    	$status = $DB->delete_records('qtype_lti_submission', array(
+    			'id' => $record->id
+    	));
+    }
 
+
+  /*  
+    $record = $DB->get_record('qtype_lti_submission', array('ltiid' => $ltiinstance->id, 'userid' => $userid,
+    		'attemptid' => $attemptid), 'id');
+    
+    $DB->update_record('qtype_lti_submission', array(
+    		'ltiid' => $ltiinstance->id,
+    		'userid' => $userid,
+    		'attemptid' => $attemptid,
+    		'dateupdated' => time(),
+    		'gradepercent' => null,
+    		'state' => 2
+    ));
+    */
 
     return $status == GRADE_UPDATE_OK;
 }
