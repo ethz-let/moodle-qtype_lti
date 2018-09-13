@@ -28,9 +28,9 @@
  $string['pluginnameediting'] = 'Editing a LTI (ETH) question';
  $string['generalfeedback'] = 'General Feedback.';
  $string['generalfeedback_help'] = 'The same general feedback is displayed regardless of the answer chosen.';
- $string['stem'] = 'Aufgabetitl';
- $string['enterstemhere'] = 'Enter the Task title, a question or a part of a sentence, here.';
- $string['tasktitle'] = 'Stamm';
+ $string['stem'] = 'Aufgabentitel';
+ $string['enterstemhere'] = 'Enter the Aufgabentitel, a question or a part of a sentence, here.';
+ $string['tasktitle'] = 'Aufgabentitel';
  $string['maxpoints'] = 'Max Punkte';
  $string['accept'] = 'Accept';
  $string['accepted'] = 'Accepted';

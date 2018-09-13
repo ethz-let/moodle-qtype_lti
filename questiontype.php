@@ -36,12 +36,9 @@ require_once($CFG->dirroot.'/question/type/lti/locallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_lti extends question_type {
+	
     public function is_manual_graded() {
         return true;
-    }
-
-    public function response_file_areas() {
-        return array('attachments', 'answer');
     }
 
     public function get_question_options($question) {

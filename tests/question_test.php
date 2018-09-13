@@ -25,8 +25,8 @@ require_once($CFG->dirroot . '/question/type/lti/question.php');
 class qtype_lti_question_test extends advanced_testcase {
 
   public function test_get_question_summary() {
-      $lti = test_question_maker::make_an_lti_question();
-      $lti->questiontext = 'Hello <img src="http://example.com/globe.png" alt="world" />';
-      $this->assertEquals('Hello [world]', $lti->get_question_summary());
+  	  $lti = test_question_maker::initialise_lti_question();
+      $lti->questiontext = 'LTI';
+      $this->assertEquals('LTI', $lti->get_question_summary());
   }
 }

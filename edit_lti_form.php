@@ -315,12 +315,29 @@ class qtype_lti_edit_form extends question_edit_form {
         $mform->addHelpButton('resourcekey', 'resourcekey', 'qtype_lti');
         $mform->setForceLtr('resourcekey');
         $mform->disabledIf('resourcekey', 'typeid', 'in', $noncontentitemtypes);
+        
+        // Hacky solution for "advanced" to work without hurting boost theme.
+        global $PAGE;
+        $themeisboost = 0;
+        
+        if (strpos($PAGE->theme->name, 'boost') !== false) {
+        	$themeisboost = 1;
+        }
+        
+        if($themeisboost == 0){
+        	$mform->addElement('html', '<div class="fitem advanced">');
+        }
 
+        
         $mform->addElement('passwordunmask', 'password', get_string('password', 'qtype_lti'));
         $mform->setType('password', PARAM_TEXT);
-        $mform->setAdvanced('password');
+        $mform->setAdvanced('password', true);
         $mform->addHelpButton('password', 'password', 'qtype_lti');
         $mform->disabledIf('password', 'typeid', 'in', $noncontentitemtypes);
+        if($themeisboost == 0){
+        	$mform->addElement('html', '</div>');
+        }
+       
 
         $mform->addElement('textarea', 'instructorcustomparameters', get_string('custom', 'qtype_lti'), array('rows' => 4, 'cols' => 60));
         $mform->setType('instructorcustomparameters', PARAM_TEXT);
