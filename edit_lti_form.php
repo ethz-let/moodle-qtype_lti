@@ -378,6 +378,9 @@ class qtype_lti_edit_form extends question_edit_form {
         $mform->addHelpButton('instructorchoiceacceptgrades', 'accept_grades', 'qtype_lti');
         $mform->disabledIf('instructorchoiceacceptgrades', 'typeid', 'in', $toolproxy);
         */
+        
+        $ctxcourse = context_course::instance($COURSE->id);
+        
         $editurl = new moodle_url('/question/type/lti/instructor_edit_tool_type.php',
                 array('sesskey' => sesskey(), 'course' => $COURSE->id));
         $ajaxurl = new moodle_url('/question/type/lti/ajax.php');
@@ -392,7 +395,8 @@ class qtype_lti_edit_form extends question_edit_form {
                         'warning_icon_url' => (string)$OUTPUT->image_url('warning', 'qtype_lti'),
                         'instructor_tool_type_edit_url' => $editurl->out(false),
                         'ajax_url' => $ajaxurl->out(true),
-                        'courseId' => $COURSE->id
+                        'courseId' => $COURSE->id,
+        				'can_add_course_tool' => has_capability('qtype/lti:addcoursetool', $ctxcourse)
                   );
 
         $module = array(
@@ -430,7 +434,7 @@ class qtype_lti_edit_form extends question_edit_form {
         $PAGE->requires->js_init_call('M.qtype_lti.editor.init', array(json_encode($jsinfo)), true, $module);
 
         // Simplify screen by showing configuration details only if not preset (when new) or have the capabilities to do so (when editing).
-        $ctxcourse = context_course::instance($COURSE->id);
+        
         if (optional_param('update', 0, PARAM_INT)) {
             $listtypes = has_capability('qtype/lti:addgloballypreconfigedtoolinstance', $ctxcourse);
             $listoptions = has_capability('qtype/lti:adddefaultinstance', $ctxcourse);

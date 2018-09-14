@@ -377,14 +377,12 @@
             });
 
             addIcon.on('click', function(e){
-
-             // if(self.getSelectedToolTypeOption().getAttribute('editable')){
+             if(self.settings.can_add_course_tool == true){
                   window.open(self.settings.instructor_tool_type_edit_url + '&action=add', 'add_tool');
-                  /*
               } else {
                   alert(M.util.get_string('cannot_add', 'qtype_lti'));
               }
-              */
+              
 
 
             });
@@ -407,6 +405,7 @@
         },
 
         toggleEditButtons: function(){
+
             var lti_edit_tool_type = Y.one('#lti_edit_tool_type');
             var lti_delete_tool_type = Y.one('#lti_delete_tool_type');
             var lti_add_tool_type = Y.one('#lti_add_tool_type');
@@ -414,14 +413,21 @@
             // Make the edit / delete icons look enabled / disabled.
             // Does not work in older browsers, but alerts will catch those cases.
             if(this.getSelectedToolTypeOption().getAttribute('editable')){
-             //   lti_add_tool_type.setStyle('opacity', '1');
                 lti_edit_tool_type.setStyle('opacity', '1');
                 lti_delete_tool_type.setStyle('opacity', '1');
             } else {
-           //     lti_add_tool_type.setStyle('opacity', '.2');
                 lti_edit_tool_type.setStyle('opacity', '.2');
                 lti_delete_tool_type.setStyle('opacity', '.2');
             }
+            
+            // Add icon opacity.
+            if(this.settings.can_add_course_tool == true){
+                   lti_add_tool_type.setStyle('opacity', '1');
+               } else {
+                   lti_add_tool_type.setStyle('opacity', '.2');
+               }
+            
+            
         },
 
         addToolType: function(toolType){

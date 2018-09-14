@@ -91,7 +91,7 @@ $capabilities = array(
         )
     ),
 
-    // The ability to a globally preconfigured instance to the course.
+    // The ability to add a globally preconfigured instance to the course.
     'qtype/lti:addgloballypreconfigedtoolinstance' => array(
                     'captype' => 'write',
                     'contextlevel' => CONTEXT_COURSE,
