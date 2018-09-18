@@ -46,6 +46,7 @@ class qtype_lti extends question_type {
 
         $question->options = $DB->get_record('qtype_lti_options',
                 array('questionid' => $question->id), '*', MUST_EXIST);
+        $question->questiontext = $question->name; // COD-4 for Import and Export title. 
         parent::get_question_options($question);
     }
 
@@ -58,7 +59,8 @@ class qtype_lti extends question_type {
         $question->grade = 100; //Default.
         $question->timecreated = time();
         $question->timemodified = $question->timecreated;
-
+       
+       
         if (!$options) { // Insertion.
             if (!isset($question->toolurl)) {
                 $question->toolurl = '';
