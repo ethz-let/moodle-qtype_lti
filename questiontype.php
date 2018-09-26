@@ -157,8 +157,10 @@ class qtype_lti extends question_type {
         $question->showdescriptionlaunch =  $questiondata->options->showdescriptionlaunch;
         $question->servicesalt =  $questiondata->options->servicesalt;
         $question->instancecode = $questiondata->options->instancecode;
-      //  $question->originalinstancecode =  $questiondata->options->originalinstancecode;
+      	// $question->originalinstancecode =  $questiondata->options->originalinstancecode;
         $question->icon =  $questiondata->options->icon;
+        $question->secureicon=  $questiondata->options->secureicon;
+        
         $question->answers =  $questiondata->options->answers;
     }
 

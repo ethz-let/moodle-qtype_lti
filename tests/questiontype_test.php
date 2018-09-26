@@ -19,7 +19,7 @@
  *
  * @package    qtype
  * @subpackage lti
- * @copyright  2010 The Open University
+ * @copyright  2018 ETH Zurich
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/question/type/lti/questiontype.php');
 /**
  * Unit tests for the lti question type class.
  *
- * @copyright  2010 The Open University
+ * @copyright  2018 ETH Zurich
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_lti_test extends advanced_testcase {

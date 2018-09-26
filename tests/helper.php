@@ -48,14 +48,30 @@ class qtype_lti_test_helper extends question_test_helper {
         $q->name = 'lti question';
         $q->questiontext = 'Please write a code.';
         $q->generalfeedback = 'I hope your code had a beginning, a middle and an end.';
-        $q->responseformat = 'editor';
-        $q->responserequired = 1;
-        $q->responsefieldlines = 10;
-        $q->attachments = 0;
-        $q->attachmentsrequired = 0;
-        $q->filetypeslist = '';
-        $q->graderinfo = '';
-        $q->graderinfoformat = FORMAT_HTML;
+        
+        $q->questionid = 1;
+        $q->typeid = null;
+        $q->toolurl = 'https://tool.org';
+        $q->securetoolurl = 'https://tool.org';
+        $q->instructorchoicesendname = 1;
+        $q->instructorchoicesendemailaddr = 1;
+        $q->instructorchoiceallowroster =1;
+        $q->instructorchoiceallowsetting = 1;
+        $q->instructorcustomparameters = 1;
+        $q->instructorchoiceacceptgrades = 1;
+        $q->grade = 1;
+        $q->launchcontainer = 1;
+        $q->resourcekey = 'key';
+        $q->password = 'secret';
+        $q->debuglaunch = 0;
+        $q->showtitlelaunch =  0;
+        $q->showdescriptionlaunch =  0;
+        $q->servicesalt =  'salt';
+        $q->instancecode = 'somerandominstancecode';
+        $q->originalinstancecode = null;
+        $q->icon =  '';
+        $q->secureicon =  '';
+        
         $q->qtype = question_bank::get_qtype('lti');
 
         return $q;
@@ -67,7 +83,6 @@ class qtype_lti_test_helper extends question_test_helper {
      */
     public function make_lti_question_plain() {
         $q = $this->initialise_lti_question();
-        $q->responseformat = 'plain';
         return $q;
     }
 
@@ -79,22 +94,40 @@ class qtype_lti_test_helper extends question_test_helper {
      * @return stdClass the data that would be returned by $form->get_gata();
      */
     public function get_lti_question_form_data_plain() {
-        $fromform = new stdClass();
+    	$q = new stdClass();
 
-        $fromform->name = 'lti question with filepicker and attachments';
-        $fromform->questiontext = array('text' => 'Please write a story about a frog.', 'format' => FORMAT_HTML);
-        $fromform->defaultmark = 1.0;
-        $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.', 'format' => FORMAT_HTML);
-        $fromform->responseformat = 'plain';
-        $fromform->responserequired = 1;
-        $fromform->responsefieldlines = 10;
-        $fromform->attachments = 0;
-        $fromform->attachmentsrequired = 0;
-        $fromform->filetypeslist = '';
-        $fromform->graderinfo = array('text' => '', 'format' => FORMAT_HTML);
-        $fromform->responsetemplate = array('text' => '', 'format' => FORMAT_HTML);
+        $q->name = 'lti question';
+        $q->questiontext = 'Please write a code.';
+        $q->generalfeedback = 'I hope your code had a beginning, a middle and an end.';
+        
+        $q->name = 'lti question';
+        $q->questiontext = 'Please write a code.';
+        $q->generalfeedback = 'I hope your code had a beginning, a middle and an end.';
+        
+        $q->questionid = 1;
+        $q->typeid = null;
+        $q->toolurl = 'https://tool.org';
+        $q->securetoolurl = 'https://tool.org';
+        $q->instructorchoicesendname = 1;
+        $q->instructorchoicesendemailaddr = 1;
+        $q->instructorchoiceallowroster =1;
+        $q->instructorchoiceallowsetting = 1;
+        $q->instructorcustomparameters = 1;
+        $q->instructorchoiceacceptgrades = 1;
+        $q->grade = 1;
+        $q->launchcontainer = 1;
+        $q->resourcekey = 'key';
+        $q->password = 'secret';
+        $q->debuglaunch = 0;
+        $q->showtitlelaunch =  0;
+        $q->showdescriptionlaunch =  0;
+        $q->servicesalt =  'salt';
+        $q->instancecode = 'somerandominstancecode';
+        $q->originalinstancecode = null;
+        $q->icon =  '';
+        $q->secureicon =  '';
 
-        return $fromform;
+        return $q;
     }
 
 }
