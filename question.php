@@ -30,19 +30,7 @@ require_once($CFG->dirroot . '/question/type/questionbase.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_lti_question extends question_graded_automatically_with_countback{
-    /* question_with_responses */
-    public $responseformat;
-    /** @var int Indicates whether an inline response is required ('0') or optional ('1')  */
-    public $responserequired;
-    public $responsefieldlines;
-    public $attachments;
-    /** @var int The number of attachments required for a response to be complete. */
-    public $attachmentsrequired;
-    public $graderinfo;
-    public $graderinfoformat;
-    public $responsetemplate;
-    public $responsetemplateformat;
-    public $rightanswer;
+
 
     public function compute_final_grade($responses, $totaltries) {
         $totalstemscore = 0;

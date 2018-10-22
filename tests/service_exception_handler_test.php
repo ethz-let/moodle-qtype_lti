@@ -18,11 +18,11 @@
  * Tests Exception handler for LTI services
  *
  * @package   qtype_lti
- * @copyright Copyright (c) 2015 Moodlerooms Inc. (http://www.moodlerooms.com)
+ * @copyright 2018 ETH Zurich
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use qtype_lti\service_exception_handler;
+require_once($CFG->dirroot . '/question/type/lti/classes/service_exception_handler.php');
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * Tests Exception handler for LTI services
  *
  * @package   qtype_lti
- * @copyright Copyright (c) 2015 Moodlerooms Inc. (http://www.moodlerooms.com)
+ * @copyright 2018 ETH Zurich
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_lti_service_exception_handler_testcase extends advanced_testcase {
@@ -79,7 +79,7 @@ class qtype_lti_service_exception_handler_testcase extends advanced_testcase {
         ob_end_clean();
 
         $this->assertTrue(is_dir($CFG->dataroot.'/temp/qtype_lti'));
-        $files = glob($CFG->dataroot.'/temp/qtype_lti/qtype*');
+       	$files = glob($CFG->dataroot.'/temp/qtype_lti/qtype*');
         $this->assertEquals(1, count($files));
     }
 }

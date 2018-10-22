@@ -18,7 +18,7 @@
  * Tests for servicelib.php
  *
  * @package   qtype_lti
- * @copyright Copyright (c) 2015 Moodlerooms Inc. (http://www.moodlerooms.com)
+ * @copyright 2018 ETH Zurich
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/question/type/lti/servicelib.php');
  * Tests for servicelib.php
  *
  * @package   qtype_lti
- * @copyright Copyright (c) 2015 Moodlerooms Inc. (http://www.moodlerooms.com)
+ * @copyright 2018 ETH Zurich
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_lti_servicelib_testcase extends basic_testcase {

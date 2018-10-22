@@ -204,17 +204,6 @@ class qtype_lti extends question_type {
     }
 
 
-    /**
-     * @return array the choices that should be offered for the number of required attachments.
-     */
-    public function attachments_required_options() {
-        return array(
-            0 => get_string('attachmentsoptional', 'qtype_lti'),
-            1 => '1',
-            2 => '2',
-            3 => '3'
-        );
-    }
 
     public function move_files($questionid, $oldcontextid, $newcontextid) {
         parent::move_files($questionid, $oldcontextid, $newcontextid);

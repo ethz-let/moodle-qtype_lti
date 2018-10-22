@@ -18,7 +18,7 @@
  * Test helpers for the lti question type.
  *
  * @package    qtype_lti
- * @copyright  2013 The Open University
+ * @copyright  2018 ETH Zurich
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -41,15 +41,28 @@ class qtype_lti_test_helper extends question_test_helper {
      * Helper method to reduce duplication.
      * @return qtype_lti_question
      */
-    protected function initialise_lti_question() {
+    public function initialise_lti_question() {
         question_bank::load_question_definition_classes('lti');
         $q = new qtype_lti_question();
         test_question_maker::initialise_a_question($q);
-        $q->name = 'lti question';
+        $q->name = 'Please write a code.';
         $q->questiontext = 'Please write a code.';
         $q->generalfeedback = 'I hope your code had a beginning, a middle and an end.';
+        $q->questiontextformat = FORMAT_HTML;
+        $q->generalfeedback = "Generalfeedback: Writing a code isn't to hard";
+        $q->generalfeedbackformat = FORMAT_HTML;
+        $q->defaultmark = 1;
+        $q->penalty = 0.3333333;
+        $q->qtype = 'lti';
+        $q->length = '1';
+        $q->hidden = '0';
+        $q->createdby = '2';
+        $q->modifiedby = '2';
         
         $q->questionid = 1;
+        $q->unittest = 1;
+        $q->id = 1;
+        $q->course = 1;
         $q->typeid = null;
         $q->toolurl = 'https://tool.org';
         $q->securetoolurl = 'https://tool.org';
@@ -71,7 +84,7 @@ class qtype_lti_test_helper extends question_test_helper {
         $q->originalinstancecode = null;
         $q->icon =  '';
         $q->secureicon =  '';
-        
+     
         $q->qtype = question_bank::get_qtype('lti');
 
         return $q;
@@ -88,44 +101,49 @@ class qtype_lti_test_helper extends question_test_helper {
 
     /**
      * Make the data what would be received from the editing form for an lti
-     * question using the HTML editor allowing embedded files as input, and up
-     * to three attachments.
-     *
+     * question.
      * @return stdClass the data that would be returned by $form->get_gata();
      */
     public function get_lti_question_form_data_plain() {
     	$q = new stdClass();
-
-        $q->name = 'lti question';
-        $q->questiontext = 'Please write a code.';
-        $q->generalfeedback = 'I hope your code had a beginning, a middle and an end.';
-        
-        $q->name = 'lti question';
-        $q->questiontext = 'Please write a code.';
-        $q->generalfeedback = 'I hope your code had a beginning, a middle and an end.';
-        
-        $q->questionid = 1;
-        $q->typeid = null;
-        $q->toolurl = 'https://tool.org';
-        $q->securetoolurl = 'https://tool.org';
-        $q->instructorchoicesendname = 1;
-        $q->instructorchoicesendemailaddr = 1;
-        $q->instructorchoiceallowroster =1;
-        $q->instructorchoiceallowsetting = 1;
-        $q->instructorcustomparameters = 1;
-        $q->instructorchoiceacceptgrades = 1;
-        $q->grade = 1;
-        $q->launchcontainer = 1;
-        $q->resourcekey = 'key';
-        $q->password = 'secret';
-        $q->debuglaunch = 0;
-        $q->showtitlelaunch =  0;
-        $q->showdescriptionlaunch =  0;
-        $q->servicesalt =  'salt';
-        $q->instancecode = 'somerandominstancecode';
-        $q->originalinstancecode = null;
-        $q->icon =  '';
-        $q->secureicon =  '';
+    	$q->name = 'Please write a code.';
+    	$q->questiontext = 'Please write a code.';
+    	$q->generalfeedback = 'I hope your code had a beginning, a middle and an end.';
+    	$q->questiontextformat = FORMAT_HTML;
+    	$q->generalfeedback = "Generalfeedback: Writing a code isn't to hard";
+    	$q->generalfeedbackformat = FORMAT_HTML;
+    	$q->defaultmark = 1;
+    	$q->penalty = 0.3333333;
+    	$q->qtype = 'lti';
+    	$q->length = '1';
+    	$q->hidden = '0';
+    	$q->createdby = '2';
+    	$q->modifiedby = '2';
+    	
+    	$q->questionid = 1;
+    	$q->unittest = 1;
+    	$q->course = 1;
+    	$q->typeid = null;
+    	$q->toolurl = 'https://tool.org';
+    	$q->securetoolurl = 'https://tool.org';
+    	$q->instructorchoicesendname = 1;
+    	$q->instructorchoicesendemailaddr = 1;
+    	$q->instructorchoiceallowroster =1;
+    	$q->instructorchoiceallowsetting = 1;
+    	$q->instructorcustomparameters = 1;
+    	$q->instructorchoiceacceptgrades = 1;
+    	$q->grade = 1;
+    	$q->launchcontainer = 1;
+    	$q->resourcekey = 'key';
+    	$q->password = 'secret';
+    	$q->debuglaunch = 0;
+    	$q->showtitlelaunch =  0;
+    	$q->showdescriptionlaunch =  0;
+    	$q->servicesalt =  'salt';
+    	$q->instancecode = 'somerandominstancecode';
+    	$q->originalinstancecode = null;
+    	$q->icon =  '';
+    	$q->secureicon =  '';
 
         return $q;
     }

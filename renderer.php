@@ -62,22 +62,31 @@ class qtype_lti_renderer extends \qtype_renderer{
                     $attemptfullrecord->state = 'preview';
 
                 }
+                
+                if (empty($question->unittest) || is_null($question->unittest)){
 
+	                $lti = $DB->get_record('qtype_lti_options', array('questionid' => $question->id), '*', MUST_EXIST);
+	                $lti_params = qtype_lti_build_sourcedid($lti->id, $original_userid, $lti->servicesalt, $lti->typeid);
+                	$serial_params = $lti_params->data;
 
-                $lti = $DB->get_record('qtype_lti_options', array('questionid' => $question->id), '*', MUST_EXIST);
-                //  $lti_params = qtype_lti_get_launch_data($lti, $original_userid);
-
-
-                $lti_params = qtype_lti_build_sourcedid($lti->id, $original_userid, $lti->servicesalt, $lti->typeid);
-                $serial_params = $lti_params->data;
-
-                //  $hidden_params_obj = json_decode($lti_params[1]['lis_result_sourcedid']);
-
-
-
+                } else {
+                	
+                	$lti_params = new stdClass();
+                	$serial_params  = new stdClass();
+                	$lti_params->data = '';
+                	$serial_params->userid = 2;
+                	$serial_params->instanceid = '';
+                	
+                	$lti = new stdClass();
+                	$lti->id = 1;
+                	$lti->servicesalt = '';
+                	$lti->typeid = null;
+                	
+                }
+	
                 if (!$step->has_qt_var('answer') && empty($options->readonly)) {
                     // Question has never been answered, fill it with response template.
-                    $step = new question_attempt_step(array('answer'=>$question->responsetemplate));
+                    $step = new question_attempt_step(array('answer'=>''));
                 } else {
                     //$step = new question_attempt_step(array('answer'=>$question->responsetemplate));
                     $sstep = $qa->get_current_manual_mark();
@@ -132,7 +141,7 @@ class qtype_lti_renderer extends \qtype_renderer{
 
                 $extra_code_expert_parameters = 'questionid='.$question->id.'&ltid='.$lti->id.'&quizid='.$attemptfullrecord->quiz.'&attemptid='.$attempt.'&attemptstate='.$attemptfullrecord->state.'&';
 
-                $result =  '<div id="qtype_lti_framediv_'.$question->id.'" class="qtype_lti_framediv" '.$readonlydevstyle.'><span class="qtype_lti_togglebutton" id="qtype_lti_togglebutton_id_'.$question->id.'">&nbsp;</span><iframe id="qtype_lti_contentframe_'.$question->id.'" border="0" height="600px" width="100%" src="'.$CFG->wwwroot.'/question/type/lti/launch.php?'.$extra_code_expert_parameters.$readonly.'id='.$question->id.'&userid='.$serial_params->userid.'" '.$readonlyclass.'></iframe></div>';
+                $result =  '<--'.$question->questiontext.'--><div id="qtype_lti_framediv_'.$question->id.'" class="qtype_lti_framediv" '.$readonlydevstyle.'><span class="qtype_lti_togglebutton" id="qtype_lti_togglebutton_id_'.$question->id.'">&nbsp;</span><iframe id="qtype_lti_contentframe_'.$question->id.'" border="0" height="600px" width="100%" src="'.$CFG->wwwroot.'/question/type/lti/launch.php?'.$extra_code_expert_parameters.$readonly.'id='.$question->id.'&userid='.$serial_params->userid.'" '.$readonlyclass.'></iframe></div>';
 
                 $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$inputname\" id=\"qtype_lti_input_id_".$question->id."\">";
                 // $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$launchid\"  value=\"$serial_params->launchid\" id=\"qtype_lti_luanch_id_".$question->id."\">";

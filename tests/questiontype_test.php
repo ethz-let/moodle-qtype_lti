@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/lti/questiontype.php');
+require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
+
 
 
 /**
@@ -49,8 +51,7 @@ class qtype_lti_test extends advanced_testcase {
 
     protected function get_test_question_data() {
         $q = new stdClass();
-        $q->id = 1;
-
+        $q->options->answers[0] = new stdClass();
         return $q;
     }
 
@@ -67,9 +68,4 @@ class qtype_lti_test extends advanced_testcase {
         $this->assertEquals(0, $this->qtype->get_random_guess_score($q));
     }
 
-    public function test_get_possible_responses() {
-        $q = $this->get_test_question_data();
-        $this->assertEquals(array(), $this->qtype->get_possible_responses($q));
-
-    }
 }
