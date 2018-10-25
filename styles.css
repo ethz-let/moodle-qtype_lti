@@ -417,7 +417,7 @@ span.qtype_lti_togglebutton {
     background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAABkklEQVQ4ja2TMWsUURSFvxMGkWhhIUFShyVlOomW7yZ/I6kshIAGSxEsRaxsRZtAwB+QaqYLIaQRQypLCUEJiMQgusUem5nwdncy7IAHhuHdd+6557w3A/8ZioiXwHxWe1uW5ddZmiNiEXialYaF7cfAb+AUQNKHHobmbT+QhO1F4C4RcZ5Set5DpBUppe2I+FVkhWVgVxIAtqknj72bvQb13kbDKYDXkg5t3wRWgPfU8a9D0wzcs/0IuA0cAq+UOVyR9AlYtX1ck7pwKWkJ+Gz7YVVVBwBzOaOJImkT+N71SHqW9YwajSIXnDy/LjScLP60YJvbyUFdvFbBLPZUc17LebnoXFdTD1zpjDm87lzaMHEM7ZeS4Z2knS5B238kLU8NiogXwL7tH/V3uAOcdf0pmbMFYBNYlXTD9loBbNkeAR9tH0kaAIPOvOPRj2xfAuuSnlxFrqrqC3B/VqFJpJTWJaGU0jkwBL7VEzfKsjyZRSQiBrZ36+UCcKeQ9Mb2rexmf/YwdiFpr1nY/tujdzb8A3p0x1EOLnCOAAAAAElFTkSuQmCC) no-repeat;
     padding:8px;
     cursor: pointer;
-    z-index:999999999999;
+    /*z-index:999999999999;*/
 }
 div.qtype_lti_maximized {
     position:fixed;
