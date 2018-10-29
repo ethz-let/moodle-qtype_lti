@@ -115,6 +115,7 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, 
 
     if ($typeid) {
         $typeconfig = qtype_lti_get_type_config($typeid);
+        $noadminconfigfound = 0;
     } else {
         // There is no admin configuration for this tool. Use configuration in the lti instance record plus some defaults.
         $typeconfig = (array)$instance;
@@ -125,6 +126,7 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, 
         $typeconfig['acceptgrades'] = $instance->instructorchoiceacceptgrades;
         $typeconfig['allowroster'] = $instance->instructorchoiceallowroster;
         $typeconfig['forcessl'] = '0';
+        $noadminconfigfound = 1;
     }
 
     // Default the organizationid if not specified.
@@ -155,8 +157,27 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, 
             $secret = '';
         }
     }
+    
+    //  Fix COD-7. Porvider has higher rule than url.
+    if ($typeconfig && !empty($typeconfig['toolurl'])) {
+    	
+    	if (!empty($instance->toolurl)) {
+    		// Strip the url domain and merge its suffix with the domain provider.
+    		$stripped_provider = parse_url($instance->toolurl);
+    		
+    		if ($noadminconfigfound == 1) { // Did not match the provider (invalid provider), then use the URL.
+    			$endpoint = $typeconfig['toolurl'].'potato';
+    		} else {
+    			$endpoint = $typeconfig['toolurl'].'/YYYYYY/'.$stripped_provider['path'];
+    		}
+    	} else {
+    		$endpoint = $typeconfig['toolurl'];
+    	}
+    	
+    } else {
+    	$endpoint = !empty($instance->toolurl) ? $instance->toolurl : $typeconfig['toolurl'];
+    }
 
-    $endpoint = !empty($instance->toolurl) ? $instance->toolurl : $typeconfig['toolurl'];
     $endpoint = trim($endpoint);
 
     // If the current request is using SSL and a secure tool URL is specified, use it.
