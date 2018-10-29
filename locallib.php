@@ -166,9 +166,14 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, 
     		$stripped_provider = parse_url($instance->toolurl);
     		
     		if ($noadminconfigfound == 1) { // Did not match the provider (invalid provider), then use the URL.
-    			$endpoint = $typeconfig['toolurl'].'potato';
+    			$endpoint = $typeconfig['toolurl'];
     		} else {
-    			$endpoint = $typeconfig['toolurl'].'/YYYYYY/'.$stripped_provider['path'];
+    			$endpoint = $typeconfig['toolurl'].$stripped_provider['path'];
+    			// We shall also update this url in that question.
+    			$update_question = new stdClass;
+    			$update_question->id = $instance->id;
+    			$update_question->toolurl = trim($endpoint);
+    			$DB->update_record('qtype_lti_options', $update_question);
     		}
     	} else {
     		$endpoint = $typeconfig['toolurl'];

@@ -101,7 +101,7 @@
  $string['createdon'] = 'Created on';
  $string['curllibrarymissing'] = 'PHP Curl library must be installed to use LTI';
  $string['custom'] = 'Custom parameters';
- $string['custom_config'] = 'Using custom tool configuration.';
+ $string['custom_config'] = 'No Provider configured, this link will be manually configured below.'; // Using custom tool configuration.
  $string['custom_help'] = 'Custom parameters are settings used by the tool provider. For example, a custom parameter may be used to display
  a specific resource from the provider.  Each parameter should be entered on a separate line using a format of "name=value"; for example, "chapter=3".
 
