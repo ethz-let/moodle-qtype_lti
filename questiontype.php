@@ -242,8 +242,7 @@ class qtype_lti extends question_type {
         $expout .= '    <cmid>' . $question->options->cmid .
         "</cmid>\n";
 
-        $expout .= '    <typeid>' . $question->options->typeid .
-                 "</typeid>\n";
+        $expout .= '    <typeid>0</typeid>\n';// $question->options->typeid
         $expout .= '    <toolurl>' . $format->writetext($question->options->toolurl) .
                  "</toolurl>\n";
         $expout .= '    <securetoolurl>' . $format->writetext($question->options->securetoolurl) .

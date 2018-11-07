@@ -100,7 +100,7 @@ define('QTYPE_LTI_VERSION_2', 'LTI-2p0');
  */
 function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, $questionmode = 'create', $manuallygraded_in_moodle = 0, $extra_code_expert_params = array()) {
     global $PAGE, $CFG, $DB;
-
+    //print_r($instance);exit;
     if (empty($instance->typeid)) {
         $tool = qtype_lti_get_tool_by_url_match($instance->toolurl, $instance->course);
         if ($tool) {
@@ -165,16 +165,18 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, 
     		// Strip the url domain and merge its suffix with the domain provider.
     		$stripped_provider = parse_url($instance->toolurl);
     		
-    		if ($noadminconfigfound == 1) { // Did not match the provider (invalid provider), then use the URL.
+    		if ($noadminconfigfound == 1) { // Did not match the provider (invalid provider), most probably was deleted or never existed.. so use the URL.
     			$endpoint = $typeconfig['toolurl'];
     		} else {
     			$endpoint = $typeconfig['toolurl'].$stripped_provider['path'];
+    		}
     			// We shall also update this url in that question.
     			$update_question = new stdClass;
     			$update_question->id = $instance->id;
     			$update_question->toolurl = trim($endpoint);
+    			
     			$DB->update_record('qtype_lti_options', $update_question);
-    		}
+    			
     	} else {
     		$endpoint = $typeconfig['toolurl'];
     	}
@@ -1660,6 +1662,7 @@ function qtype_lti_get_domain_from_url($url) {
     $matches = array();
 
     if (preg_match(QTYPE_LTI_URL_DOMAIN_REGEX, $url, $matches)) {
+  
         return $matches[1];
     }
 }
@@ -2303,11 +2306,13 @@ function qtype_lti_update_config($config) {
     global $DB;
 
     $return = true;
-    $old = $DB->get_record('qtype_lti_types_config', array('typeid' => $config->typeid, 'name' => $config->name));
+    $old = $DB->get_records('qtype_lti_types_config', array('typeid' => $config->typeid, 'name' => $config->name));
 
     if ($old) {
-        $config->id = $old->id;
-        $return = $DB->update_record('qtype_lti_types_config', $config);
+    	foreach($old as $o){
+    		$config->id = $o->id;
+    		$return = $DB->update_record('qtype_lti_types_config', $config);
+    	}
     } else {
         $return = $DB->insert_record('qtype_lti_types_config', $config);
     }

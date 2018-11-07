@@ -112,7 +112,7 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         // Try to find existing lti type with the same properties.
         $ltitypeid = $this->find_existing_lti_type($data);
         $this->newltitype = false;
-        if (!$ltitypeid && $data->course == $courseid) {
+        if (!$ltitypeid) {// && $data->course == $courseid
             unset($data->toolproxyid); // Course tools can not use LTI2.
             $ltitypeid = $DB->insert_record('qtype_lti_types', $data);
             $this->newltitype = true;
