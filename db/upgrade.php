@@ -30,6 +30,27 @@ function xmldb_qtype_lti_upgrade($oldversion) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager();
+    
+    if ($oldversion < 2018111207) {
+    	$old_record = $DB->get_record('role_capabilities', array('capability' => 'qtype/lti:addcoursetool', 'roleid' => 3));
+    	if(!$old_record){
+    		$new_record = new stdClass;
+    		$new_record->roleid = 3;
+    		$new_record->contextid = 1;
+    		$new_record->permission = 1;
+    		$new_record->capability = 'qtype/lti:addcoursetool';
+    		$new_record->permission = 1;
+    		$new_record->timemodified = time();
+    		
+    		$DB->insert_record('role_capabilities', $new_record);
+    	} else {
+    		$sql = 'capability = :caps';
+    		$params = ['caps' => 'qtype/lti:addcoursetool'];
+    		$DB->set_field_select('role_capabilities', 'permission', 1, $sql, $params);
+    	}
+    	
+    	upgrade_plugin_savepoint(true, 2018111207, 'qtype', 'lti');	
+    } 	
 
     return true;
 }
