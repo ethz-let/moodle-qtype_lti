@@ -3292,8 +3292,12 @@ function qtype_get_tag($tagname, $xpath, $attribute = null) {
  * @throws moodle_exception
  */
 function qtype_lti_ensure_user_can_use_type($lti) {
-    global $DB, $SITE;
-
+    global $DB, $SITE, $COURSE;
+    
+    if($lti->course == 1){
+    	$lti->course = $COURSE->id;
+    }
+     
     if (empty($lti->typeid)) {
         // Not a global tool.
         require_capability('qtype/lti:adddefaultinstance', context_course::instance($lti->course));
@@ -3307,6 +3311,6 @@ function qtype_lti_ensure_user_can_use_type($lti) {
         return;
     }
 
-    // Global tool.
+    // Global tool. Always allow.
     require_capability('qtype/lti:addgloballypreconfigedtoolinstance', context_course::instance($lti->course));
 }
