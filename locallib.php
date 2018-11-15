@@ -100,7 +100,7 @@ define('QTYPE_LTI_VERSION_2', 'LTI-2p0');
  */
 function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, $questionmode = 'create', $manuallygraded_in_moodle = 0, $extra_code_expert_params = array()) {
     global $PAGE, $CFG, $DB;
-    //print_r($instance);exit;
+
     if (empty($instance->typeid)) {
         $tool = qtype_lti_get_tool_by_url_match($instance->toolurl, $instance->course);
         if ($tool) {
@@ -157,7 +157,7 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, 
             $secret = '';
         }
     }
-    
+    /*
     //  Fix COD-7. Porvider has higher rule than url.
     if ($typeconfig && !empty($typeconfig['toolurl'])) {
     	
@@ -184,7 +184,8 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, 
     } else {
     	$endpoint = !empty($instance->toolurl) ? $instance->toolurl : $typeconfig['toolurl'];
     }
-
+    */
+    $endpoint = !empty($instance->toolurl) ? $instance->toolurl : $typeconfig['toolurl'];
     $endpoint = trim($endpoint);
 
     // If the current request is using SSL and a secure tool URL is specified, use it.
@@ -2020,6 +2021,8 @@ function qtype_lti_update_type($type, $config) {
     }
     unset($config->oldicon);
 
+    $original_provider = $DB->get_record('qtype_lti_types', array('id' => $type->id));
+    
     if ($DB->update_record('qtype_lti_types', $type)) {
         foreach ($config as $key => $value) {
             if (substr($key, 0, 4) == 'lti_' && !is_null($value)) {
@@ -2030,6 +2033,92 @@ function qtype_lti_update_type($type, $config) {
                 qtype_lti_update_config($record);
             }
         }
+
+        // COD-11 (update all tool_urls for qtypes with same provider).
+        $questions = $DB->get_records('qtype_lti_options', array('typeid' => $type->id),'','id, toolurl, questionid');
+        
+        if($questions && $original_provider){
+        	foreach($questions as $question){
+        		
+        	
+        		$record->id = $question->id;
+        		$record->typeid = $type->id;
+        		//$new_domain = qtype_lti_get_domain_from_url($type->baseurl);
+        		//$old_domain = qtype_lti_get_domain_from_url($question->toolurl);
+
+        		$current_qtype_url = parse_url($question->toolurl);
+        		$updated_qtype_url = $type->baseurl;
+        		if(!empty($current_qtype_url['path'])){
+        			
+        			/*
+        			//check if path matches in parts at least and then ingore it.
+        			$original_path = parse_url($question->toolurl);
+        			$split_original = explode('/',$original_path['path']);
+        			$split_new = explode('/',$current_qtype_url['path']);
+        			
+        			$result = array_filter(array_unique(array_merge($split_original,$split_new), SORT_REGULAR));
+        			
+        			$updated_qtype_url .= '/' . implode('/',$result);
+        			
+        			*/
+        			$original_path = parse_url($question->toolurl);
+        			$parts = explode("/", $original_path['path']);
+        			$final_part = '/' . end($parts);
+        			$final_part = str_replace('//','/',$final_part);
+        			
+        			$updated_qtype_url .= $final_part;
+        			
+        		}
+        		if(!empty($current_qtype_url['query'])){
+        			$updated_qtype_url .= $current_qtype_url['query'];
+        		}
+        		$record->toolurl = str_replace('//','/', $updated_qtype_url);
+        		$record->toolurl = str_replace(':/','://', $record->toolurl);
+        		
+        		$DB->update_record('qtype_lti_options', $record);
+        	
+        		
+        		
+
+        	}
+        }
+
+        //Some records might not be connected to type id but rely on type id.
+        
+        $original_domain = $original_provider->tooldomain;
+        if($original_domain){
+        	$loose_questions = $DB->get_records_sql('select id, toolurl from {qtype_lti_options} where '.$DB->sql_like('toolurl', ':toolurl').' and typeid = :typeid', array( 'toolurl' => '%'.$original_domain.'%', 'typeid' => 0));
+
+        	foreach($loose_questions as $loose_question){
+        		$record->id = $loose_question->id;
+        		$record->typeid = $type->id;
+
+        		$current_qtype_url = parse_url($loose_question->toolurl);
+        		$updated_qtype_url = $type->baseurl;
+        		if(!empty($current_qtype_url['path'])){
+
+        			$original_path = parse_url($loose_question->toolurl);
+        			$parts = explode("/", $original_path['path']);
+        			$final_part = '/' . end($parts);
+        			$final_part = str_replace('//','/',$final_part);
+        			
+        			$updated_qtype_url .= $final_part;
+        			
+        		}
+        		if(!empty($current_qtype_url['query'])){
+        			$updated_qtype_url .= $current_qtype_url['query'];
+        		}
+        		$record->toolurl = str_replace('//','/', $updated_qtype_url);
+        		$record->toolurl = str_replace(':/','://', $record->toolurl);
+        		
+        		$DB->update_record('qtype_lti_options', $record);
+        		
+        		
+        		
+        	}
+        }
+
+        
         require_once($CFG->libdir.'/modinfolib.php');
         if ($clearcache) {
             $sql = "SELECT DISTINCT course
@@ -2071,6 +2160,9 @@ function qtype_lti_add_type($type, $config) {
     $config->lti_servicesalt = uniqid('', true);
 
     $id = $DB->insert_record('qtype_lti_types', $type);
+   
+    
+    
 
     if ($id) {
         foreach ($config as $key => $value) {
@@ -2082,9 +2174,24 @@ function qtype_lti_add_type($type, $config) {
 
                 qtype_lti_add_config($record);
             }
-        }
+        
+        
+        
+        //Some records might not be connected to type id but rely on type id.
+        
+        	$loose_questions = $DB->get_records_sql('select id, toolurl from {qtype_lti_options} where '.$DB->sql_like('toolurl', ':toolurl').' and typeid = :typeid', array( 'toolurl' => '%'.$type->baseurl.'%', 'typeid' => 0));
+        	if($loose_questions){
+        		foreach($loose_questions as $loose_question){
+        			$record = new \StdClass();
+        			$record->id = $loose_question->id;
+        			$record->typeid = $id;
+        			$DB->update_record('qtype_lti_options', $record);
+        		}
+        	}
+        	
+      }
+    
     }
-
     return $id;
 }
 
@@ -2330,7 +2437,7 @@ function qtype_lti_update_config($config) {
  */
 function qtype_lti_get_tool_settings($toolproxyid, $courseid = null, $instanceid = null) {
     global $DB;
-print_r($instanceid);exit;
+
     $settings = array();
     $settingsstr = $DB->get_field('qtype_lti_tool_settings', 'settings', array('toolproxyid' => $toolproxyid,
         'course' => $courseid, 'questionid' => $instanceid));

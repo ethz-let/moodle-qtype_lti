@@ -114,6 +114,7 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         $this->newltitype = false;
         if (!$ltitypeid) {// && $data->course == $courseid
             unset($data->toolproxyid); // Course tools can not use LTI2.
+            $data->coursevisible = 0;
             $ltitypeid = $DB->insert_record('qtype_lti_types', $data);
             $this->newltitype = true;
             $this->set_mapping('ltitype', $oldid, $ltitypeid);

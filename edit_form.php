@@ -123,7 +123,7 @@ class qtype_lti_edit_types_form extends moodleform{
             }
             $mform->addElement('select', 'lti_coursevisible', get_string($stringname, 'qtype_lti'), $options);
             $mform->addHelpButton('lti_coursevisible', $stringname, 'qtype_lti');
-            $mform->setDefault('lti_coursevisible', '1');
+            $mform->setDefault('lti_coursevisible', '0');
         } else {
             $mform->addElement('hidden', 'lti_coursevisible', QTYPE_LTI_COURSEVISIBLE_PRECONFIGURED);
         }
