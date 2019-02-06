@@ -89,7 +89,14 @@ $functions = array(
         'capabilities'  => 'moodle/site:config',
         'ajax'          => true
     ),
-
+	'qtype_lti_regrade_lti_questions' => array(
+			'classname'     => 'qtype_lti_external',
+			'methodname'    => 'regrade_lti_questions',
+			'description'   => 'Regrade LTI questions',
+			'type'          => 'write',
+			'capabilities'  => 'mod/quiz:regrade',
+			'ajax'          => true
+	),
     'qtype_lti_get_tool_types' => array(
         'classname'     => 'qtype_lti_external',
         'methodname'    => 'get_tool_types',
@@ -134,4 +141,11 @@ $functions = array(
         'capabilities'  => 'moodle/site:config',
         'ajax'          => true
     ),
+	'qtype_lti_course_backup_by_id' => array(
+			'classname' => 'qtype_lti_external',
+			'methodname' => 'course_backup_by_id',
+			'description' => 'Generate a course backup file and return a link.',
+			'type' => 'read',
+			'capabilities' => 'moodle/backup:backupcourse'
+	),
 );

@@ -38,9 +38,9 @@ $string['accept_grades'] = 'Bewertungen aus dem Tool akzeptieren';
 $string['accept_grades_admin'] = 'Bewertungen aus dem Tool akzeptieren';
 $string['accept_grades_admin_help'] = 'Legen Sie fest, ob der Tool-Anbieter Bewertungen der Instanzen des Tools hinzufügen, aktualisieren, lesen und löschen darf. Einige Tool-Anbieter ermöglichen, dass Bewertungen aus den Aktivitäten im Tool an Moodle übermittelt werden. Dadurch erscheint das Tool noch besser integriert.';
 $string['accept_grades_help'] = 'Hiermit wird spezifiziert, ob der Tool-Anbieter Bewertungen, welche nur mit dieser externen Tool Instanz assoziert sind, hinzufügen, aktualisieren, lesen und löschen kann.
-
+		
 Einige Tool-Anbieter ermöglichen, dass Bewertungen aus den Aktivitäten im Tool an Moodle übermittelt werden. Dadurch erscheint das Tool noch besser integriert.
-
+		
 Bitte beachten, dass diese Einstellung in der Tool Konfiguration überschrieben werden kann.';
 $string['action'] = 'Aktion';
 $string['activate'] = 'Aktivieren';
@@ -100,7 +100,7 @@ $string['curllibrarymissing'] = 'Die PHP Curl Bibliothek muss installiert sein u
 $string['custom'] = 'Angepasste Parameter';
 $string['custom_config'] = 'Benutzerdefinierte Tool Konfiguration verwenden.';
 $string['custom_help'] = 'Angepasste Parameter sind Einstellungen, die vom Tool-Anbieter genutzt werden. Beispiel: eine Parameter kann die Nutzung einer Ressource des Anbieters sein. Jeder Parameter ist in einer eigenen Zeile einzugeben. Die Eingabe erfolgt nach folgender Regel: "name=value"; z.B. "chapter=3".
-
+		
 Wenn keine direkten Hinweise des Tool-Anbieters vorliegen, ist es am sichersten das Feld leer zu lassen.';
 $string['custominstr'] = 'Benutzerdefinierte Parameter';
 $string['debuglaunch'] = 'Debug Optionen';
@@ -109,7 +109,7 @@ $string['debuglaunchon'] = 'Start debuggen';
 $string['default'] = 'Standard';
 $string['default_launch_container'] = 'Standard Startcontainer';
 $string['default_launch_container_help'] = 'Der Startcontainer beeinflusst die Anzeige des Tools beim Start aus dem Kurs heraus. Einige Startcontainer generieren eine Oberfläche in der Darstellung des Tools, andere passen sich an die Oberfläche von Moodle an.
-
+		
 * **Standard** - Startcontainer wie in Tool-Konfiguration festgelegt verwenden.
 * **Einbetten** - Das Tool wird in einem bestehenden Moodle-Fenster angezeigt, ählich wie andere Aktivitäten.
 * **Eingebettet, ohne Blöcke** - Das Tool wird in einem bestehenden Moodle-Fenster ohne Blöcke, nur mit der Navigation im Kopf angezeigt.
@@ -122,15 +122,15 @@ $string['delete_confirmation'] = 'Sind Sie sicher, dass Sie dieses vorkonfigurie
 $string['deletetype'] = 'Vorkonfiguriertes Tool löschen';
 $string['display_description'] = 'Beim Start Aktivitätsbeschreibung anzeigen';
 $string['display_description_help'] = 'Falls aktiviert wird die Aktivitätsbeschreibung (weiter oben spezifiziert) oberhalb des Inhalts des Tool-Anbieters angezeigt.
-
+		
 Die Beschreibung kann dazu verwendet werden zusätzliche Anweisungen zum Starten des Tools bereit zu stellen, muss aber nicht verwendet werden.
-
+		
 Die Beschreibung wird nicht angezeigt wenn der Startcontainer des Tools in einem neuen Fenster geöffnet wird.';
 $string['display_name'] = 'Beim Start Aktivitätsname anzeigen';
 $string['display_name_help'] = 'Falls aktiviert wird die Aktivitätsname (weiter oben spezifiziert) oberhalb des Inhalts des Tool-Anbieters angezeigt.
-
+		
 Es ist möglich, dass der Tool-Anbieter auch den Titel anzeigt. Diese Option kann verhindern, dass der Aktivitätstitel zwei Mal angezeigt wird.
-
+		
 Der Titel wird nicht angezeigt wenn der Startcontainer des Tools in einem neuen Fenster geöffnet wird.';
 $string['domain_mismatch'] = 'Die Domaine der Tool URL entspricht nicht der Tool Konfiguration.';
 $string['donot'] = 'Nicht senden';
@@ -158,11 +158,11 @@ $string['external_tool_type'] = 'Vorkonfiguriertes Tool';
 $string['external_tool_type_help'] = '* **Automatisch, basierend auf der Tool URL** - Die beste Tool Konfiguration wird automatisch ausgewählt. Falls die Tool URL nicht erkannt wird, müssen ev. die Tool Konfigurationsdetails manuell hinzugefügt werden.
 * **Ein spezifisch vorkonfiguriertes Tool** - Die Tool Konfiguration für das spezifische Tool wird bei der Kommunikation mit dem externen Tool-Anbieter verwendet. Falls die Tool URL nicht zu einem Tool-Anbieter gehört, wird eine Warnung angezeigt. Es ist nicht immer notwendig eine Tool URL einzugeben.
 * **Benutzerdefinierte Konfiguration** - Der Anwenderschlüssel und das öffentliche Kennwort müssen ev. manuell eingefügt werden. Der Anwenderschlüssel und das öffentliche Kennwort können beim Tool-Anbieter bezogen werden. Wobei nicht alle Tools einen Anwenderschlüssel und ein öffentliches Kennwort, in deisem Fall können die Felder leer gelassen werden.
-
+		
 ### Bearbeitung vorkonfiguriertes Tool
-
+		
 Drei Icons stehen via vorkonfigurierte Tool Dropdown-Liste zur Verfügung:
-
+		
 * **Hinzufügen** - Auf Kursebene eine Tool Konfiguration erstellen. Alle externen Tool Instanzen in diesem Kurs dürfen die Tool Konfiguration verwenden.
 * **Bearbeiten** - Wählen Sie auf Kursebene ein Tool aus der Dropdown-Liste und klicken Sie anschliessend dieses Icon. Die Details der Tool Konfiguration können bearbeitet werden.
 * **Löschen** - Auf Kurseben ausgewähltes Tool entfernen.';
@@ -181,9 +181,9 @@ $string['fixold'] = 'Existierende verwenden';
 $string['forced_help'] = 'Diese Einstellung wurde auf Kurs Ebene oder Site Ebene in der Tool Konfiguration erzwungen. Sie können sie hier nicht ändern.';
 $string['force_ssl'] = 'SSL erzwingen';
 $string['force_ssl_help'] = 'Mit dieser Funktion erzwingen Sie SSL für alle Verbindungen zu diesem Anbieter.
-
+		
 Dies gilt auch für alle Web Service Anfrage zu dem Anbieter.
-
+		
 Hierzu ist es erforderelich, dass sowohl das Moodle-System als auch der Anbieter SSL unterstützen. Wenn diese Option aktiviert ist, muss die Verbindung zum Tool-Anbieter zwingend über SSL geschehen.';
 $string['generaltool'] = 'Allgemeines Tool';
 $string['global_tool_types'] = 'Globale vorkonfigurierte Tools';
@@ -196,13 +196,13 @@ $string['launch_in_moodle'] = 'Das Tool in Moodle starten';
 $string['launch_in_popup'] = 'Das Tool als Popu-Up starten';
 $string['launch_url'] = 'Tool URL';
 $string['launch_url_help'] = 'Die Tool-URL ist die Webadresse des externen Tools. Sie kann zusätzliche Informationen enthalten, z.B. welche Ressource aufgerufen werden soll. Weitere Informationen gibt der Tool-Anbieter.
-
+		
 Sie können eine Cartridge-URL eingeben, falls Sie darüber verfügen. Anschliessend werden die übrigen Formularfelder automatisch ausgefüllt.
-
+		
 Wenn Sie ein vorkonfigurierten Tool ausgewählt haben, brauchen sie keine Tool-URL einzugeben. Wenn das Tool verwendet wird, um auf das Anbietersystem zuzugreifen, aber nicht eine spezielle Ressource aufrufen soll, dann wird das funktionieren.';
 $string['launchinpopup'] = 'Startcontainer';
 $string['launchinpopup_help'] = 'Der Startcontainer beeinflusst die Anzeige des Tools beim Start aus dem Kurs heraus. Einige Startcontainer generieren eine Oberfläche in der Darstellung des Tools, andere passen sich an die Oberfläche von Moodle an.
-
+		
 * **Standard** - Startcontainer wie in Tool-Konfiguration festgelegt verwenden.
 * **Einbetten** - Das Tool wird in einem bestehenden Moodle-Fenster angezeigt, ählich wie andere Aktivitäten.
 * **Eingebettet, ohne Blöcke** - Das Tool wird in einem bestehenden Moodle-Fenster ohne Blöcke, nur mit der Navigation im Kopf angezeigt.
@@ -233,9 +233,9 @@ $string['main_admin'] = 'Allgemeine Hilfe';
 $string['main_admin_help'] = 'Externe Tools ermöglichen es Moodle Nutzern nahtlos mit externen Lernanwendungen zu arbeiten und Daten auszutauschen.
 Durch ein spezielles Start-Protokoll erhält das externe Tool Zugriff auf bestimmte Daten des Nutzers.
 Dies können sein: Institutionsbezeichnung, Kurs-ID, Nutzer-ID, Nutzername oder E-Mail.
-
+		
 Die Tools auf dieser Seite sind in drei unterschiedliche Typen klassifiziert:
-
+		
 * **Aktiv** - Diese Tool-Anbieter wurden durch einen Administrator geprüft und konfiguriert. Sie können in jedem Kurs genutzt werden.
 Wenn ein Anwenderschlüssel und ein Kennwort eingegegeben werden, wird eine geschützte Verbindung zwischen Moodle und dem Tool-Anbieter aufgebaut.
 * **Abwarten** - Diese Tool-Anbieter wurden im Rahmen eines Paketimports im System hinterlegt. Sie sind noch nicht von einem Administrator konfiguriert worden.
@@ -252,9 +252,9 @@ $string['missingparameterserror'] = 'Die Seite ist falsch konfiguriert: "{$a}"';
 $string['module_class_type'] = 'Moodle Modultyp';
 $string['modulename'] = 'Externes Tool';
 $string['modulename_help'] = 'Mit der Schnittstelle \'Externe Tools\' geben Sie den Teilnehmer/innen direkten Zugriff auf Lernprogramme ausserhalb von Moodle.
-
+		
 Die Teilnehmer/innen benötigen kein zusätzliches Login. Die Verbindung zwischen Moodle und dem externen Lernprogramm erfolgt über den LTI-Standard, den das andere Lernprogramm unterstützen muss. Sie erhalten vom Anbieter einen Link und Zugangsschlüssel.
-
+		
 Hinweis zum Datenschutz: Häufig werden Namen und E-Mail-Adressen Ihrer Teilnehmer/innen an den externen Anbieter übertragen. Fragen Sie den Anbieter.';
 $string['modulename_link'] = 'mod/lti/view';
 $string['modulename_shortcut_link'] = 'mod/lti/view/custom';
@@ -283,11 +283,11 @@ $string['organization'] = 'Organisationsdetails';
 $string['organizationdescr'] = 'Organisationsbeschreibung';
 $string['organizationid'] = 'Organisation ID';
 $string['organizationid_help'] = 'Ein eindeutiged Identifizierungszeichen für diese Moodle Instanz. Typischerweise wird der DNS Name der Organisation verwendet.
-
+		
 Falls dieses Feld leer gelassen wir, wird der Hostname dieser Moodle Site als Standardwert genommen.';
 $string['organizationurl'] = 'Organisations-URL';
 $string['organizationurl_help'] = 'Die Basis-URL dieser Moodle Instanz.
-
+		
 Falls dieses Feld leer gelassen wird, wird ein Standardwert basierend auf der Site Konfiguration genommen.';
 $string['pagesize'] = 'Einreichungen per Seite werden angezeigt';
 $string['parameter'] = 'Tool Parameter';
@@ -297,11 +297,11 @@ $string['password_admin'] = 'Öffentliches Kennwort';
 $string['password_admin_help'] = 'Das Kennwort wird für die Authentifizierung genutzt. Es wird mit dem Anwenderschlüssel vom Tool-Anbieter zur Verfügung gestellt.
 Tools, die keine sichere Datenübertragung oder keine zusätzlichen Dienste (wie Bewertungen) anbieten, können auf Kennwörter verzichten.';
 $string['password_help'] = 'Für vorkonfigurierte Tools ist es nicht erforderlich ein Kennwort einzugeben. Dies erfolgte schon während der Tool Konfiguration.
-
+		
 Das Feld ist jedoch auszufüllen, falls eine Verbindung zu einem Anbieter geschaffen werden soll, die noch nicht existiert. Falls das Tool mehrfach genutzt werden soll, ist es zu empfehlen, diese Einstellungen in der Kurs Konfiguration vorzunehmen, um sich mehrfache Arbeit zu ersparen.
-
+		
 Das Kennwort wird für eine Authentifizierung beim externen Tool verwendet. Es wird meist zusammen mit dem Anwenderschlüssel vergeben.
-
+		
 Tools die keine sichere Kommunikation mit Moodle erfordern, benötigen meist auch kein Kennwort.';
 $string['pending'] = 'Wartend';
 $string['pluginadministration'] = 'Externe Tool Administration';
@@ -328,21 +328,21 @@ $string['resourcekey'] = 'Anwenderschlüssel';
 $string['resourcekey_admin'] = 'Anwenderschlüssel';
 $string['resourcekey_admin_help'] = 'Der Anwenderschlüssel ist eine Art Nutzername zur Authentifizierung gegenüber dem externen Tool.
 Es wird vom Tool-Anbieter vergeben, um das Moodle System eindeutig zu identifizieren.
-
-
+		
+		
 Der Anwenderschlüssel wird vom Tool-Anbieter bereitgestellt. Dies kann automatisch oder nach Kontaktaufnahme mit dem Anbieter erfolgen.
-
+		
 Tools, die keine sichere Kommunikation von Moodle erfordern oder keine zusätzlichen Dienste (wie Bewertungen) anbieten verzichten häufig auf Anwenderschlüssel.';
 $string['resourcekey_help'] = 'Für vorkonfigurierte Tools, ist es nicht notwendig hier einen Ressourcenschlüssel einzufügen, da der Anwenderschlüssel als Teil des Konfigurationsprozesses bereitgestellt wird.
-
+		
 Dieses Feld sollte verwendet werden, falls ein Link zu einem Tool-Anbieter erstellt wird, welcher noch nicht konfiguriert ist.
 Falls der Tool-Anbieter mehr als einmal in diesem Kurs verwendet wird, ist es eine gute Idee eine Kurs Tool Konfiguration zu verwenden.
-
+		
 Der Anwenderschlüssel ist eine Art Nutzername zur Authentifizierung gegenüber dem externen Tool.
 Er wird vom Tool-Anbieter vergeben, um das Moodle System eindeutig zu identifizieren.
-
+		
 Der Anwenderschlüssel wird vom Tool-Anbieter bereitgestellt. Dies kann automatisch oder nach Kontaktaufnahme mit dem Anbieter erfolgen.
-
+		
 Tools, die keine sichere Kommunikation von Moodle erfordern oder keine zusätzlichen Dienste (wie Bewertungen) anbieten verzichten häufig auf Anwenderschlüssel.';
 $string['resourceurl'] = 'Resource URL';
 $string['return_to_course'] = 'Klicken Sie  <a href="{$a->link}" target="_top">hier</a> um zurück zum Kurs zu gelangen.';
@@ -352,7 +352,7 @@ $string['secure_icon_url'] = 'Sichere Icon-URL';
 $string['secure_icon_url_help'] = 'Ähnlich wie Icon URL. Die Funktion wird bei verschlüsselter Datenübertragung genutzt, um einen Warnhinweis zu verhindern, falls ein Icon unverschlüsselt aufgerufen wird.';
 $string['secure_launch_url'] = 'Sichere Tool-URL';
 $string['secure_launch_url_help'] = 'Ähnlich wie die Tool URL, wird aber anstatt der Tool URL verwendet, wenn eine hohe Sicherheit verlangt wird. Moodle benutzt die sichere Tool URL anstelle der Tool URL, wenn die Moodle Site via SSL zugegriffen wird oder wenn die Tool Konfiguration so konfiguriert ist, dass immer via SSL gestartet wird.
-
+		
 Die Tool URL kann auch mit einer https Adresse konfiguriert sein um den Zugriff via SSL zu erzwingen, dann kann dieses Feld leer gelassen werden.';
 $string['selectcontent'] = 'Inhalt wählen';
 $string['send'] = 'Senden';
@@ -363,23 +363,23 @@ $string['share_email'] = 'E-Mail des Anwenders an Tool übergeben Hilfe für E-M
 $string['share_email_admin'] = 'E-Mail des Anwenders an Tool übergeben Hilfe für E-Mail des Anwenders an Tool übergeben ';
 $string['share_email_admin_help'] = 'Legen Sie fest, ob die E-Mail Adresse des Nutzers übergeben werden soll. Dies kann notwendig sein, um bestimmte Informationen im Tool anzuzeigen, oder aufgrund von Aktivitäten im externen Tool E-Mails zu versenden.';
 $string['share_email_help'] = 'Legen Sie fest, ob die E-Mail Adresse des Nutzers übergeben werden soll.
-
+		
 Dies kann notwendig sein, um bestimmte Informationen im Tool anzuzeigen, oder aufgrund von Aktivitäten im externen Tool E-Mails zu versenden.
-
+		
 Beachten Sie, dass diese Einstellung in der Tool Konfiguration übersteuert werden kann.';
 $string['share_name'] = 'Anwendername an Tool überegeben';
 $string['share_name_admin'] = 'Anwendername an Tool überegeben';
 $string['share_name_admin_help'] = 'Festlegen, ob der Name des Anwenders an den Anbieter des Tools übergeben werden soll. Dies kann erforderlich sein, um im Tool bestimmte Informationen anzeigen zu können.';
 $string['share_name_help'] = 'Festlegen, ob der Name des Anwenders an den Anbieter des Tools übergeben werden soll.
-
+		
 Dies kann erforderlich sein, um im Tool bestimmte Informationen anzeigen zu können.
-
+		
 Beachten Sie, dass diese Einstellung in der Tool Konfiguration übersteuert werden kann.';
 $string['share_roster'] = 'Dem Tool erlauben auf den Kursplan zuzugreifen';
 $string['share_roster_admin'] = 'Das Tool kann auf den Kursplan zugreifen';
 $string['share_roster_admin_help'] = 'Konfigurieren Sie, ob das Tool auf die Liste der eingeschreibenen Benutzer in dem Kurs, von dem das Tool gestartet wird zugreifen darf.';
 $string['share_roster_help'] = 'Konfigurieren Sie, ob das Tool auf die Liste der eingeschriebenen Benutzer in dem Kurs zugreifen darf.
-
+		
 Beachten Sie, dass diese Einstellung in der Tool Konfiguration übersteuert werden kann.';
 $string['show_in_course_activity_chooser'] = 'In der Aktivitätenauswahl als vorkonfiguriertes Tool anzeigen';
 $string['show_in_course_lti1'] = 'Verwendung der Tool Konfiguration';
@@ -406,15 +406,15 @@ $string['tool_config_not_found'] = 'Für dies URL wurde keine Tool Konfiguration
 $string['tool_settings'] = 'Tool Einstellungen';
 $string['tooldescription'] = 'Tool-Beschreibung';
 $string['tooldescription_help'] = 'Die Beschreibung des Tools, die Teachern in der Aktivitätsliste angezeigt wird.
-
+		
 Sie sollte beschreiben, wofür das Tool ist, was es tut und jede weitere Information enthalten, die der Teacher haben muss.';
 $string['toolisbeingused'] = 'Dieses Tool wird  {$a} Mal verwendet';
 $string['toolisnotbeingused'] = 'Dieses Tool wurde bisher nicht verwendet.';
 $string['toolproxy'] = 'Registrierung von externen Tools';
 $string['toolproxy_help'] = 'Administratoren können hier externe Tools registrieren, die den LTI 2.0 Standard bereitstellen. Für den Beginn ist nur eine URL des Anbieters des Tools erforderlich. Die Berechtigungen und Service-Zugänge werden dann beim Anlegen einer neuen Aktivität festgelegt.
-
+		
 Die registrierten Tools werden in vier Kategorien angezeigt:
-
+		
 * **Konfiguriert** - Das Tool wurde angelegt, der Registrierungsprozess wurde jedoch noch nicht begonnen.
 * **Wartend ** - Der Registrierungsprozess wurde begonnen, jedoch noch nicht abgeschlossen. Verschieben Sie die Einstellungen zurück zu \'konfiguriert\' und speichern Sie sie erneut.
 * **Akzeptiert ** - Die Tool-Einstellungen wurden bestätigt. Die Ressourcen erscheinen unter \'Wartend\'.
@@ -430,29 +430,29 @@ $string['tooltypeupdated'] = 'Vorkonfiguriertes Tool wurde aktualisiert';
 $string['toolurl'] = 'Tool URL';
 $string['toolurlplaceholder'] = 'Tool URL...';
 $string['toolurl_help'] = 'Die Basis-URL des Tools wird verwendet um die Start URLs mit der korrekten Konfiguration zu verknüpfen. Die Verwendung von http(s) am Beginn ist optional.
-
+		
 Die Basis-URL wird auch verwendet wenn das Tool keine separate Start-URL zur Verfügung stellt.
-
+		
 Die Basis-URL von tool.com passt beispielsweise für folgende URLs:
-
+		
 * tool.com
 * tool.com/quizzes
 * tool.com/quizzes/quiz.php?id=10
 * www.tool.com/quizzes
-
+		
 Die Basis-URL von www.tool.com/quizzes hingegen passt für folgende URLs:
-
+		
 * www.tool.com/quizzes
 * tool.com/quizzes
 * tool.com/quizzes/take.php?id=10
-
+		
 Die Basis-URL von *quiz.tool.com* hingegen passt für folgende URLs:
-
+		
 * quiz.tool.com
 * quiz.tool.com/take.php?id=10
-
+		
 Wenn es zwei unterschiedliche Tool-Konfigurationen für die gleiche Domain gibt, wird die spezifischere benutzt.
-
+		
 Sie können, falls vorhanden, auch eine cartridge URL eintragen. Die Details für das Tool werden dann automatisch eingefügt.';
 $string['typename'] = 'Name des Tools';
 $string['typename_help'] = 'Die Toolbezeichnung wird genutzt, um den Tool-Anbieter in Moodle zu identifizieren. Die Bezeichnung wird Trainer/innen gezeigt, wenn sie das Tool in ihren Kursen einbinden.';
@@ -482,3 +482,7 @@ $string['privacy:metadata:role'] = 'Die Rolle im Kurs für den Benutzer der auf 
 $string['privacy:metadata:userid'] = 'Die ID des Benutzers der auf den LTI Consumer zugreift';
 $string['privacy:metadata:useridnumber'] = 'Die ID Nummer des Benutzers der auf den LTI Consumer zugreift';
 $string['privacy:metadata:username'] = 'Der Benutzername des Benutzers der auf den LTI Consumer zugreift';
+$string['reviewmode'] = 'Im Überprüfungsmodus';
+$string['lti:addgloballypreconfigedtoolinstance'] = 'Add a globally preconfigured tool';
+$string['lti:adddefaultinstance'] = 'Add a non-globally-configured tool';
+$string['lti:admin'] = 'LTI qtype Admin';

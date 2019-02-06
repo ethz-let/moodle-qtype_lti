@@ -57,12 +57,10 @@ class qtype_lti_edit_types_form extends moodleform{
         global $CFG;
 
         $mform    =& $this->_form;
-
         $istool = $this->_customdata && $this->_customdata->istool;
 
         // Add basiclti elements.
         $mform->addElement('header', 'setup', get_string('tool_settings', 'qtype_lti'));
-
         $mform->addElement('text', 'lti_typename', get_string('typename', 'qtype_lti'));
         $mform->setType('lti_typename', PARAM_TEXT);
         $mform->addHelpButton('lti_typename', 'typename', 'qtype_lti');

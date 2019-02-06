@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->libdir . '/externallib.php');
 require_once($CFG->dirroot . '/question/type/lti/lib.php');
 require_once($CFG->dirroot . '/question/type/lti/locallib.php');
+require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 
 /**
  * External tool qtype external functions
@@ -622,6 +623,19 @@ class qtype_lti_external extends external_api {
     }
 
     /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     * @since Moodle 3.0
+     */
+    public static function regrade_lti_questions_parameters() {
+    	return new external_function_parameters(
+    			array(
+    					'id' => new external_value(PARAM_INT, 'Moodle QuizID.'),
+    			)
+    			);
+    }
+    /**
      * Returns the registration request for a tool proxy.
      *
      * @param int $id the lti instance id
@@ -644,6 +658,108 @@ class qtype_lti_external extends external_api {
         return qtype_lti_build_registration_request($toolproxy);
     }
 
+    /**
+     * Returns the registration request for a tool proxy.
+     *
+     * @param int $id the qtype lti question IDs
+     * @return array of registration parameters
+     * @since Moodle 3.1
+     * @throws moodle_exception
+     */
+    public static function regrade_lti_questions($id) {
+    	$params = self::validate_parameters(self::regrade_lti_questions_parameters(),
+    			array(
+    					'id' => $id,
+    			));
+    	$id = $params['id'];
+    	
+    	global $CFG, $DB;
+    	
+    	require_once($CFG->dirroot . '/question/engine/lib.php');
+    	require_once($CFG->dirroot . '/question/engine/questionusage.php');
+    	
+    	
+    	$quiz = $DB->get_record('quiz', array('id'=>$id));
+    	
+    	\core\session\manager::write_close();
+    	ignore_user_abort(true);
+    	
+    	$sql = "SELECT quiza.*
+                  FROM {quiz_attempts} quiza";
+    	$where = "quiz = :qid AND preview = 0";
+    	$params = array('qid' => $quiz->id);
+
+    	$sql .= "\nWHERE {$where}";
+    	$attempts = $DB->get_records_sql($sql, $params);
+    	if (!$attempts) {
+    		return 0;
+    	}
+    	
+    	// Fetch all attempts that need regrading.
+    	$select = "questionusageid IN (
+                    SELECT uniqueid
+                      FROM {quiz_attempts} quiza";
+    	$where = "WHERE quiza.quiz = :qid";
+    	$fparams = array('qid' => $quiz->id);
+    	
+    	$select .= "\n$where)";
+    	
+    	$DB->delete_records_select('quiz_overview_regrades', $select, $fparams);
+    	require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+    	
+
+    	foreach ($attempts as $attempt) {
+    		// Need more time for a quiz with many questions.
+    		core_php_time_limit::raise(300);
+    		
+    		$transaction = $DB->start_delegated_transaction();
+    		
+    		$quba = question_engine::load_questions_usage_by_activity($attempt->uniqueid);
+    		
+    	    $slots = $quba->get_slots();
+    		$finished = $attempt->state == quiz_attempt::FINISHED;
+    		foreach ($slots as $slot) {
+    			$qqr = new stdClass();
+    			$qqr->oldfraction = $quba->get_question_fraction($slot);
+    			
+    			$quba->regrade_question($slot, $finished);
+    			
+    			$qqr->newfraction = $quba->get_question_fraction($slot);
+    			
+    			if (abs($qqr->oldfraction - $qqr->newfraction) > 1e-7) {
+    				$qqr->questionusageid = $quba->get_id();
+    				$qqr->slot = $slot;
+    				$qqr->regraded = empty(false);
+    				$qqr->timemodified = time();
+    				$DB->insert_record('quiz_overview_regrades', $qqr, false);
+    			}
+    		}
+    		
+    		question_engine::save_questions_usage_by_activity($quba);
+    		
+    		$transaction->allow_commit();
+    		
+    		// Really, PHP should not need this hint, but without this, we just run out of memory.
+    		$quba = null;
+    		$transaction = null;
+    		gc_collect_cycles();
+    	}
+    	
+    	quiz_update_all_attempt_sumgrades($quiz);
+    	quiz_update_all_final_grades($quiz);
+    	quiz_update_grades($quiz);
+
+    	return 1;
+    }
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     * @since Moodle 3.1
+     */
+    public static function regrade_lti_questions_returns() {
+    	return new external_value(PARAM_TEXT, 'TRUE (1) or FALSE (0/none) will be returned to confirm the regrade for those sepecific questions.');
+    }
     /**
      * Returns description of method result value
      *
@@ -1004,5 +1120,92 @@ class qtype_lti_external extends external_api {
                 'iscartridge' => new external_value(PARAM_BOOL, 'True if the URL is a cartridge'),
             )
         );
+    }
+    
+    
+    /**
+     * Parameter description for course_backup_by_id().
+     *
+     * @return external_function_parameters
+     */
+    public static function course_backup_by_id_parameters() {
+    	return new external_function_parameters(
+    			array(
+    					'id' => new external_value(PARAM_INT, 'id')
+    			)
+    			);
+    }
+    /**
+     * Create and retrieve a course backup by course id.
+     *
+     *
+     * @param int $id the course id
+     * @return array|bool An array containing the url or false on failure
+     */
+    public static function course_backup_by_id($id) {
+    	global $CFG, $DB;
+    	// Validate parameters passed from web service.
+    	$params = self::validate_parameters(
+    			self::course_backup_by_id_parameters(), array('id' => $id)
+    			);
+    	// Instantiate controller.
+    	$bc = new backup_controller(
+    			\backup::TYPE_1COURSE, $id, backup::FORMAT_MOODLE, backup::INTERACTIVE_NO, backup::MODE_GENERAL, 2);
+    	// Run the backup.
+    	$bc->set_status(backup::STATUS_AWAITING);
+    	$bc->execute_plan();
+    	$result = $bc->get_results();
+    	if (isset($result['backup_destination']) && $result['backup_destination']) {
+    		$file = $result['backup_destination'];
+    		$context = context_course::instance($id);
+    		$fs = get_file_storage();
+    		$timestamp = time();
+    		
+    		// Set the default filename.
+    		$format = $bc->get_format();
+    		$type = $bc->get_type();
+    		$fid = $bc->get_id();
+    		$users = $bc->get_plan()->get_setting('users')->get_value();
+    		$anonymised = $bc->get_plan()->get_setting('anonymize')->get_value();
+    		// 'lti_course_'.$id.'_'.$timestamp.'.mbz'
+    		$filerecord = array(
+    				'contextid' => $context->id,
+    				'component' => 'qtype_lti',
+    				'filearea' => 'backup',
+    				'itemid' => $timestamp,
+    				'filepath' => '/',
+    				'filename' => backup_plan_dbops::get_default_backup_filename($format, $type, $fid, $users, $anonymised),
+    				'timecreated' => $timestamp,
+    				'timemodified' => $timestamp
+    		);
+    		$storedfile = $fs->create_file_from_storedfile($filerecord, $file);
+    		$file->delete();
+    		// Make the link.
+    		$filepath = $storedfile->get_filepath() . $storedfile->get_filename();
+    		$fileurl = moodle_url::make_webservice_pluginfile_url(
+    				$storedfile->get_contextid(),
+    				$storedfile->get_component(),
+    				$storedfile->get_filearea(),
+    				$storedfile->get_itemid(),
+    				$storedfile->get_filepath(),
+    				$storedfile->get_filename()
+    				);
+    		return array('url' => $fileurl->out(true));
+    	} else {
+    		return false;
+    	}
+    }
+    /**
+     * Parameter description for course_backup_by_id().
+     *
+     * @return external_description
+     */
+    public static function course_backup_by_id_returns() {
+    	return new external_single_structure(
+    			array(
+    					'url' => new external_value(PARAM_RAW, 'URL of the backup file. To FORCE download the file, curl the URL in addition to the webservice token parameter and ?forcedownload=1. example: RETURNED_URL?forcedownload=1&token=d2cd9212c0e31a379c3ade9f30d5cb64'),
+
+    			)
+    			);
     }
 }

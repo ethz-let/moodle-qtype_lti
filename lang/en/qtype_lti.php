@@ -38,13 +38,13 @@ $string['accepted'] = 'Accepted';
 $string['accept_grades'] = 'Accept grades from the tool';
 $string['accept_grades_admin'] = 'Accept grades from the tool';
 $string['accept_grades_admin_help'] = 'Specify whether the tool provider can add, update, read, and delete grades associated with instances of this tool.
-
+		
 Some tool providers support reporting grades back to Moodle based on actions taken within the tool, creating a more integrated
 experience.';
 $string['accept_grades_help'] = 'Specify whether the tool provider can add, update, read, and delete grades associated only with this external tool instance.
-
+		
 Some tool providers support reporting grades back to Moodle based on actions taken within the tool, creating a more integrated experience.
-
+		
 Note that this setting may be overridden in the tool configuration.';
 $string['action'] = 'Action';
 $string['activate'] = 'Activate';
@@ -105,7 +105,7 @@ $string['custom'] = 'Custom parameters';
 $string['custom_config'] = 'Using custom tool configuration.';
 $string['custom_help'] = 'Custom parameters are settings used by the tool provider. For example, a custom parameter may be used to display
 a specific resource from the provider.  Each parameter should be entered on a separate line using a format of "name=value"; for example, "chapter=3".
-
+		
 It is safe to leave this field unchanged unless directed by the tool provider.';
 $string['custominstr'] = 'Custom parameters';
 $string['debuglaunch'] = 'Debug option';
@@ -115,7 +115,7 @@ $string['default'] = 'Default';
 $string['default_launch_container'] = 'Default launch container';
 $string['default_launch_container_help'] = 'The launch container affects the display of the tool when launched from the course. Some launch containers provide more screen
 real estate to the tool, and others provide a more integrated feel with the Moodle environment.
-
+		
 * **Default** - Use the launch container specified by the tool configuration.
 * **Embed** - The tool is displayed within the existing Moodle window, in a manner similar to most other Activity types.
 * **Embed, without blocks** - The tool is displayed within the existing Moodle window, with just the navigation controls
@@ -129,16 +129,16 @@ $string['delete_confirmation'] = 'Are you sure you want to delete this preconfig
 $string['deletetype'] = 'Delete preconfigured tool';
 $string['display_description'] = 'Display activity description when launched';
 $string['display_description_help'] = 'If selected, the activity description (specified above) will display above the tool provider\'s content.
-
+		
 The description may be used to provide additional instructions for launchers of the tool, but it is not required.
-
+		
 The description is never displayed when the tool\'s launch container is in a new window.';
 $string['display_name'] = 'Display activity name when launched';
 $string['display_name_help'] = 'If selected, the activity name (specified above) will display above the tool provider\'s content.
-
+		
 It is possible that the tool provider may also display the title. This option can prevent the activity title from
 being displayed twice.
-
+		
 The title is never displayed when the tool\'s launch container is in a new window.';
 $string['domain_mismatch'] = 'Tool URL\'s domain does not match tool configuration.';
 $string['donot'] = 'Do not send';
@@ -166,11 +166,11 @@ $string['external_tool_type'] = 'Preconfigured tool';
 $string['external_tool_type_help'] = '* **Automatic, based on tool URL** - The best tool configuration is selected automatically. If the tool URL is not recognised, the tool configuration details may need to be entered manually.
 * **A specific preconfigured tool** - The tool configuration for the specified tool will be used when communicating with the external tool provider. If the tool URL does not appear to belong to the tool provider, a warning will be shown. It is not always necessary to enter a tool URL.
 * **Custom configuration** - A consumer key and shared secret may need to be entered manually. The consumer key and shared secret may be obtained from the tool provider. However, not all tools require a consumer key and shared secret, in which case the fields may be left blank.
-
+		
 ### Preconfigured tool editing
-
+		
 Three icons are available after the preconfigured tool dropdown list:
-
+		
 * **Add** - Create a course level tool configuration. All External tool instances in this course may use the tool configuration.
 * **Edit** - Select a course level tool from the dropdown, then click this icon. The details of the tool configuration may be edited.
 * **Delete** - Remove the selected course level tool.';
@@ -189,9 +189,9 @@ $string['fixold'] = 'Use existing';
 $string['forced_help'] = 'This setting has been forced in a course or site level tool configuration. You may not change it from this interface.';
 $string['force_ssl'] = 'Force SSL';
 $string['force_ssl_help'] = 'Selecting this option forces all launches to this tool provider to use SSL.
-
+		
 In addition, all web service requests from the tool provider will use SSL.
-
+		
 If using this option, confirm that this Moodle site and the tool provider support SSL.';
 $string['generaltool'] = 'General tool';
 $string['global_tool_types'] = 'Global preconfigured tools';
@@ -206,15 +206,15 @@ $string['launch_in_popup'] = 'Launch tool in a pop-up';
 $string['launch_url'] = 'Tool URL';
 $string['launch_url_help'] = 'The tool URL indicates the web address of the External Tool, and may contain additional information, such as the resource to show.
 If you are unsure what to enter for the tool URL, please check with the tool provider for more information.
-
+		
 You can enter a cartridge URL if you have one, and the rest of the form details will fill automatically.
-
+		
 If you have selected a preconfigured tool, you may not need to enter a tool URL. If the tool link is used to just launch
 into the tool provider\'s system, and not go to a specific resource, this will likely be the case.';
 $string['launchinpopup'] = 'Launch container';
 $string['launchinpopup_help'] = 'The launch container affects the display of the tool when launched from the course. Some launch containers provide more screen
 real estate to the tool, and others provide a more integrated feel with the Moodle environment.
-
+		
 * **Default** - Use the launch container specified by the tool configuration.
 * **Embed** - The tool is displayed within the existing Moodle window, in a manner similar to most other Activity types.
 * **Embed, without blocks** - The tool is displayed within the existing Moodle window, with just the navigation controls
@@ -248,9 +248,9 @@ $string['main_admin'] = 'General help';
 $string['main_admin_help'] = 'External tools allow Moodle users to seamlessly interact with learning resources hosted remotely. Through a special
 launch protocol, the remote tool will have access to some general information about the launching user. For example,
 the institution name, course id, user id, and other information such as the user\'s name or e-mail address.
-
+		
 Tools listed on this page are separated into three categories:
-
+		
 * **Active** - These tool providers have been approved and configured by an administrator. They can be used from within any
         course on this Moodle instance. If a consumer key and shared secret are entered, a trust relationship is established
         between this Moodle instance and the remote tool, providing a secure communication channel.
@@ -268,11 +268,11 @@ $string['missingparameterserror'] = 'The page is misconfigured: "{$a}"';
 $string['module_class_type'] = 'Moodle module type';
 $string['modulename'] = 'External tool';
 $string['modulename_help'] = 'The external tool activity module enables students to interact with learning resources and activities on other web sites. For example, an external tool could provide access to a new activity type or learning materials from a publisher.
-
+		
 To create an external tool activity, a tool provider which supports LTI (Learning Tools Interoperability) is required. A teacher can create an external tool activity or make use of a tool configured by the site administrator.
-
+		
 External tool activities differ from URL resources in a few ways:
-
+		
 * External tools are context aware i.e. they have access to information about the user who launched the tool, such as institution, course and name
 * External tools support reading, updating, and deleting grades associated with the activity instance
 * External tool configurations create a trust relationship between your site and the tool provider, allowing secure communication between them';
@@ -303,11 +303,11 @@ $string['organization'] = 'Organization details';
 $string['organizationdescr'] = 'Organization description';
 $string['organizationid'] = 'Organization ID';
 $string['organizationid_help'] = 'A unique identifier for this Moodle instance. Typically, the DNS name of the organization is used.
-
+		
 If this field is left blank, the host name of this Moodle site will be used as the default value.';
 $string['organizationurl'] = 'Organization URL';
 $string['organizationurl_help'] = 'The base URL of this Moodle instance.
-
+		
 If this field is left blank, a default value will be used based on the site configuration.';
 $string['pagesize'] = 'Submissions shown per page';
 $string['parameter'] = 'Tool parameters';
@@ -316,18 +316,18 @@ $string['password'] = 'Shared secret';
 $string['password_admin'] = 'Shared secret';
 $string['password_admin_help'] = 'The shared secret can be thought of as a password used to authenticate access to the tool. It should be provided
 along with the consumer key from the tool provider.
-
+		
 Tools which do not require secure communication from Moodle and do not provide additional services (such as grade reporting)
 may not require a shared secret.';
 $string['password_help'] = 'For pre-configured tools, it is not necessary to enter a shared secret here, as the shared secret will be
 provided as part of the configuration process.
-
+		
 This field should be entered if creating a link to a tool provider which is not already configured.
 If the tool provider is to be used more than once in this course, adding a course tool configuration is a good idea.
-
+		
 The shared secret can be thought of as a password used to authenticate access to the tool. It should be provided
 along with the consumer key from the tool provider.
-
+		
 Tools which do not require secure communication from Moodle and do not provide additional services (such as grade reporting)
 may not require a shared secret.';
 $string['pending'] = 'Pending';
@@ -355,24 +355,24 @@ $string['resourcekey'] = 'Consumer key';
 $string['resourcekey_admin'] = 'Consumer key';
 $string['resourcekey_admin_help'] = 'The consumer key can be thought of as a username used to authenticate access to the tool.
 It can be used by the tool provider to uniquely identify the Moodle site from which users launch into the tool.
-
+		
 The consumer key must be provided by the tool provider. The method of obtaining a consumer key varies between
 tool providers. It may be an automated process, or it may require a dialogue with the tool provider.
-
+		
 Tools which do not require secure communication from Moodle and do not provide additional services (such as grade reporting)
 may not require a resource key.';
 $string['resourcekey_help'] = 'For pre-configured tools, it is not necessary to enter a resource key here, as the consumer key will be
 provided as part of the configuration process.
-
+		
 This field should be entered if creating a link to a tool provider which is not already configured.
 If the tool provider is to be used more than once in this course, adding a course tool configuration is a good idea.
-
+		
 The consumer key can be thought of as a username used to authenticate access to the tool.
 It can be used by the tool provider to uniquely identify the Moodle site from which users launch into the tool.
-
+		
 The consumer key must be provided by the tool provider. The method of obtaining a consumer key varies between
 tool providers. It may be an automated process, or it may require a dialogue with the tool provider.
-
+		
 Tools which do not require secure communication from Moodle and do not provide additional services (such as grade reporting)
 may not require a resource key.';
 $string['resourceurl'] = 'Resource URL';
@@ -384,7 +384,7 @@ $string['secure_icon_url_help'] = 'Similar to the icon URL, but used if the user
 the browser from warning the user if the underlying page was accessed over SSL, but requesting to show an unsecure image.';
 $string['secure_launch_url'] = 'Secure tool URL';
 $string['secure_launch_url_help'] = 'Similar to the tool URL, but used instead of the tool URL if high security is required. Moodle will use the secure tool URL instead of the tool URL if the Moodle site is accessed through SSL, or if the tool configuration is set to always launch through SSL.
-
+		
 The tool URL may also be set to an https address to force launching through SSL, and this field may be left blank.';
 $string['selectcontent'] = 'Select content';
 $string['send'] = 'Send';
@@ -397,24 +397,24 @@ $string['share_email_admin_help'] = 'Specify whether the e-mail address of the u
 The tool provider may need launcher\'s e-mail addresses to distinguish users with the same name in the UI, or send e-mails
 to users based on actions within the tool.';
 $string['share_email_help'] = 'Specify whether the e-mail address of the user launching the tool will be shared with the tool provider.
-
+		
 The tool provider may need launcher\'s email addresses to distinguish users with the same name, or send emails to users based on actions within the tool.
-
+		
 Note that this setting may be overridden in the tool configuration.';
 $string['share_name'] = 'Share launcher\'s name with the tool';
 $string['share_name_admin'] = 'Share launcher\'s name with tool';
 $string['share_name_admin_help'] = 'Specify whether the full name of the user launching the tool should be shared with the tool provider.
 The tool provider may need launchers\' names to show meaningful information within the tool.';
 $string['share_name_help'] = 'Specify whether the full name of the user launching the tool should be shared with the tool provider.
-
+		
 The tool provider may need launchers\' names to show meaningful information within the tool.
-
+		
 Note that this setting may be overridden in the tool configuration.';
 $string['share_roster'] = 'Allow the tool to access this course\'s roster';
 $string['share_roster_admin'] = 'Tool may access course roster';
 $string['share_roster_admin_help'] = 'Specify whether the tool can access the list of users enrolled in courses from which this tool is launched.';
 $string['share_roster_help'] = 'Specify whether the tool can access the list of users enrolled in this course.
-
+		
 Note that this setting may be overridden in the tool configuration.';
 $string['show_in_course_activity_chooser'] = 'Show in activity chooser and as a preconfigured tool';
 $string['show_in_course_lti1'] = 'Tool configuration usage';
@@ -440,15 +440,15 @@ $string['tool_config_not_found'] = 'Tool configuration not found for this URL.';
 $string['tool_settings'] = 'Tool settings';
 $string['tooldescription'] = 'Tool description';
 $string['tooldescription_help'] = 'The description of the tool that will be displayed to teachers in the activity list.
-
+		
 This should describe what the tool is for and what it does and any additional information the teacher may need to know.';
 $string['toolisbeingused'] = 'This tool is being used {$a} times';
 $string['toolisnotbeingused'] = 'This tool has not yet been used';
 $string['toolproxy'] = 'External tool registrations';
 $string['toolproxy_help'] = 'External tool registrations allow Moodle site administrators to configure external tools from a tool proxy obtained from a tool provider supporting LTI 2.0. A registration URL provided by the tool provider is all that is required to initiate the process. The capabilities and services offered to the tool provider are selected when configuring a new registration.
-
+		
 Tool registrations listed on this page are separated into four categories:
-
+		
 * **Configured** - These tool registrations have been set up but the registration process has not yet been started.
 * **Pending** - The registration process for these tool registrations has been started but has not completed. Open and save the settings to move it
 back to the \'Configured\' category.
@@ -467,29 +467,29 @@ $string['tooltypeupdated'] = 'Preconfigured tool updated';
 $string['toolurl'] = 'Tool URL';
 $string['toolurlplaceholder'] = 'Tool URL...';
 $string['toolurl_help'] = 'The tool URL is used to match tool URLs to the correct tool configuration. Prefixing the URL with http(s) is optional.
-
+		
 Additionally, the base URL is used as the tool URL if a tool URL is not specified in the external tool instance.
-
+		
 For example, a base URL of *tool.com* would match the following:
-
+		
 * tool.com
 * tool.com/quizzes
 * tool.com/quizzes/quiz.php?id=10
 * www.tool.com/quizzes
-
+		
 A base URL of *www.tool.com/quizzes* would match the following:
-
+		
 * www.tool.com/quizzes
 * tool.com/quizzes
 * tool.com/quizzes/take.php?id=10
-
+		
 A base URL of *quiz.tool.com* would match the following:
-
+		
 * quiz.tool.com
 * quiz.tool.com/take.php?id=10
-
+		
 If two different tool configurations are for the same domain, the most specific match will be used.
-
+		
 You can also insert a cartridge URL if you have one and the details for the tool will be automatically filled.';
 $string['typename'] = 'Tool name';
 $string['typename_help'] = 'The tool name is used to identify the tool provider within Moodle. The name entered will be visible
@@ -520,3 +520,9 @@ $string['privacy:metadata:role'] = 'The role in the course for the user accessin
 $string['privacy:metadata:userid'] = 'The ID of the user accessing the LTI Consumer';
 $string['privacy:metadata:useridnumber'] = 'The ID number of the user accessing the LTI Consumer';
 $string['privacy:metadata:username'] = 'The username of the user accessing the LTI Consumer';
+$string['reviewmode'] = 'In review mode';
+$string['lti:addgloballypreconfigedtoolinstance'] = 'Add a globally preconfigured tool';
+$string['lti:adddefaultinstance'] = 'Add a non-globally-configured tool';
+$string['lti:admin'] = 'LTI qtype Admin';
+$string['lti:backupcourse'] = 'LTI qtype Course Backup by Course ID';
+$string['lti:regradelti'] = 'LTI qtype Quiz regrade by Quiz ID';

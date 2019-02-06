@@ -90,7 +90,25 @@ $capabilities = array(
         				'manager' => CAP_PREVENT
         )
     ),
-
+	// The ability to regrade LTI questions.
+	'qtype/lti:regradelti' => array(
+			'captype' => 'write',
+			'contextlevel' => CONTEXT_COURSE,
+			'archetypes' => array(
+					'editingteacher' => CAP_ALLOW,
+					'manager' => CAP_ALLOW
+			)
+	),
+	// The ability to backup qtype LTI courses via CodeExpert.
+	'qtype/lti:backupcourse' => array(
+			'riskbitmask' => RISK_CONFIG | RISK_SPAM | RISK_PERSONAL | RISK_XSS,
+			'captype' => 'write',
+			'contextlevel' => CONTEXT_COURSE,
+			'archetypes' => array(
+					'editingteacher' => CAP_ALLOW,
+					'manager' => CAP_ALLOW
+			),
+	),
     // The ability to add a globally preconfigured instance to the course.
     'qtype/lti:addgloballypreconfigedtoolinstance' => array(
                     'captype' => 'write',

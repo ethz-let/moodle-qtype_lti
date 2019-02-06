@@ -55,9 +55,12 @@ class qtype_lti_renderer extends \qtype_renderer{
 
                 if($attempt) {
                     $attemptfullrecord = $DB->get_record('quiz_attempts',array('id' => $attempt));
+                    // $quiz = $DB->get_record('quiz',array('id' => $attemptfullrecord->quiz));
+                    // $courseid = $quiz->course;
                 } else {
                     $attemptfullrecord = new stdClass();
                     $attemptfullrecord->quiz = 0;
+                    // $courseid = 1;
                     $attempt = 0;
                     $attemptfullrecord->state = 'preview';
 
@@ -115,6 +118,7 @@ class qtype_lti_renderer extends \qtype_renderer{
                     $readonlyclass = '  style="border:0px;background: #D3D3D3;" ';
                     $readonly = 'manuallygraded=0&questionmode=solve&';
                     $readonlydevstyle = '';
+                    $reviewmodetext = '';
                 } else {
                     // If the logged user not the same user attempting the question, then mode is 'correction'.
                     if($serial_params->userid != $USER->id){
@@ -122,9 +126,15 @@ class qtype_lti_renderer extends \qtype_renderer{
                     } else {
                         $questionmode = 'review';
                     }
-                    $readonlyclass = ' style="pointer-events: none; background-color: white; filter:alpha(opacity=50); opacity: 0.5; -moz-opacity:0.50; z-index: 20; background-repeat:no-repeat; background-position:center; border:0px;" ';
+                    
+                    $reviewmodetext = get_string('reviewmode','qtype_lti');
+                    
+                    // Disable Read-only overlay as per COD-12.
+                    $readonlyclass = '  style="border:0px;background: #D3D3D3;" ';
+                   	// $readonlyclass = ' style="pointer-events: none; background-color: white; filter:alpha(opacity=50); opacity: 0.5; -moz-opacity:0.50; z-index: 20; background-repeat:no-repeat; background-position:center; border:0px;" ';
                     $readonly = 'questionmode='.$questionmode.'&readonly=1&';
-                    $readonlydevstyle = ' style="background-color:#EBEBE4;" ';
+                    $readonlydevstyle = ' title="'.$reviewmodetext.'" style="background-color:#EBEBE4;" '; //Originally: #EBEBE4.
+                    
 
                     // check if manual grade in moodle has been done to this person.
 
@@ -141,7 +151,7 @@ class qtype_lti_renderer extends \qtype_renderer{
 
                 $extra_code_expert_parameters = 'questionid='.$question->id.'&ltid='.$lti->id.'&quizid='.$attemptfullrecord->quiz.'&attemptid='.$attempt.'&attemptstate='.$attemptfullrecord->state.'&';
 
-                $result =  '<!--'.$question->questiontext.'--><div id="qtype_lti_framediv_'.$question->id.'" class="qtype_lti_framediv" '.$readonlydevstyle.'><span class="qtype_lti_togglebutton" id="qtype_lti_togglebutton_id_'.$question->id.'">&nbsp;</span><iframe id="qtype_lti_contentframe_'.$question->id.'" border="0" height="600px" width="100%" src="'.$CFG->wwwroot.'/question/type/lti/launch.php?'.$extra_code_expert_parameters.$readonly.'id='.$question->id.'&userid='.$serial_params->userid.'" '.$readonlyclass.'></iframe></div>';
+                $result =  '<!--'.$question->questiontext.'--><div id="qtype_lti_framediv_'.$question->id.'" class="qtype_lti_framediv" '.$readonlydevstyle.'><span id="quiz_timer_lti_'.$question->id.'" style="display:none; margin-top:-1em; background-color:#fff"></span><span class="qtype_lti_togglebutton" id="qtype_lti_togglebutton_id_'.$question->id.'">&nbsp;</span><iframe id="qtype_lti_contentframe_'.$question->id.'" border="0" height="600px" width="100%" src="'.$CFG->wwwroot.'/question/type/lti/launch.php?'.$extra_code_expert_parameters.$readonly.'id='.$question->id.'&userid='.$serial_params->userid.'" '.$readonlyclass.'></iframe></div>';
 
                 $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$inputname\" id=\"qtype_lti_input_id_".$question->id."\">";
                 // $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$launchid\"  value=\"$serial_params->launchid\" id=\"qtype_lti_luanch_id_".$question->id."\">";
@@ -176,24 +186,38 @@ class qtype_lti_renderer extends \qtype_renderer{
                                     Y.one("#qtype_lti_input_id_"+'.$question->id.').set("value", Math.random());
 
                                     Y.on("windowresize", resize);
-
+									var quiz_is_timed = 0;
 
                                     Y.one("#qtype_lti_togglebutton_id_"+'.$question->id.').on("click", function (e) {
-
                                           Y.one("#qtype_lti_framediv_"+'.$question->id.').toggleClass("qtype_lti_maximized");
                                           Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height","100%");
                                           Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height","100%");
 
+											if (document.getElementById("quiz-timer")) {
+												var lti_fullsc_'.$question->id.' = document.getElementById("quiz_timer_lti_'.$question->id.'");
+												// lti_fullsc_'.$question->id.'.innerHTML = document.getElementById("quiz-timer").innerHTML;
+												lti_fullsc_'.$question->id.'.appendChild(document.getElementById("quiz-timer").cloneNode(true));
+												Y.one("#quiz_timer_lti_"+'.$question->id.').setStyle("display", "block");
+										  }
+
                                           if (!Y.one("#qtype_lti_framediv_"+'.$question->id.').hasClass("qtype_lti_maximized") && lastHeight > 0) {
                                             Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height",lastHeight);
                                             Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", lastHeight + "px");
+
+											if (document.getElementById("quiz-timer")) {
+												var lti_fullsc_'.$question->id.' = document.getElementById("quiz_timer_lti_'.$question->id.'");
+												lti_fullsc_'.$question->id.'.innerHTML = "";
+												Y.one("#quiz_timer_lti_"+'.$question->id.').setStyle("display", "none");
+											}
+
+
                                           }
 
 
                                     });
+                
 
                                 });
-
 
                             //]]
                             </script>
