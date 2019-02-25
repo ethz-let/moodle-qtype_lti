@@ -191,7 +191,8 @@ class qtype_lti_renderer extends \qtype_renderer{
                                     Y.one("#qtype_lti_togglebutton_id_"+'.$question->id.').on("click", function (e) {
                                           Y.one("#qtype_lti_framediv_"+'.$question->id.').toggleClass("qtype_lti_maximized");
                                           Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height","100%");
-                                          Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height","100%");
+                                        //  Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height","100%");
+ 											Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", doc.get("winHeight") - 25 + "px");
 
 											if (document.getElementById("quiz-timer")) {
 												var lti_fullsc_'.$question->id.' = document.getElementById("quiz_timer_lti_'.$question->id.'");
