@@ -513,6 +513,13 @@ function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null
     "correction" Correction Mode is used by an assistant or a lecturer while correcting an solved exam by one or multiple students.
     "review" for Reviewing the answer (after submission and usually attached to readonly mode).
     */
+        
+    // Due to inability to control the launch url in question edit mode, questionmodede is faulted to 1.
+    // Transform it to 'create' shall it be 1.
+    
+     if(!$questionmode || $questionmode == '1'){
+     	$questionmode = 'create';
+     }
 
     $requestparams['ext_workflow_mode'] = $questionmode;
     $requestparams['ext_manually_graded'] = $manuallygraded_in_moodle;

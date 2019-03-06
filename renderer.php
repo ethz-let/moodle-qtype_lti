@@ -150,7 +150,7 @@ class qtype_lti_renderer extends \qtype_renderer{
                 // Extra Parameters specific to CodeExpert
 
                 $extra_code_expert_parameters = 'questionid='.$question->id.'&ltid='.$lti->id.'&quizid='.$attemptfullrecord->quiz.'&attemptid='.$attempt.'&attemptstate='.$attemptfullrecord->state.'&';
-
+				
                 $result =  '<!--'.$question->questiontext.'--><div id="qtype_lti_framediv_'.$question->id.'" class="qtype_lti_framediv" '.$readonlydevstyle.'><span id="quiz_timer_lti_'.$question->id.'" style="display:none; margin-top:-1em; background-color:#fff"></span><span class="qtype_lti_togglebutton" id="qtype_lti_togglebutton_id_'.$question->id.'">&nbsp;</span><iframe id="qtype_lti_contentframe_'.$question->id.'" border="0" height="600px" width="100%" src="'.$CFG->wwwroot.'/question/type/lti/launch.php?'.$extra_code_expert_parameters.$readonly.'id='.$question->id.'&userid='.$serial_params->userid.'" '.$readonlyclass.'></iframe></div>';
 
                 $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$inputname\" id=\"qtype_lti_input_id_".$question->id."\">";
@@ -176,7 +176,9 @@ class qtype_lti_renderer extends \qtype_renderer{
                                     var resize = function(e) {
                                         var viewportHeight = doc.get("winHeight");
                                         if(lastHeight !== Math.min(doc.get("docHeight"), viewportHeight)){
-                                            Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", viewportHeight - Y.one("#qtype_lti_contentframe_"+'.$question->id.').getY() - padding + "px");
+											//var resize_height = viewportHeight - Y.one("#qtype_lti_contentframe_"+'.$question->id.').getY() - padding;
+											if(viewportHeight > 500 ) viewportHeight = 500;
+                                            Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", viewportHeight + "px");
                                             lastHeight = Math.min(doc.get("docHeight"), doc.get("winHeight"));
                                         }
                                     };
@@ -191,19 +193,35 @@ class qtype_lti_renderer extends \qtype_renderer{
                                     Y.one("#qtype_lti_togglebutton_id_"+'.$question->id.').on("click", function (e) {
                                           Y.one("#qtype_lti_framediv_"+'.$question->id.').toggleClass("qtype_lti_maximized");
                                           Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height","100%");
-                                        //  Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height","100%");
- 											Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", doc.get("winHeight") - 25 + "px");
-
+                                          // Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height","100%");
+ 									      Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", doc.get("winHeight") - 25 + "px");
 											if (document.getElementById("quiz-timer")) {
 												var lti_fullsc_'.$question->id.' = document.getElementById("quiz_timer_lti_'.$question->id.'");
 												// lti_fullsc_'.$question->id.'.innerHTML = document.getElementById("quiz-timer").innerHTML;
 												lti_fullsc_'.$question->id.'.appendChild(document.getElementById("quiz-timer").cloneNode(true));
-												Y.one("#quiz_timer_lti_"+'.$question->id.').setStyle("display", "block");
+												if(document.getElementById("quiz-time-left").innerHTML === ""){
+													Y.one("#quiz_timer_lti_"+'.$question->id.').setStyle("display", "none");
+													Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height","100%");
+												} else {
+													Y.one("#quiz_timer_lti_"+'.$question->id.').setStyle("display", "block");
+												}
 										  }
 
                                           if (!Y.one("#qtype_lti_framediv_"+'.$question->id.').hasClass("qtype_lti_maximized") && lastHeight > 0) {
-                                            Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height",lastHeight);
-                                            Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", lastHeight + "px");
+
+                                         //   Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height",lastHeight);
+                                         //   Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", lastHeight + "px");
+
+
+										  var viewportHeight_resized = doc.get("winHeight"); 
+										//  var yiframePosition = Y.one("#qtype_lti_contentframe_"+'.$question->id.').getY(); 
+										 // var current_height_iframe = viewportHeight_resized - yiframePosition - 15;
+										  if(viewportHeight_resized && viewportHeight_resized > 500) viewportHeight_resized = 5 00;                              
+                                           Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height", viewportHeight_resized); 
+                                           Y.one("#qtype_lti_contentframe_'.$question->id.'").setStyle("height", viewportHeight_resized + "px");
+										 //  Y.one("#qtype_lti_contentframe_'.$question->id.'").setStyle("min-height", "100%");
+                                      
+
 
 											if (document.getElementById("quiz-timer")) {
 												var lti_fullsc_'.$question->id.' = document.getElementById("quiz_timer_lti_'.$question->id.'");
