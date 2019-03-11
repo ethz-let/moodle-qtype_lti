@@ -216,7 +216,7 @@ class qtype_lti_renderer extends \qtype_renderer{
 										  var viewportHeight_resized = doc.get("winHeight"); 
 										//  var yiframePosition = Y.one("#qtype_lti_contentframe_"+'.$question->id.').getY(); 
 										 // var current_height_iframe = viewportHeight_resized - yiframePosition - 15;
-										  if(viewportHeight_resized && viewportHeight_resized > 500) viewportHeight_resized = 5 00;                              
+										  if(viewportHeight_resized && viewportHeight_resized > 500) viewportHeight_resized = 500;                              
                                            Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height", viewportHeight_resized); 
                                            Y.one("#qtype_lti_contentframe_'.$question->id.'").setStyle("height", viewportHeight_resized + "px");
 										 //  Y.one("#qtype_lti_contentframe_'.$question->id.'").setStyle("min-height", "100%");

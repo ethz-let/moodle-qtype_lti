@@ -2047,7 +2047,7 @@ function qtype_lti_update_type($type, $config) {
         if($questions && $original_provider){
         	foreach($questions as $question){
         		
-        	
+        		$record = new \StdClass();
         		$record->id = $question->id;
         		$record->typeid = $type->id;
         		//$new_domain = qtype_lti_get_domain_from_url($type->baseurl);
