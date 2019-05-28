@@ -20,18 +20,68 @@
  * @copyright ETHz 2018 amr.hourani@id.ethz.ch
  */
 
-
 require_once($CFG->dirroot . '/question/type/rendererbase.php');
 
 //require_once($CFG->libdir . '/outputcomponents.php');
 
 class qtype_lti_renderer extends \qtype_renderer{
 
+	protected function qtype_lti_generate_usage_record($ltiid, $instancecode, $userid, $username, $attempt, $questionid, $quizid, $courseid, $toolurl){
+		
+		global $CFG, $DB;
+		
+		// What if backup/restore? then attempt and instancecode never changed.
+		$params = array('ltiid' => $ltiid, 'instancecode' => $instancecode, 'userid' => $userid, 'questionid' => $questionid, 'courseid' => $courseid, 'quizid' => $quizid, 'mattemptid' => $attempt);
+		
+		$org_ce_attempt_records = $DB->get_records_sql('select id, attemptid from {qtype_lti_usage} 
+														where ltiid = :ltiid and  instancecode = :instancecode and userid = :userid
+														and questionid = :questionid and courseid = :courseid and quizid <> :quizid and mattemptid <> :mattemptid limit 1', $params);
+		foreach($org_ce_attempt_records as $org_ce_attempt_record) {
+			// Update the record with new values.
+			$user_ce_attempt_record = new stdClass();
+			$user_ce_attempt_record->id = $org_ce_attempt_record->id;
+			$user_ce_attempt_record->mattemptid = $attempt;
+			$user_ce_attempt_record->quizid = $quizid;
+			$user_ce_attempt_record->origin = $CFG->wwwroot;
+			$user_ce_attempt_record->destination = $toolurl;
+			$user_ce_attempt_record->resourcelinkid = $org_ce_attempt_record->attemptid.'-'.$instancecode.'-'.$username;
+			$user_ce_attempt_record->resultid = $user_ce_attempt_record->resourcelinkid.'-'.uniqid();
+			$DB->update_record('qtype_lti_usage', $user_ce_attempt_record);
+			
+			$updated_ce_attempt_record = $DB->get_record('qtype_lti_usage', array('id' => $org_ce_attempt_record->id));
+			if($updated_ce_attempt_record) {
+				return $updated_ce_attempt_record;
+			}
+		}
+			
 
+		// Check if actual record exists in usage table.
+		$user_ce_attempt_record = $DB->get_record('qtype_lti_usage',array('mattemptid' => $attempt, 'instancecode' => $instancecode, 'userid' => $userid));
+		if(!$user_ce_attempt_record) {
+			$user_ce_attempt_record = new stdClass();
+			$user_ce_attempt_record->ltiid = $ltiid;
+			$user_ce_attempt_record->instancecode = $instancecode;
+			$user_ce_attempt_record->attemptid = uniqid();
+			$user_ce_attempt_record->mattemptid = $attempt;
+			$user_ce_attempt_record->questionid = $questionid;
+			$user_ce_attempt_record->quizid = $quizid;
+			$user_ce_attempt_record->courseid = $courseid;
+			$user_ce_attempt_record->userid = $userid;
+			// ResourceLinkId: attemptid + instancecode + username
+			$user_ce_attempt_record->resourcelinkid = $user_ce_attempt_record->attemptid.'-'.$instancecode.'-'.$username;
+			// RestultID: attemptid + instancecode + username + uniqid()
+			$user_ce_attempt_record->resultid = $user_ce_attempt_record->resourcelinkid.'-'.uniqid();
+			$user_ce_attempt_record->origin = $CFG->wwwroot;
+			$user_ce_attempt_record->destination = $toolurl;
+			$user_ce_attempt_record->timeadded = time();
+			$insert_ce_attempt_record = $DB->insert_record('qtype_lti_usage', $user_ce_attempt_record);
+		}
+		return $user_ce_attempt_record;
+		
+	}
     public function formulation_and_controls(question_attempt $qa,
             question_display_options $options) {
                 global $PAGE, $CFG, $DB, $USER;
-
                 $question = $qa->get_question();
                 // Answer field.
                 $step = $qa->get_last_step_with_qt_var('answer');
@@ -43,6 +93,9 @@ class qtype_lti_renderer extends \qtype_renderer{
                 // $launchid = $qa->get_qt_field_name('launchid');
                 $instanceid = $qa->get_qt_field_name('instanceid');
                 $attemptfieldname = $qa->get_qt_field_name('attemptid');
+                $resultidfieldname = $qa->get_qt_field_name('resultid');
+                $linkidfieldname = $qa->get_qt_field_name('linkid');
+                $usernamefieldname = $qa->get_qt_field_name('username');
                 $userid = $qa->get_qt_field_name('userid');
 
                 $attemptinfo = $DB->get_record('question_attempt_steps', array('id' => $qa->get_database_id()));
@@ -69,7 +122,13 @@ class qtype_lti_renderer extends \qtype_renderer{
                 if (empty($question->unittest) || is_null($question->unittest)){
 
 	                $lti = $DB->get_record('qtype_lti_options', array('questionid' => $question->id), '*', MUST_EXIST);
-	                $lti_params = qtype_lti_build_sourcedid($lti->id, $original_userid, $lti->servicesalt, $lti->typeid);
+	                $user = $DB->get_record('user', array('id' => $original_userid), 'id,username', MUST_EXIST);
+	                global $COURSE;
+ 
+	                $user_ce_attempt_record = $this->qtype_lti_generate_usage_record($lti->id, $lti->instancecode, $user->id, $user->username, $attempt, $question->id, $attemptfullrecord->quiz, $COURSE->id, $lti->toolurl);
+	                
+	                $lti_params = qtype_lti_build_sourcedid($user_ce_attempt_record->resultid, $user->username, $lti->servicesalt, $lti->typeid, $user_ce_attempt_record->attemptid, $lti->id);
+	              
                 	$serial_params = $lti_params->data;
 
                 } else {
@@ -121,7 +180,7 @@ class qtype_lti_renderer extends \qtype_renderer{
                     $reviewmodetext = '';
                 } else {
                     // If the logged user not the same user attempting the question, then mode is 'correction'.
-                    if($serial_params->userid != $USER->id){
+                	if($user->id != $USER->id){
                         $questionmode = 'correction';
                     } else {
                         $questionmode = 'review';
@@ -147,17 +206,23 @@ class qtype_lti_renderer extends \qtype_renderer{
 
                 }
 
+
                 // Extra Parameters specific to CodeExpert
 
-                $extra_code_expert_parameters = 'questionid='.$question->id.'&ltid='.$lti->id.'&quizid='.$attemptfullrecord->quiz.'&attemptid='.$attempt.'&attemptstate='.$attemptfullrecord->state.'&';
+                $extra_code_expert_parameters = 'questionid='.$question->id.'&ltid='.$lti->id.'&quizid='.$attemptfullrecord->quiz.'&attemptid='.$user_ce_attempt_record->attemptid.'&attemptstate='.$attemptfullrecord->state.'&';
 				
-                $result =  '<!--'.$question->questiontext.'--><div id="qtype_lti_framediv_'.$question->id.'" class="qtype_lti_framediv" '.$readonlydevstyle.'><span id="quiz_timer_lti_'.$question->id.'" style="display:none; margin-top:-1em; background-color:#fff"></span><span class="qtype_lti_togglebutton" id="qtype_lti_togglebutton_id_'.$question->id.'">&nbsp;</span><iframe id="qtype_lti_contentframe_'.$question->id.'" border="0" height="600px" width="100%" src="'.$CFG->wwwroot.'/question/type/lti/launch.php?'.$extra_code_expert_parameters.$readonly.'id='.$question->id.'&userid='.$serial_params->userid.'" '.$readonlyclass.'></iframe></div>';
+                $result =  '<div id="qtype_lti_framediv_'.$question->id.'" class="qtype_lti_framediv" '.$readonlydevstyle.'><span id="quiz_timer_lti_'.$question->id.'" style="display:none; margin-top:-1em; background-color:#fff"></span><span class="qtype_lti_togglebutton" id="qtype_lti_togglebutton_id_'.$question->id.'">&nbsp;</span><iframe id="qtype_lti_contentframe_'.$question->id.'" border="0" height="600px" width="100%" src="'.$CFG->wwwroot.'/question/type/lti/launch.php?'.$extra_code_expert_parameters.$readonly.'id='.$question->id.'&userid='.$user->id.'&resourcelinkid='.$user_ce_attempt_record->resourcelinkid.'&resultid='.$user_ce_attempt_record->resultid.'" '.$readonlyclass.'></iframe></div>';
 
                 $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$inputname\" id=\"qtype_lti_input_id_".$question->id."\">";
                 // $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$launchid\"  value=\"$serial_params->launchid\" id=\"qtype_lti_luanch_id_".$question->id."\">";
                 $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$attemptfieldname\"  value=\"$attempt\" id=\"qtype_lti_attempt_id_".$question->id."\">";
-                $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$instanceid\" value=\"$serial_params->instanceid\" id=\"qtype_lti_instance_id_".$question->id."\">";
-                $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$userid\" value=\"$serial_params->userid\" id=\"qtype_lti_user_id_".$question->id."\">";
+                $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$instanceid\" value=\"$lti->id\" id=\"qtype_lti_instance_id_".$question->id."\">";
+                $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$userid\" value=\"$user->id\" id=\"qtype_lti_user_id_".$question->id."\">";
+                $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$resultidfieldname\" value=\"$user_ce_attempt_record->resultid\" id=\"qtype_lti_user_id_".$question->id."\">";
+                $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$linkidfieldname\" value=\"$user_ce_attempt_record->resourcelinkid\" id=\"qtype_lti_user_id_".$question->id."\">";
+                $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$usernamefieldname\" value=\"$user->username\" id=\"qtype_lti_user_id_".$question->id."\">";
+                
+                
 
 
                 // Output script to make the iframe tag be as large as possible.
@@ -176,72 +241,91 @@ class qtype_lti_renderer extends \qtype_renderer{
                                     var resize = function(e) {
                                         var viewportHeight = doc.get("winHeight");
                                         if(lastHeight !== Math.min(doc.get("docHeight"), viewportHeight)){
-											//var resize_height = viewportHeight - Y.one("#qtype_lti_contentframe_"+'.$question->id.').getY() - padding;
-											if(viewportHeight > 500 ) viewportHeight = 500;
+                      //var resize_height = viewportHeight - Y.one("#qtype_lti_contentframe_"+'.$question->id.').getY() - padding;
+                      if(viewportHeight > 500 ) viewportHeight = 500;
                                             Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", viewportHeight + "px");
                                             lastHeight = Math.min(doc.get("docHeight"), doc.get("winHeight"));
                                         }
                                     };
-
+                                            		
                                     resize();
-
+                                            		
                                     Y.one("#qtype_lti_input_id_"+'.$question->id.').set("value", Math.random());
-
+                                    		
                                     Y.on("windowresize", resize);
-									var quiz_is_timed = 0;
-
+                                    var quiz_is_timed = 0;
+                                    		
                                     Y.one("#qtype_lti_togglebutton_id_"+'.$question->id.').on("click", function (e) {
                                           Y.one("#qtype_lti_framediv_"+'.$question->id.').toggleClass("qtype_lti_maximized");
                                           Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height","100%");
                                           // Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height","100%");
- 									      Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", doc.get("winHeight") - 25 + "px");
-											if (document.getElementById("quiz-timer")) {
-												var lti_fullsc_'.$question->id.' = document.getElementById("quiz_timer_lti_'.$question->id.'");
-												// lti_fullsc_'.$question->id.'.innerHTML = document.getElementById("quiz-timer").innerHTML;
-												lti_fullsc_'.$question->id.'.appendChild(document.getElementById("quiz-timer").cloneNode(true));
-												if(document.getElementById("quiz-time-left").innerHTML === ""){
-													Y.one("#quiz_timer_lti_"+'.$question->id.').setStyle("display", "none");
-													Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height","100%");
-												} else {
-													Y.one("#quiz_timer_lti_"+'.$question->id.').setStyle("display", "block");
-												}
-										  }
-
+                                          if (Y.one("#qtype_lti_framediv_"+'.$question->id.').hasClass("qtype_lti_maximized")) {
+                                            Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", "100%");
+                                            Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height","100%");
+                                          }else{
+                                              Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", doc.get("winHeight") - 25 + "px");
+                                            }
+                        if (document.getElementById("quiz-timer")) {
+                        var lti_fullsc_'.$question->id.' = document.getElementById("quiz_timer_lti_'.$question->id.'");
+                        // lti_fullsc_'.$question->id.'.innerHTML = document.getElementById("quiz-timer").innerHTML;
+                        lti_fullsc_'.$question->id.'.appendChild(document.getElementById("quiz-timer").cloneNode(true));
+                        var quiz_timer_div = document.getElementById("quiz-time-left");
+                        if(quiz_timer_div && quiz_timer_div && quiz_timer_div.innerHTML === ""){
+                          Y.one("#quiz_timer_lti_"+'.$question->id.').setStyle("display", "none");
+                          Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height","100%");
+                        } else {
+                          Y.one("#quiz_timer_lti_"+'.$question->id.').setStyle("display", "block");
+                        }
+                      }
+                          		
                                           if (!Y.one("#qtype_lti_framediv_"+'.$question->id.').hasClass("qtype_lti_maximized") && lastHeight > 0) {
-
+                                          		
                                          //   Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height",lastHeight);
                                          //   Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", lastHeight + "px");
-
-
-										  var viewportHeight_resized = doc.get("winHeight"); 
-										//  var yiframePosition = Y.one("#qtype_lti_contentframe_"+'.$question->id.').getY(); 
-										 // var current_height_iframe = viewportHeight_resized - yiframePosition - 15;
-										  if(viewportHeight_resized && viewportHeight_resized > 500) viewportHeight_resized = 500;                              
-                                           Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height", viewportHeight_resized); 
-                                           Y.one("#qtype_lti_contentframe_'.$question->id.'").setStyle("height", viewportHeight_resized + "px");
-										 //  Y.one("#qtype_lti_contentframe_'.$question->id.'").setStyle("min-height", "100%");
-                                      
-
-
-											if (document.getElementById("quiz-timer")) {
-												var lti_fullsc_'.$question->id.' = document.getElementById("quiz_timer_lti_'.$question->id.'");
-												lti_fullsc_'.$question->id.'.innerHTML = "";
-												Y.one("#quiz_timer_lti_"+'.$question->id.').setStyle("display", "none");
-											}
-
-
+                                         		
+                                         		
+                      var viewportHeight_resized = doc.get("winHeight");
+                    //  var yiframePosition = Y.one("#qtype_lti_contentframe_"+'.$question->id.').getY();
+                     // var current_height_iframe = viewportHeight_resized - yiframePosition - 15;
+                      if(viewportHeight_resized && viewportHeight_resized > 500) viewportHeight_resized = 500;
+                    		
+                      Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height", viewportHeight_resized);
+                      Y.one("#qtype_lti_contentframe_'.$question->id.'").setStyle("height", viewportHeight_resized + "px");
+                      		
+                      		
+                     //  Y.one("#qtype_lti_contentframe_'.$question->id.'").setStyle("min-height", "100%");
+                     		
+                     		
+                     		
+                      if (document.getElementById("quiz-timer")) {
+                        var lti_fullsc_'.$question->id.' = document.getElementById("quiz_timer_lti_'.$question->id.'");
+                        lti_fullsc_'.$question->id.'.innerHTML = "";
+                        Y.one("#quiz_timer_lti_"+'.$question->id.').setStyle("display", "none");
+                      }
+                        		
+                        		
                                           }
-
-
+                        		
+                        		
+                        		
+                                          if(quiz_timer_div && quiz_timer_div.innerHTML !== "" && Y.one("#qtype_lti_framediv_"+'.$question->id.').hasClass("qtype_lti_maximized")){
+                                            var viewportHeight_resized = doc.get("winHeight");
+                                            var timer_height = document.getElementById("quiz_timer_lti_'.$question->id.'").clientHeight;
+                                            viewportHeight_resized = viewportHeight_resized - timer_height;
+                                            Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height", viewportHeight_resized);
+                                            Y.one("#qtype_lti_contentframe_'.$question->id.'").setStyle("height", viewportHeight_resized + "px");
+                                          }
+                                            		
+                                            		
                                     });
-                
-
+                                            		
+                                            		
                                 });
-
+                                            		
                             //]]
                             </script>
-
-
+                                            		
+                                            		
                             ';
 
                 return $result;
@@ -271,4 +355,5 @@ class qtype_lti_renderer extends \qtype_renderer{
         return parent::render_from_template('qtype_lti/external_registration_return', $data);
     }
 
+    
 }

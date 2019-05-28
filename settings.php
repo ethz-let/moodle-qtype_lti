@@ -193,6 +193,9 @@ if ($ADMIN->fulltree) {
 </script>
 EOD;
 
+    $settings->add(new admin_setting_configcheckbox('qtype_lti/removerestoredlink',
+    		get_string('removerestoredlink', 'qtype_lti'),
+    		get_string('removerestoredlink_help', 'qtype_lti'), 0));
     
     $settings->add(new admin_setting_heading('qtype_lti_types', new lang_string('external_tool_types', 'qtype_lti') .
             $OUTPUT->help_icon('main_admin', 'qtype_lti'), $template.'<br />'));

@@ -23,8 +23,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_lti';
-$plugin->version = 2019031100;
+$plugin->version = 2019052800;
 $plugin->requires = 2013111904; // Moodle >=2.6.4.
 
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '0.2 for Moodle 3.0+';
+$plugin->release = '0.4 for Moodle 3.0+';

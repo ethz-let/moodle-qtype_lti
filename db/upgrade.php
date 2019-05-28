@@ -43,6 +43,66 @@ function xmldb_qtype_lti_upgrade($oldversion) {
     	
     	upgrade_plugin_savepoint(true, 2018111300, 'qtype', 'lti');	
     } 	
+    if ($oldversion < 2019031902) {
+    	// Define field lti_usage to control display of result table
+    	$table = new xmldb_table('qtype_lti_usage');
+    	
+    	// Adding fields to table lti_usage
+    	$table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+    	$table->add_field('ltiid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, false, null);
+    	$table->add_field('instancecode', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, false, null);
+    	$table->add_field('attemptid', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, false, null);
+    	$table->add_field('mattemptid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, false, null);
+    	$table->add_field('questionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, false, null);
+    	$table->add_field('quizid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, false, null);
+    	$table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, false, null);
+    	$table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, false, null);
+    	$table->add_field('resourcelinkid', XMLDB_TYPE_CHAR, '250', null, XMLDB_NOTNULL, false, null);
+    	$table->add_field('resultid', XMLDB_TYPE_CHAR, '250', null, XMLDB_NOTNULL, false, null);
+    	$table->add_field('origin', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, false, null);
+    	$table->add_field('destination', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, false, null);
+    	$table->add_field('timeadded', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, false, null);
 
+    	// Adding keys to table lti_usage
+    	$table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+    	if (!$dbman->table_exists($table)) {
+    		$dbman->create_table($table);
+    	}
+    	
+    	unset($table);
+    	
+    	$DB->delete_records('qtype_lti_submission');
+
+    	$table = new xmldb_table('qtype_lti_submission');
+
+    	if ($dbman->field_exists($table, 'attemptid')) {
+    		$field = new xmldb_field('attemptid');
+    		$dbman->drop_field($table, $field);
+    	}
+    	if ($dbman->field_exists($table, 'userid')) {
+    		$field = new xmldb_field('userid');
+    		$dbman->drop_field($table, $field);
+    	}
+    	
+    	// Add needed columns.
+    	if (!$dbman->field_exists($table, 'username')) {
+    		$field = new xmldb_field('username', XMLDB_TYPE_CHAR, '60', null, XMLDB_NOTNULL, false, null);
+    		$dbman->add_field($table, $field);
+    	}
+    	if (!$dbman->field_exists($table, 'linkid')) {
+    		$field = new xmldb_field('linkid', XMLDB_TYPE_CHAR, '250', null, XMLDB_NOTNULL, false, null);	
+    		$dbman->add_field($table, $field);
+    	}
+    	if (!$dbman->field_exists($table, 'resultid')) {
+    		$field = new xmldb_field('resultid', XMLDB_TYPE_CHAR, '250', null, XMLDB_NOTNULL, false, null);
+    		$dbman->add_field($table, $field);
+    	}
+    	
+    	upgrade_plugin_savepoint(true, 2019031902, 'qtype', 'lti');
+    	
+    }
+    
+    
     return true;
 }

@@ -188,9 +188,9 @@ switch ($messagetype) {
         }
 
         qtype_lti_verify_sourcedid($ltiinstance, $parsed);
-        qtype_lti_set_session_user($parsed->userid);
+        qtype_lti_set_session_user($parsed->username);
 
-        $gradestatus = qtype_lti_update_grade($ltiinstance, $parsed->userid, /*$parsed->launchid*/ $parsed->attemptid, $parsed->gradeval);
+        $gradestatus = qtype_lti_update_grade($parsed->username, $parsed->linkid, $parsed->resultid, $parsed->gradeval);
 
         if (!$gradestatus) {
             throw new Exception('Grade replace response');
@@ -224,7 +224,7 @@ switch ($messagetype) {
 
         qtype_lti_verify_sourcedid($ltiinstance, $parsed);
 
-        $grade = qtype_lti_read_grade($ltiinstance, $parsed->userid, $parsed->attemptid);
+        $grade = qtype_lti_read_grade($parsed->username, $parsed->linkid, $parsed->resultid);
 
         $responsexml = qtype_lti_get_response_xml(
                 'success',  // Empty grade is also 'success'.
@@ -252,9 +252,9 @@ switch ($messagetype) {
         }
 
         qtype_lti_verify_sourcedid($ltiinstance, $parsed);
-        qtype_lti_set_session_user($parsed->userid);
-
-        $gradestatus = qtype_lti_delete_grade($ltiinstance, $parsed->userid, $parsed->attemptid);
+        qtype_lti_set_session_user($parsed->username);
+        
+        $gradestatus = qtype_lti_delete_grade($parsed->username, $parsed->linkid, $parsed->resultid);
 
         if (!$gradestatus) {
             throw new Exception('Grade delete request was not successful');

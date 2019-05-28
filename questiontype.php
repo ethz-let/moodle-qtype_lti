@@ -278,194 +278,6 @@ class qtype_lti extends question_type {
         $expout .= '    <secureicon>' . $format->writetext($question->options->secureicon) .
                 "</secureicon>\n";
 
-
-/*      KEEP FOR ROUND 2 - ADVANCED EXPORT/IMPORT.
-        // Backup LTI type, based on typeid.
-        if(!is_null($question->options->typeid) && $question->options->typeid != 0){
-
-          $ltitype = $DB->get_record("qtype_lti_types", array('id' => $question->options->typeid));
-
-          if($ltitype) {
-            $expout .= "    <ltitype>\n";
-
-            $expout .= "<name>";
-            $expout .= $format->writetext($ltitype->name);
-            $expout .= "</name>\n";
-
-            $expout .= "<baseurl>";
-            $expout .= $format->writetext($ltitype->baseurl);
-            $expout .= "</baseurl>\n";
-
-            $expout .= "<tooldomain>";
-            $expout .= $format->writetext($ltitype->tooldomain);
-            $expout .= "</tooldomain>\n";
-
-            $expout .= "<state>";
-            $expout .= $ltitype->state;
-            $expout .= "</state>\n";
-
-            $expout .= "<coursevisible>";
-            $expout .= $ltitype->coursevisible;
-            $expout .= "</coursevisible>\n";
-
-            $expout .= "<toolproxyid>";
-            $expout .= $ltitype->toolproxyid;
-            $expout .= "</toolproxyid>\n";
-
-            $expout .= "<enabledcapability>";
-            $expout .= $format->writetext($ltitype->enabledcapability);
-            $expout .= "</enabledcapability>\n";
-
-            $expout .= "<icon>";
-            $expout .= $format->writetext($ltitype->icon);
-            $expout .= "</icon>\n";
-
-            $expout .= "<secureicon>";
-            $expout .= $format->writetext($ltitype->secureicon);
-            $expout .= "</secureicon>\n";
-
-
-            $expout .= "<createdby>";
-            $expout .= $ltitype->createdby;
-            $expout .= "</createdby>\n";
-
-            $expout .= "<timecreated>";
-            $expout .= $ltitype->timecreated;
-            $expout .= "</timecreated>\n";
-
-            $expout .= "<timemodified>";
-            $expout .= $ltitype->timemodified;
-            $expout .= "</timemodified>\n";
-
-            $expout .= "<description>";
-            $expout .= $format->writetext($ltitype->description);
-            $expout .= "</description>\n";
-
-
-            // LTI Tpyes configs.
-
-            $ltitypesconfigs = $DB->get_records('qtype_lti_types_config', array('typeid' => $question->options->typeid));
-
-            if($ltitypesconfigs) {
-
-              $expout .= "      <ltitypesconfigs>\n";
-
-              foreach ($ltitypesconfigs as $ltitypesconfig) {
-
-                $expout .= "<ltitypesconfig id=\"$ltitypesconfig->id\">";
-
-                $expout .= "<name>";
-                $expout .= $format->writetext($ltitypesconfig->name);
-                $expout .= "</name>\n";
-
-                $expout .= "<value>";
-                $expout .= $format->writetext($ltitypesconfig->value);
-                $expout .= "</value>\n";
-
-                $expout .= "</ltitypesconfig>\n";
-              }
-
-              $expout .= "      </ltitypesconfigs>\n";
-
-            }
-
-
-            // If this is LTI 2 tool add settings for the current question.
-
-            if( $ltitype->toolproxyid && $ltitype->toolproxyid != 0 ){
-
-                $ltitoolproxy = $DB->get_record('qtype_lti_tool_proxies', array('id' => $ltitype->toolproxyid));
-
-                if($ltitoolproxy) {
-                  $expout .= "      <ltitoolproxy>\n";
-
-                  $expout .= "<name>";
-                  $expout .= $format->writetext($ltitoolproxy->name);
-                  $expout .= "</name>\n";
-
-                  $expout .= "<state>";
-                  $expout .= $ltitoolproxy->state;
-                  $expout .= "</state>\n";
-
-                  $expout .= "<guid>";
-                  $expout .= $format->writetext($ltitoolproxy->guid);
-                  $expout .= "</guid>\n";
-
-                  $expout .= "<secret>";
-                  $expout .= $format->writetext($ltitoolproxy->secret);
-                  $expout .= "</secret>\n";
-
-                  $expout .= "<vendorcode>";
-                  $expout .= $format->writetext($ltitoolproxy->vendorcode);
-                  $expout .= "</vendorcode>\n";
-
-                  $expout .= "<capabilityoffered>";
-                  $expout .= $format->writetext($ltitoolproxy->capabilityoffered);
-                  $expout .= "</capabilityoffered>\n";
-
-                  $expout .= "<serviceoffered>";
-                  $expout .= $format->writetext($ltitoolproxy->serviceoffered);
-                  $expout .= "</serviceoffered>\n";
-
-                  $expout .= "<toolproxy>";
-                  $expout .= $format->writetext($ltitoolproxy->toolproxy);
-                  $expout .= "</toolproxy>\n";
-
-                  $expout .= "<createdby>";
-                  $expout .= $ltitoolproxy->createdby;
-                  $expout .= "</createdby>\n";
-
-                  $expout .= "<timecreated>";
-                  $expout .= $ltitoolproxy->timecreated;
-                  $expout .= "</timecreated>\n";
-
-                  $expout .= "</timemodified>";
-                  $expout .= $ltitoolproxy->timemodified;
-                  $expout .= "</timemodified>\n";
-
-                  // Now Tool Proxy Settings
-
-                  $ltitoolsettings = $DB->get_records('qtype_lti_tool_settings', array('toolproxyid' => $ltitype->toolproxyid));
-
-                  if($ltitoolsettings) {
-
-                    $expout .= "      <ltitoolsettings>\n";
-
-                    foreach ($ltitoolsettings as $ltitoolsetting) {
-
-                      $expout .= "<ltitoolsetting id=\"$ltitoolsetting->id\">\n";
-
-                      $expout .= "<settings>";
-                      $expout .= $format->writetext($ltitoolsetting->settings);
-                      $expout .= "</settings>\n";
-
-                      $expout .= "<timecreated>";
-                      $expout .= $ltitoolsetting->timecreated;
-                      $expout .= "</timecreated>\n";
-
-                      $expout .= "<timemodified>";
-                      $expout .= $ltitoolsetting->timemodified;
-                      $expout .= "</timemodified>\n";
-
-                      $expout .= "</ltitoolsetting>\n";
-
-                    }
-
-                    $expout .= "      </ltitoolsettings>\n";
-
-                  }
-
-                  $expout .= "      </ltitoolproxy>\n";
-                }
-            }
-
-
-            $expout .= "    </ltitype>\n";
-          }
-
-
-        }
-*/
         return $expout;
     }
 
@@ -508,12 +320,20 @@ class qtype_lti extends question_type {
         $question->typeid = $format->getpath($data,
         array('#', 'typeid', 0, '#'), null);
 
-        $question->toolurl = $format->getpath($data,
-        array('#', 'toolurl', 0, '#', 'text', 0, '#'
-        ), '');
-        $question->securetoolurl = $format->getpath($data,
-        array('#', 'securetoolurl', 0, '#', 'text', 0, '#'
-        ), '');
+        $ltipluginconfig= get_config('qtype_lti');
+        
+        if (!isset($ltipluginconfig->removerestoredlink) || $ltipluginconfig->removerestoredlink == 0){
+        	
+        	$question->toolurl = $format->getpath($data,
+        			array('#', 'toolurl', 0, '#', 'text', 0, '#'
+        			), '');
+        	$question->securetoolurl = $format->getpath($data,
+        			array('#', 'securetoolurl', 0, '#', 'text', 0, '#'
+        			), '');
+        } else {
+        	$question->toolurl = '';
+        	$question->securetoolurl = '';
+        }
 
         $question->instructorchoicesendname = $format->getpath($data,
         array('#', 'instructorchoicesendname', 0, '#'), 1);

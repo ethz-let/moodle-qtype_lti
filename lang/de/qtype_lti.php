@@ -486,3 +486,7 @@ $string['reviewmode'] = 'Im Überprüfungsmodus';
 $string['lti:addgloballypreconfigedtoolinstance'] = 'Add a globally preconfigured tool';
 $string['lti:adddefaultinstance'] = 'Add a non-globally-configured tool';
 $string['lti:admin'] = 'LTI qtype Admin';
+$string['lti:backupcourse'] = 'LTI qtype Course Backup by Course ID';
+$string['lti:regradelti'] = 'LTI qtype Quiz regrade by Quiz ID';
+$string['removerestoredlink'] = 'Remove the LTI tool URL upon restoring';
+$string['removerestoredlink_help'] = 'Enabling this option will remove the Tool URL from each question restored. Please note that this option will not remove the tool provider connection.';

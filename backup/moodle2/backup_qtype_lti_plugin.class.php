@@ -123,16 +123,34 @@ class backup_qtype_lti_plugin extends backup_qtype_plugin {
         $ltisubmissions = new backup_nested_element('ltisubmissions');
 
         $ltisubmission = new backup_nested_element('ltisubmission', array('id'), array(
-            'ltiid',
-            'userid',
+            'username',
+            'linkid',
+        	'resultid',
             'datesubmitted',
             'dateupdated',
             'gradepercent',
             'originalgrade',
-            'attemptid',
             'state'
         ));
-
+        
+        
+        $ltiusagemappings = new backup_nested_element('qtype_lti_usages');
+        $ltiusagemapping = new backup_nested_element('qtype_lti_usage', array('id'), array(
+        		'ltiid',
+        		'instancecode',
+        		'attemptid',
+        		'mattemptid',
+        		'questionid',
+        		'quizid',
+        		'courseid',
+        		'userid',
+        		'resourcelinkid',
+        		'resultid',
+        		'origin',
+        		'destination',
+        		'timeadded'
+        ));
+        
 
         // Now the qtype tree.
         $pluginwrapper->add_child($lti);
@@ -146,19 +164,8 @@ class backup_qtype_lti_plugin extends backup_qtype_plugin {
         $ltitoolsettings->add_child($ltitoolsetting);
         $lti->add_child($ltisubmissions);
         $ltisubmissions->add_child($ltisubmission);
-
-
-/*
-        $lti->add_child($ltisubmissions);
-        $pluginwrapper->add_child($ltitype);
-        $ltitype->add_child($ltitypesconfigs);
-        $ltitypesconfigs->add_child($ltitypesconfig);
-        $ltitypesconfigs->add_child($ltitypesconfigencrypted);
-        $ltitype->add_child($ltitoolproxy);
-        $ltitoolproxy->add_child($ltitoolsettings);
-        $ltitoolsettings->add_child($ltitoolsetting);
-        $ltisubmissions->add_child($ltisubmission);
-*/
+        $lti->add_child($ltiusagemappings);
+        $ltiusagemappings->add_child($ltiusagemapping);
 
         // Define sources.
 
@@ -189,11 +196,13 @@ class backup_qtype_lti_plugin extends backup_qtype_plugin {
         // All the rest of elements only happen if we are including user info.
         $ltisubmission->set_source_sql('SELECT * FROM {qtype_lti_submission} WHERE ltiid = :ltiid', array('ltiid' => backup::VAR_PARENTID));
 
+        // All the rest of mapping elements only happen if we are including user info.
+        $ltiusagemapping->set_source_sql('SELECT * FROM {qtype_lti_usage} WHERE ltiid = :ltiid', array('ltiid' => backup::VAR_PARENTID));
 
         // Define id annotations
-        $ltitype->annotate_ids('user', 'createdby');
-        $ltitype->annotate_ids('course', 'course');
-        $ltisubmission->annotate_ids('user', 'userid');
+        $ltitype->annotate_ids('user', 'createdby');  
+        $ltiusagemapping->annotate_ids('user', 'userid');
+
 
 
         // Return the root element (activity)

@@ -217,7 +217,7 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, 
     } else {
         $requestparams = $allparams;
     }
-    $requestparams = array_merge($requestparams, qtype_lti_build_standard_request($instance, $orgid, $islti2));
+    $requestparams = array_merge($requestparams, qtype_lti_build_standard_request($instance, $orgid, $islti2, 'basic-lti-launch-request', $extra_code_expert_params));
     $customstr = '';
     if (isset($typeconfig['customparameters'])) {
         $customstr = $typeconfig['customparameters'];
@@ -369,19 +369,19 @@ function qtype_lti_build_registration_request($toolproxy) {
  * @param null|int $launchid
  * @return stdClass
  */
-function qtype_lti_build_sourcedid($instanceid, $userid, $servicesalt, $typeid = null, /*$launchid*/ $attemptid = null) {
+function qtype_lti_build_sourcedid($instanceid, $userid, $servicesalt, $typeid = null, $attemptid = null, $ltiid = null) {
     $data = new \stdClass();
 
-    $data->instanceid = $instanceid;
-    $data->userid = $userid;
-    $data->typeid = $typeid;
-    if (!empty($attemptid /*$launchid*/)) {
-       // $data->launchid = $launchid;
+    $data->instance = $instanceid;
+    $data->username = $userid;
+    //$data->typeid = $typeid;
+    if (!empty($attemptid)) {
         $data->attemptid = $attemptid;
     } else {
-       // $data->launchid = mt_rand();
-        $data->attemptid = 0;
+    	$data->attemptid = uniqid();
     }
+    
+    $data->ltiid = $ltiid;
 
     $json = json_encode($data);
 
@@ -411,6 +411,7 @@ function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null
         $instance->cmid = 0;
     }
     $original_user = $USER;
+    
     /*
     if($userid && $USER->id != $userid){ // readonly mode?
       $original_user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
@@ -452,6 +453,9 @@ function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null
     if (!empty($instance->resource_link_id)) {
         $requestparams['resource_link_id'] = $instance->instancecode; //$instance->resource_link_id;
     }
+    
+    $requestparams['resource_link_id'] =  $extra_code_expert_params['resourcelinkid'];
+    
     if ($course->format == 'site') {
         $requestparams['context_type'] = 'Group';
     } else {
@@ -467,7 +471,7 @@ function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null
             ($typeconfig['acceptgrades'] == QTYPE_LTI_SETTING_DELEGATE && $instance->instructorchoiceacceptgrades == QTYPE_LTI_SETTING_ALWAYS))
     ) {
         $placementsecret = $instance->servicesalt;
-        $sourcedid = json_encode(qtype_lti_build_sourcedid($instance->id, $original_user->id, $placementsecret, $typeid, $extra_code_expert_params['attemptid']));
+        $sourcedid = json_encode(qtype_lti_build_sourcedid($extra_code_expert_params['resultid'], $original_user->username, $placementsecret, $typeid, $extra_code_expert_params['attemptid'], $instance->id));
         $requestparams['lis_result_sourcedid'] = $sourcedid;
 
         // Add outcome service URL.
@@ -514,7 +518,7 @@ function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null
     "review" for Reviewing the answer (after submission and usually attached to readonly mode).
     */
         
-    // Due to inability to control the launch url in question edit mode, questionmodede is faulted to 1.
+    // Due to inability to control the launch url in question edit mode, questionmodede is defaulted to 1.
     // Transform it to 'create' shall it be 1.
     
      if(!$questionmode || $questionmode == '1'){
@@ -585,14 +589,18 @@ function qtype_lti_build_request_lti2($tool, $params, $userid, $readonly, $quest
  *
  * @return array                    Request details
  */
-function qtype_lti_build_standard_request($instance, $orgid, $islti2, $messagetype = 'basic-lti-launch-request') {
+function qtype_lti_build_standard_request($instance, $orgid, $islti2, $messagetype = 'basic-lti-launch-request', $extra_code_expert_params) {
     global $CFG;
 
     $requestparams = array();
-    if ($instance) {
-        $requestparams['resource_link_id'] =  $instance->instancecode; //$instance->id;
+    if ($instance) {   	
+        global $DB;
+       // print_r($instance);exit;
+       // $resourcelinkid = $DB->get_record('qtype_lti_usage', array('attemptid' => $extra_code_expert_params[attemptid], ''));
+        $requestparams['resource_link_id'] =  $extra_code_expert_params['resourcelinkid'];
+        
         if (property_exists($instance, 'resource_link_id') and !empty($instance->resource_link_id)) {
-            $requestparams['resource_link_id'] =  $instance->instancecode; //$instance->resource_link_id;
+        	$requestparams['resource_link_id'] =  $extra_code_expert_params['resourcelinkid'];
         }
     }
 
@@ -779,7 +787,7 @@ function qtype_lti_build_content_item_selection_request($id, $course, moodle_url
 
     // Get standard request parameters and merge to the request parameters.
     $orgid = !empty($typeconfig['organizationid']) ? $typeconfig['organizationid'] : '';
-    $standardparams = qtype_lti_build_standard_request(null, $orgid, $islti2, 'ContentItemSelectionRequest');
+    $standardparams = qtype_lti_build_standard_request(null, $orgid, $islti2, 'ContentItemSelectionRequest', $extra_code_expert_params);
 
     $requestparams = array_merge($requestparams, $standardparams);
 
@@ -2027,8 +2035,6 @@ function qtype_lti_update_type($type, $config) {
         $clearcache = isset($type->icon) && (!isset($config->oldicon) || ($config->oldicon !== $type->icon));
     }
     unset($config->oldicon);
-
-    $original_provider = $DB->get_record('qtype_lti_types', array('id' => $type->id));
     
     if ($DB->update_record('qtype_lti_types', $type)) {
         foreach ($config as $key => $value) {
@@ -2040,91 +2046,6 @@ function qtype_lti_update_type($type, $config) {
                 qtype_lti_update_config($record);
             }
         }
-
-        // COD-11 (update all tool_urls for qtypes with same provider).
-        $questions = $DB->get_records('qtype_lti_options', array('typeid' => $type->id),'','id, toolurl, questionid');
-        
-        if($questions && $original_provider){
-        	foreach($questions as $question){
-        		
-        		$record = new \StdClass();
-        		$record->id = $question->id;
-        		$record->typeid = $type->id;
-        		//$new_domain = qtype_lti_get_domain_from_url($type->baseurl);
-        		//$old_domain = qtype_lti_get_domain_from_url($question->toolurl);
-
-        		$current_qtype_url = parse_url($question->toolurl);
-        		$updated_qtype_url = $type->baseurl;
-        		if(!empty($current_qtype_url['path'])){
-        			
-        			/*
-        			//check if path matches in parts at least and then ingore it.
-        			$original_path = parse_url($question->toolurl);
-        			$split_original = explode('/',$original_path['path']);
-        			$split_new = explode('/',$current_qtype_url['path']);
-        			
-        			$result = array_filter(array_unique(array_merge($split_original,$split_new), SORT_REGULAR));
-        			
-        			$updated_qtype_url .= '/' . implode('/',$result);
-        			
-        			*/
-        			$original_path = parse_url($question->toolurl);
-        			$parts = explode("/", $original_path['path']);
-        			$final_part = '/' . end($parts);
-        			$final_part = str_replace('//','/',$final_part);
-        			
-        			$updated_qtype_url .= $final_part;
-        			
-        		}
-        		if(!empty($current_qtype_url['query'])){
-        			$updated_qtype_url .= $current_qtype_url['query'];
-        		}
-        		$record->toolurl = str_replace('//','/', $updated_qtype_url);
-        		$record->toolurl = str_replace(':/','://', $record->toolurl);
-        		
-        		$DB->update_record('qtype_lti_options', $record);
-        	
-        		
-        		
-
-        	}
-        }
-
-        //Some records might not be connected to type id but rely on type id.
-        
-        $original_domain = $original_provider->tooldomain;
-        if($original_domain){
-        	$loose_questions = $DB->get_records_sql('select id, toolurl from {qtype_lti_options} where '.$DB->sql_like('toolurl', ':toolurl').' and typeid = :typeid', array( 'toolurl' => '%'.$original_domain.'%', 'typeid' => 0));
-
-        	foreach($loose_questions as $loose_question){
-        		$record->id = $loose_question->id;
-        		$record->typeid = $type->id;
-
-        		$current_qtype_url = parse_url($loose_question->toolurl);
-        		$updated_qtype_url = $type->baseurl;
-        		if(!empty($current_qtype_url['path'])){
-
-        			$original_path = parse_url($loose_question->toolurl);
-        			$parts = explode("/", $original_path['path']);
-        			$final_part = '/' . end($parts);
-        			$final_part = str_replace('//','/',$final_part);
-        			
-        			$updated_qtype_url .= $final_part;
-        			
-        		}
-        		if(!empty($current_qtype_url['query'])){
-        			$updated_qtype_url .= $current_qtype_url['query'];
-        		}
-        		$record->toolurl = str_replace('//','/', $updated_qtype_url);
-        		$record->toolurl = str_replace(':/','://', $record->toolurl);
-        		
-        		$DB->update_record('qtype_lti_options', $record);
-        		
-        		
-        		
-        	}
-        }
-
         
         require_once($CFG->libdir.'/modinfolib.php');
         if ($clearcache) {
@@ -2167,9 +2088,7 @@ function qtype_lti_add_type($type, $config) {
     $config->lti_servicesalt = uniqid('', true);
 
     $id = $DB->insert_record('qtype_lti_types', $type);
-   
-    
-    
+
 
     if ($id) {
         foreach ($config as $key => $value) {
@@ -2182,19 +2101,18 @@ function qtype_lti_add_type($type, $config) {
                 qtype_lti_add_config($record);
             }
         
-        
-        
-        //Some records might not be connected to type id but rely on type id.
-        
-        	$loose_questions = $DB->get_records_sql('select id, toolurl from {qtype_lti_options} where '.$DB->sql_like('toolurl', ':toolurl').' and typeid = :typeid', array( 'toolurl' => '%'.$type->baseurl.'%', 'typeid' => 0));
-        	if($loose_questions){
-        		foreach($loose_questions as $loose_question){
-        			$record = new \StdClass();
-        			$record->id = $loose_question->id;
-        			$record->typeid = $id;
-        			$DB->update_record('qtype_lti_options', $record);
-        		}
+        //Some records might not be connected to type id but rely on type id. 
+        $loose_questions = $DB->get_records_sql('select id, toolurl from {qtype_lti_options}
+												 where '.$DB->sql_like('toolurl', ':toolurl').' and
+												 typeid = :typeid', array( 'toolurl' => '%'.$type->baseurl.'%', 'typeid' => 0));
+        if($loose_questions) {
+        	foreach($loose_questions as $loose_question) {
+        		$record = new \StdClass();
+        		$record->id = $loose_question->id;
+        		$record->typeid = $id;
+        		$DB->update_record('qtype_lti_options', $record);
         	}
+        }
         	
       }
     

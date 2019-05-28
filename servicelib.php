@@ -160,31 +160,26 @@ function qtype_lti_accepts_grades($ltiinstance) {
  *
  * @param int $userid
  */
-function qtype_lti_set_session_user($userid) {
+function qtype_lti_set_session_user($username) {
     global $DB;
 
-    if ($user = $DB->get_record('user', array('id' => $userid))) {
+    if ($user = $DB->get_record('user', array('username' => $username))) {
         \core\session\manager::set_user($user);
     }
 }
 
-function qtype_lti_update_grade($ltiinstance, $userid, /*$launchid*/ $attemptid, $gradeval) {
+function qtype_lti_update_grade($username, $linkid, $resultid, $gradeval) {
     global $CFG, $DB;
     require_once($CFG->libdir . '/gradelib.php');
 
     $params = array();
     $params['itemname'] = $ltiinstance->name;
 
-    //$gradeval = $gradeval * floatval($ltiinstance->grade);
-
     $grade = new stdClass();
     $grade->userid   = $userid;
     $grade->rawgrade = $gradeval;
 
-  //  $status = grade_update(QTYPE_LTI_SOURCE, $ltiinstance->course, QTYPE_LTI_ITEM_TYPE, QTYPE_LTI_ITEM_MODULE, $ltiinstance->id, 0, $grade, $params);
-
-    $record = $DB->get_record('qtype_lti_submission', array('ltiid' => $ltiinstance->id, 'userid' => $userid,
-                    /*'launchid' => $launchid*/ 'attemptid' => $attemptid), 'id');
+    $record = $DB->get_record('qtype_lti_submission',  array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid), 'id');
     if ($record) {
         $id = $record->id;
     } else {
@@ -200,13 +195,13 @@ function qtype_lti_update_grade($ltiinstance, $userid, /*$launchid*/ $attemptid,
         ));
     } else {
         $DB->insert_record('qtype_lti_submission', array(
-            'ltiid' => $ltiinstance->id,
-            'userid' => $userid,
+        	'username' => $username,
+        	'linkid' => $linkid,
+        	'resultid' => $resultid,
             'datesubmitted' => time(),
             'dateupdated' => time(),
             'gradepercent' => $gradeval,
             'originalgrade' => $gradeval,
-            'attemptid' => $attemptid,
             'state' => 1
         ));
 
@@ -215,24 +210,17 @@ function qtype_lti_update_grade($ltiinstance, $userid, /*$launchid*/ $attemptid,
     return $status == GRADE_UPDATE_OK;
 }
 
-function qtype_lti_read_grade($ltiinstance, $userid, $attemptid) {
+function qtype_lti_read_grade($username, $linkid, $resultid){
     global $CFG, $DB;
     require_once($CFG->libdir . '/gradelib.php');
 
-  //  $grades = grade_get_grades($ltiinstance->course, QTYPE_LTI_ITEM_TYPE, QTYPE_LTI_ITEM_MODULE, $ltiinstance->id, $userid);
-
     $ltigrade = floatval($ltiinstance->grade);
 
-
-    $submission_grade = $DB->get_record('qtype_lti_submission', array(
-        'ltiid' => $ltiinstance->id,
-        'userid' => $userid,
-    	'attemptid' => $attemptid
-        ));
+    $submission_grade = $DB->get_record('qtype_lti_submission',  array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid));
 
     if($submission_grade) {
 
-        return $submission_grade->gradepercent; // / $ltigrade;
+        return $submission_grade->gradepercent;
     }
     return null;
     /* */
@@ -240,23 +228,20 @@ function qtype_lti_read_grade($ltiinstance, $userid, $attemptid) {
         foreach ($grades->items[0]->grades as $agrade) {
             $grade = $agrade->grade;
             if (isset($grade)) {
-                return $grade;// / $ltigrade;
+                return $grade;
             }
         }
     }
 }
 
-function qtype_lti_delete_grade($ltiinstance, $userid, $attemptid) {
+function qtype_lti_delete_grade($username, $linkid, $resultid) {
     global $CFG, $DB;
- /*  
-    $grade = new stdClass();
-    $grade->userid   = $userid;
-    $grade->rawgrade = null;
 
-    //$status = grade_update(QTYPE_LTI_SOURCE, $ltiinstance->course, QTYPE_LTI_ITEM_TYPE, QTYPE_LTI_ITEM_MODULE, $ltiinstance->id, 0, $grade);
-
-*/
-    $record = $DB->get_record('qtype_lti_submission', array('ltiid' => $ltiinstance->id, 'userid' => $userid, 'attemptid' => $attemptid), 'id');
+    
+    $regrade_result_id = '';
+    
+    		
+    $record = $DB->get_record('qtype_lti_submission', array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid), 'id');
     
     if($record){
     	$status = $DB->delete_records('qtype_lti_submission', array(
@@ -264,20 +249,6 @@ function qtype_lti_delete_grade($ltiinstance, $userid, $attemptid) {
     	));
     }
 
-
-  /*  
-    $record = $DB->get_record('qtype_lti_submission', array('ltiid' => $ltiinstance->id, 'userid' => $userid,
-    		'attemptid' => $attemptid), 'id');
-    
-    $DB->update_record('qtype_lti_submission', array(
-    		'ltiid' => $ltiinstance->id,
-    		'userid' => $userid,
-    		'attemptid' => $attemptid,
-    		'dateupdated' => time(),
-    		'gradepercent' => null,
-    		'state' => 2
-    ));
-    */
 
     return $status == GRADE_UPDATE_OK;
 }
@@ -310,7 +281,7 @@ function qtype_lti_verify_message($key, $sharedsecrets, $body, $headers = null) 
  */
 function qtype_lti_verify_sourcedid($ltiinstance, $parsed) {
     $sourceid = qtype_lti_build_sourcedid($parsed->instanceid, $parsed->userid,
-        $ltiinstance->servicesalt, $parsed->typeid, /*$parsed->launchid*/ $parsed->attemptid);
+        $ltiinstance->servicesalt, $parsed->typeid, $parsed->attemptid, $parsed->ltiid);
 
     if ($sourceid->hash != $parsed->sourcedidhash) {
         throw new Exception('SourcedId hash not valid');

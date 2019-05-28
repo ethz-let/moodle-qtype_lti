@@ -51,14 +51,14 @@ require_once($CFG->dirroot.'/question/type/lti/lib.php');
 require_once($CFG->dirroot.'/question/type/lti/locallib.php');
 
 $id = required_param('id', PARAM_INT); // Course Module ID.
-$userid = required_param('userid', PARAM_INT); // Course Module ID.
+$userid = required_param('userid', PARAM_INT); // User ID.
+$resourcelinkid = required_param('resourcelinkid', PARAM_RAW);
+$resultid = required_param('resultid', PARAM_RAW);
+
 $triggerview = optional_param('triggerview', 1, PARAM_BOOL);
 $readonly = optional_param('readonly', 0, PARAM_BOOL);
 $manuallygraded_in_moodle = optional_param('manuallygraded', 0, PARAM_BOOL);
-
-$attemptid = optional_param('attemptid', 0, PARAM_INT);
-
-
+$attemptid = optional_param('attemptid', '', PARAM_RAW);
 $quizid = optional_param('quizid', 0, PARAM_INT);
 $questionid = optional_param('questionid', 0, PARAM_INT);
 $attemptstate= optional_param('attemptstate', 'preview', PARAM_RAW);
@@ -94,22 +94,12 @@ $extra_code_expert_params = array(
                 'quiztitle' => $quiz->name,
                 'courseid' => $course->id,
                 'ltiid' => $lti->id,
-                'attemptonlast' => $quiz->attemptonlast
+                'attemptonlast' => $quiz->attemptonlast,
+				'resourcelinkid' => $resourcelinkid,
+				'resultid' => $resultid
              );
 
 
-/*
-$context = context_module::instance($cm->id);
-
-require_login($course, true, $cm);
-require_capability('qtype/lti:view', $context);
-*/
-require_login(); //$course, true
-/*
-// Completion and trigger events.
-if ($triggerview) {
-    qtype_lti_view($lti, $course, $cm, $context);
-}
-*/
+require_login();
 $lti->cmid = 0;
 qtype_lti_launch_tool($lti, $user->username, $readonly, $questionmode, $manuallygraded_in_moodle, $extra_code_expert_params);

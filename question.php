@@ -54,7 +54,7 @@ class qtype_lti_question extends question_graded_automatically_with_countback{
     }
 
     public function get_expected_data() {
-        return array('answer' => PARAM_RAW, 'instanceid' => PARAM_RAW, 'userid' => PARAM_RAW, 'attemptid' => PARAM_RAW); //'launchid' => PARAM_RAW,
+    	return array('answer' => PARAM_RAW, 'instanceid' => PARAM_RAW, 'userid' => PARAM_RAW, 'attemptid' => PARAM_RAW, 'username' => PARAM_RAW, 'linkid' => PARAM_RAW, 'resultid' => PARAM_RAW); //'launchid' => PARAM_RAW,
     }
 
     public function is_complete_response(array $response) {
@@ -120,13 +120,18 @@ class qtype_lti_question extends question_graded_automatically_with_countback{
       //  $launchid = $answers['launchid'];
         $userid = $answers['userid'];
         $attemptid = $answers['attemptid'];
-
+        
+        $username = $answers['username'];
+        $linkid = $answers['linkid'];
+        $result = $answers['resultid'];
+    //    print_r($answers);exit;
+        $regrade_result_id = '';
+        
         $submission_grade = $DB->get_record('qtype_lti_submission', array(
-            'ltiid' => $instanceid,
-            'userid' => $userid,
-            'attemptid' => $attemptid,
+        		'username' => $username,
+        		'linkid' => $linkid,
+        		'resultid' => $result,
           ));
-
         if($submission_grade) {
             $value = $submission_grade->gradepercent;
         }

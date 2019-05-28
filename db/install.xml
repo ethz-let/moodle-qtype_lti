@@ -9,7 +9,7 @@
         <FIELD NAME="instancecode" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"  COMMENT="Instance to be sent and never changes in restore."/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Course basiclti activity belongs to"/>
         <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="CMID basiclti activity belongs to. default 0"/>
-	       <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Question basic LTI activity belongs to"/>
+	    <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Question basic LTI activity belongs to"/>
         <FIELD NAME="typeid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Basic LTI type"/>
         <FIELD NAME="toolurl" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Remote tool url"/>
         <FIELD NAME="securetoolurl" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
@@ -122,13 +122,35 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="ltiid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the LTI tool instance"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="username" TYPE="char" LENGTH="60" NOTNULL="false" SEQUENCE="false" COMMENT="username in moodle."/>
+        <FIELD NAME="linkid" TYPE="char" LENGTH="250" NOTNULL="true" SEQUENCE="false" COMMENT="logged resource_link_id"/>
+        <FIELD NAME="resultid" TYPE="char" LENGTH="250" NOTNULL="true" SEQUENCE="false" COMMENT="logged lis_result_sourcedid"/>	
         <FIELD NAME="datesubmitted" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="dateupdated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="gradepercent" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5"/>
         <FIELD NAME="originalgrade" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5"/>
-        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="state" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="qtype_lti_usage" COMMENT="Keeps track of LTI user-vs-question usage.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="ltiid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the LTI tool instance"/>
+        <FIELD NAME="instancecode" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="Question InstanceCode in moodle."/>
+        <FIELD NAME="attemptid" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="ID of the CodeExpert tool instance"/>
+        <FIELD NAME="mattemptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="ID of the CodeExpert tool instance"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Moodle QuestionID"/>
+        <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Moodle QuizID"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="resourcelinkid" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="logged resource_link_id"/>
+        <FIELD NAME="resultid"  TYPE="char" LENGTH="250" NOTNULL="true" SEQUENCE="false" COMMENT="logged lis_result_sourcedid"/>
+        <FIELD NAME="origin" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="logged moodle origin"/>
+        <FIELD NAME="destination" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="logged CE destination"/>
+        <FIELD NAME="timeadded" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

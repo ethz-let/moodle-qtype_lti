@@ -40,6 +40,7 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         $paths[] = new restore_path_element('ltitoolproxy', $this->get_pathfor('/lti/ltitype/ltitoolproxy'));
         $paths[] = new restore_path_element('ltitoolsetting', $this->get_pathfor('/lti/ltitype/ltitoolproxy/ltitoolsettings/ltitoolsetting'));
         $paths[] = new restore_path_element('ltisubmission', $this->get_pathfor('/lti/ltisubmissions/ltisubmission'));
+        $paths[] = new restore_path_element('qtype_lti_usage', $this->get_pathfor('/lti/qtype_lti_usages/qtype_lti_usage'));
         // Return the paths wrapped into standard activity structure.
         return $paths;
     }
@@ -79,6 +80,15 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         // Try to get resourcekey and password. Null if not possible (DB default).
         $data->resourcekey = isset($data->resourcekey) ? $data->resourcekey : null;
         $data->password = isset($data->password) ? $data->password : null;
+        
+        
+        
+        $ltipluginconfig= get_config('qtype_lti');
+        
+        if (isset($ltipluginconfig->removerestoredlink) && $ltipluginconfig->removerestoredlink == 1){
+        	$data->securetoolurl = '';
+        	$data->toolurl = '';
+        }
 
         // If the question has been created by restore, we need to create its
         // qtype_lti_options too.
@@ -241,13 +251,45 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         $data->ltiid = $this->get_new_parentid('lti');
         $data->datesubmitted = $this->apply_date_offset($data->datesubmitted);
         $data->dateupdated = $this->apply_date_offset($data->dateupdated);
-        if ($data->userid > 0) {
-            $data->userid = $this->get_mappingid('user', $data->userid);
-        }
+
         $newitemid = $DB->insert_record('qtype_lti_submission', $data);
         $this->set_mapping('ltisubmission', $oldid, $newitemid);
     }
+    /**
+     * Process a usage mapping restore
+     * @param mixed $data The data from backup XML file
+     */
+    public function process_qtype_lti_usage($data) {
+    	global $DB;
+    	if (!$this->is_question_created()) {
+    		return;
+    	}
 
+    	$data = (object)$data;
+    	$oldid = $data->id;
+    	$data->ltiid = $this->get_new_parentid('lti');
+    	if ($data->userid > 0) {
+    		$data->userid = $this->get_mappingid('user', $data->userid);
+    	}
+
+    	if ($data->questionid > 0) {
+	    	// Detect if the question is created or mapped.
+	        $oldquestionid = $this->get_old_parentid('question');
+	        $newquestionid = $this->get_new_parentid('question');
+	        $questioncreated = (bool) $this->get_mappingid('question_created', $oldquestionid);
+	        if ($questioncreated) {
+	            $data->questionid = $newquestionid;
+	        }
+    	}
+    	if ($data->courseid > 0) {
+    		$courseid = $this->task->get_courseid();
+    		$data->courseid = ($this->get_mappingid('course', $data->courseid) == $courseid) ? $courseid : SITEID;
+    	}
+    	
+    	$newitemid = $DB->insert_record('qtype_lti_usage', $data);
+    	$this->set_mapping('qtype_lti_usage', $oldid, $newitemid);
+    }
+    
     public function recode_response($questionid, $sequencenumber, array $response) {
         if (array_key_exists('_order', $response)) {
             $response['_order'] = $response['_order'];
