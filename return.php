@@ -18,9 +18,8 @@
  * Handle the return back to Moodle from the tool provider
  *
  * @package qtype_lti
- * @copyright  Copyright (c) 2011 Moodlerooms Inc. (http://www.moodlerooms.com)
+ * @copyright  Copyright (c) 2019 ETH Zurich
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author     Chris Scribner
  */
 
 require_once('../../../config.php');
@@ -41,8 +40,6 @@ $lti = null;
 $context = null;
 if (!empty($instanceid)) {
     $lti = $DB->get_record('qtype_lti_options', array('id' => $instanceid), '*', MUST_EXIST);
-  //  $cm = get_coursemodule_from_instance('lti', $lti->id, $lti->course, false, MUST_EXIST);
-  //  $context = context_module::instance($cm->id);
 }
 
 
@@ -65,7 +62,7 @@ if (!empty($errormsg) || !empty($msg)) {
     }
 
     echo $OUTPUT->header();
-    if (!empty($lti)) { // and !empty($context)
+    if (!empty($lti)) {
         echo $OUTPUT->heading(format_string('QUESTION ID: ' . $lti->questionid, true, array('context' => $context)));
     }
 }
@@ -90,7 +87,8 @@ if (!empty($errormsg)) {
         }
 
         if (!empty($lti) && has_capability('mod/lti:requesttooladd', $contextcourse)) {
-            $adminrequesturl = new moodle_url('/question/type/lti/request_tool.php', array('instanceid' => $lti->id, 'sesskey' => sesskey()));
+            $adminrequesturl = new moodle_url('/question/type/lti/request_tool.php',
+                            array('instanceid' => $lti->id, 'sesskey' => sesskey()));
             $links->admin_request_url = $adminrequesturl->out(false);
 
             echo get_string('lti_launch_error_tool_request', 'lti', $links);

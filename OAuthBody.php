@@ -32,7 +32,7 @@
 // of the Universitat Politecnica de Catalunya http://www.upc.edu
 // Contact info: Marc Alier Forment granludo @ gmail.com or marc.alier @ upc.edu.
 
-namespace moodle\qtype\lti; //moodle\question\type\lti; // Using a namespace as the basicLTI module imports classes with the same names.
+namespace moodle\qtype\lti; // Using a namespace as the basicLTI module imports classes with the same names.
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -96,6 +96,6 @@ function handle_oauth_body_post($oauthconsumerkey, $oauthconsumersecret, $body, 
     if ( $hash != $oauthbodyhash ) {
         throw new OAuthException("OAuth oauth_body_hash mismatch");
     }
-    
+
     return $postdata;
 }

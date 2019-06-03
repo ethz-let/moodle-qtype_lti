@@ -18,26 +18,23 @@
  * LTI web service endpoints
  *
  * @package qtype_lti
- * @copyright  Copyright (c) 2011 Moodlerooms Inc. (http://www.moodlerooms.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author     Chris Scribner
+ * @copyright Copyright (c) 2019 ETH Zurich
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 define('NO_DEBUG_DISPLAY', true);
 define('NO_MOODLE_COOKIES', true);
 
 require_once(__DIR__ . "/../../../config.php");
-require_once($CFG->dirroot.'/question/type/lti/locallib.php');
-require_once($CFG->dirroot.'/question/type/lti/servicelib.php');
+require_once($CFG->dirroot . '/question/type/lti/locallib.php');
+require_once($CFG->dirroot . '/question/type/lti/servicelib.php');
 
 /**
  * Handles exceptions when handling incoming LTI messages.
- *
  * Ensures that LTI always returns a XML message that can be consumed by the caller.
  *
- * @package   qtype_lti
- * @copyright Copyright (c) 2015 Moodlerooms Inc. (http://www.moodlerooms.com)
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package qtype_lti
+ * @copyright Copyright 2019 ETH Zurich
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class service_exception_handler {
     /**
@@ -53,7 +50,7 @@ class service_exception_handler {
      * @var string
      */
     protected $id = '';
-    
+
     /**
      * The LTI service message type, if known.
      *
@@ -64,7 +61,8 @@ class service_exception_handler {
     /**
      * Constructor.
      *
-     * @param boolean $log Enable error response logging.
+     * @param boolean $log
+     *        Enable error response logging.
      */
     public function __construct($log) {
         $this->log = $log;
@@ -95,14 +93,15 @@ class service_exception_handler {
     /**
      * Echo an exception message encapsulated in XML.
      *
-     * @param \Exception|\Throwable $exception The exception that was thrown
+     * @param \Exception|\Throwable $exception
+     *        The exception that was thrown
      */
     public function handle($exception) {
         $message = $exception->getMessage();
 
         // Add the exception backtrace for developers.
         if (debugging('', DEBUG_DEVELOPER)) {
-            $message .= "\n".format_backtrace(get_exception_info($exception)->backtrace, true);
+            $message .= "\n" . format_backtrace(get_exception_info($exception)->backtrace, true);
         }
 
         // Switch to response.
@@ -122,14 +121,12 @@ class service_exception_handler {
     }
 }
 
-
 // TODO: Switch to core oauthlib once implemented - MDL-30149.
 use moodle\qtype\lti as lti;
 
-
 $rawbody = file_get_contents("php://input");
 
-$logrequests  = qtype_lti_should_log_request($rawbody);
+$logrequests = qtype_lti_should_log_request($rawbody);
 $errorhandler = new service_exception_handler($logrequests);
 
 // Register our own error handler so we can always send valid XML response.
@@ -138,8 +135,8 @@ set_exception_handler(array($errorhandler, 'handle'));
 if ($logrequests) {
     qtype_lti_log_request($rawbody);
 }
-$lti_headers = lti\OAuthUtil::get_headers();
-foreach ($lti_headers as $name => $value) {
+$ltiheaders = lti\OAuthUtil::get_headers();
+foreach ($ltiheaders as $name => $value) {
     if ($name === 'Authorization') {
         $oauthparams = lti\OAuthUtil::split_header($value);
         $consumerkey = $oauthparams['oauth_consumer_key'];
@@ -148,11 +145,11 @@ foreach ($lti_headers as $name => $value) {
 }
 
 if (empty($consumerkey)) {
-   throw new Exception('Consumer key is missing, or Authorization header is not readable by the server.');
+    throw new Exception('Consumer key is missing, or Authorization header is not readable by the server.');
 }
 $returnedsecret = qtype_lti_get_shared_secrets_by_key($consumerkey);
 
-$sharedsecret = qtype_lti_verify_message($consumerkey, $returnedsecret , $rawbody);
+$sharedsecret = qtype_lti_verify_message($consumerkey, $returnedsecret, $rawbody);
 
 if ($sharedsecret === false) {
     throw new Exception('Message signature not valid');
@@ -196,16 +193,11 @@ switch ($messagetype) {
             throw new Exception('Grade replace response');
         }
 
-        $responsexml = qtype_lti_get_response_xml(
-                'success',
-                'Grade replace response',
-                $parsed->messageid,
-                'replaceResultResponse'
-        );
+        $responsexml = qtype_lti_get_response_xml('success', 'Grade replace response', $parsed->messageid, 'replaceResultResponse');
 
         echo $responsexml->asXML();
 
-        break;
+    break;
 
     case 'readResultRequest':
 
@@ -217,21 +209,11 @@ switch ($messagetype) {
             throw new Exception('Tool does not accept grades');
         }
 
-        // Getting the grade requires the context is set.
-    //    $context = context_course::instance($ltiinstance->course);
-      //  $PAGE->set_context($context);
-
-
         qtype_lti_verify_sourcedid($ltiinstance, $parsed);
 
         $grade = qtype_lti_read_grade($parsed->username, $parsed->linkid, $parsed->resultid);
 
-        $responsexml = qtype_lti_get_response_xml(
-                'success',  // Empty grade is also 'success'.
-                'Result read',
-                $parsed->messageid,
-                'readResultResponse'
-        );
+        $responsexml = qtype_lti_get_response_xml('success', 'Result read', $parsed->messageid, 'readResultResponse');
 
         $node = $responsexml->imsx_POXBody->readResultResponse;
         $node = $node->addChild('result')->addChild('resultScore');
@@ -240,7 +222,7 @@ switch ($messagetype) {
 
         echo $responsexml->asXML();
 
-        break;
+    break;
 
     case 'deleteResultRequest':
         $parsed = qtype_lti_parse_grade_delete_message($xml);
@@ -253,23 +235,18 @@ switch ($messagetype) {
 
         qtype_lti_verify_sourcedid($ltiinstance, $parsed);
         qtype_lti_set_session_user($parsed->username);
-        
+
         $gradestatus = qtype_lti_delete_grade($parsed->username, $parsed->linkid, $parsed->resultid);
 
         if (!$gradestatus) {
             throw new Exception('Grade delete request was not successful');
         }
 
-        $responsexml = qtype_lti_get_response_xml(
-                'success',
-                'Grade delete request',
-                $parsed->messageid,
-                'deleteResultResponse'
-        );
+        $responsexml = qtype_lti_get_response_xml('success', 'Grade delete request', $parsed->messageid, 'deleteResultResponse');
 
         echo $responsexml->asXML();
 
-        break;
+    break;
 
     default:
         // Fire an event if we get a web service request which we don't support directly.
@@ -307,15 +284,10 @@ switch ($messagetype) {
         }
 
         if (!$ltiwebservicehandled) {
-            $responsexml = qtype_lti_get_response_xml(
-                'unsupported',
-                'unsupported',
-                 qtype_lti_parse_message_id($xml),
-                 $messagetype
-            );
+            $responsexml = qtype_lti_get_response_xml('unsupported', 'unsupported', qtype_lti_parse_message_id($xml), $messagetype);
 
             echo $responsexml->asXML();
         }
 
-        break;
+    break;
 }

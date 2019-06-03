@@ -38,13 +38,7 @@
  * It is used to create a new form used to pre-configure lti activities
  *
  * @package qtype_lti
- * @copyright  2009 Marc Alier, Jordi Piguillem, Nikolas Galanis
- *  marc.alier@upc.edu
- * @copyright  2009 Universitat Politecnica de Catalunya http://www.upc.edu
- * @author     Marc Alier
- * @author     Jordi Piguillem
- * @author     Nikolas Galanis
- * @author     Chris Scribner
+ * @copyright  2019 ETH Zurich
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -141,7 +135,8 @@ if ($data = $form->get_data()) {
 }
 
 $PAGE->set_title("$SITE->shortname: " . get_string('toolsetup', 'qtype_lti'));
-$PAGE->navbar->add(get_string('lti_administration', 'qtype_lti'), $CFG->wwwroot.'/'.$CFG->admin.'/settings.php?section=qtypesettinglti');
+$PAGE->navbar->add(get_string('lti_administration', 'qtype_lti'),
+                $CFG->wwwroot.'/'.$CFG->admin.'/settings.php?section=qtypesettinglti');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('toolsetup', 'qtype_lti'));

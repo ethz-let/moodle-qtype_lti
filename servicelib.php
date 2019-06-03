@@ -18,18 +18,15 @@
  * Utility code for LTI service handling.
  *
  * @package qtype_lti
- * @copyright  Copyright (c) 2011 Moodlerooms Inc. (http://www.moodlerooms.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author     Chris Scribner
+ * @copyright Copyright 2019 ETH Zurich
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
-defined('MOODLE_INTERNAL') || die;
-
-require_once($CFG->dirroot.'/question/type/lti/OAuthBody.php');
-require_once($CFG->dirroot.'/question/type/lti/locallib.php');
+require_once($CFG->dirroot . '/question/type/lti/OAuthBody.php');
+require_once($CFG->dirroot . '/question/type/lti/locallib.php');
 
 // TODO: Switch to core oauthlib once implemented - MDL-30149.
-//use moodle\question\type\lti as lti;
 use moodle\qtype\lti as lti;
 
 define('QTYPE_LTI_ITEM_TYPE', 'qtype');
@@ -75,12 +72,12 @@ function qtype_lti_parse_grade_replace_message($xml) {
 
     $node = $xml->imsx_POXBody->replaceResultRequest->resultRecord->result->resultScore->textString;
 
-    $score = (string) $node;
-    if ( ! is_numeric($score) ) {
+    $score = (string)$node;
+    if (!is_numeric($score)) {
         throw new Exception('Score must be numeric');
     }
     $grade = floatval($score);
-    if ( $grade < 0.0 || $grade > 1.0 ) {
+    if ($grade < 0.0 || $grade > 1.0) {
         throw new Exception('Score not between 0.0 and 1.0');
     }
 
@@ -89,7 +86,6 @@ function qtype_lti_parse_grade_replace_message($xml) {
 
     $parsed->instanceid = $resultjson->data->instanceid;
     $parsed->userid = $resultjson->data->userid;
-   // $parsed->launchid = $resultjson->data->launchid;
     $parsed->attemptid = $resultjson->data->attemptid;
     $parsed->typeid = $resultjson->data->typeid;
     $parsed->sourcedidhash = $resultjson->hash;
@@ -105,7 +101,6 @@ function qtype_lti_parse_grade_read_message($xml) {
     $parsed = new stdClass();
     $parsed->instanceid = $resultjson->data->instanceid;
     $parsed->userid = $resultjson->data->userid;
-    //$parsed->launchid = $resultjson->data->launchid;
     $parsed->attemptid = $resultjson->data->attemptid;
     $parsed->typeid = $resultjson->data->typeid;
     $parsed->sourcedidhash = $resultjson->hash;
@@ -122,7 +117,6 @@ function qtype_lti_parse_grade_delete_message($xml) {
     $parsed = new stdClass();
     $parsed->instanceid = $resultjson->data->instanceid;
     $parsed->userid = $resultjson->data->userid;
-    //$parsed->launchid = $resultjson->data->launchid;
     $parsed->attemptid = $resultjson->data->attemptid;
     $parsed->typeid = $resultjson->data->typeid;
     $parsed->sourcedidhash = $resultjson->hash;
@@ -134,25 +128,7 @@ function qtype_lti_parse_grade_delete_message($xml) {
 
 function qtype_lti_accepts_grades($ltiinstance) {
     global $DB;
-    return true; // always true!
-    $acceptsgrades = true;
-    $ltitype = $DB->get_record('qtype_lti_types', array('id' => $ltiinstance->typeid));
-
-    if (empty($ltitype->toolproxyid)) {
-        $typeconfig = lti_get_config($ltiinstance);
-
-        $typeacceptgrades = isset($typeconfig['acceptgrades']) ? $typeconfig['acceptgrades'] : QTYPE_LTI_SETTING_DELEGATE;
-
-        if (!($typeacceptgrades == QTYPE_LTI_SETTING_ALWAYS ||
-            ($typeacceptgrades == QTYPE_LTI_SETTING_DELEGATE && $ltiinstance->instructorchoiceacceptgrades == QTYPE_LTI_SETTING_ALWAYS))) {
-            $acceptsgrades = false;
-        }
-    } else {
-        $enabledcapabilities = explode("\n", $ltitype->enabledcapability);
-        $acceptsgrades = in_array('Result.autocreate', $enabledcapabilities);
-    }
-
-    return $acceptsgrades;
+    return true; // Always true!.
 }
 
 /**
@@ -176,10 +152,11 @@ function qtype_lti_update_grade($username, $linkid, $resultid, $gradeval) {
     $params['itemname'] = $ltiinstance->name;
 
     $grade = new stdClass();
-    $grade->userid   = $userid;
+    $grade->userid = $userid;
     $grade->rawgrade = $gradeval;
 
-    $record = $DB->get_record('qtype_lti_submission',  array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid), 'id');
+    $record = $DB->get_record('qtype_lti_submission', array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid),
+                            'id');
     if ($record) {
         $id = $record->id;
     } else {
@@ -187,68 +164,42 @@ function qtype_lti_update_grade($username, $linkid, $resultid, $gradeval) {
     }
 
     if (!empty($id)) {
-        $DB->update_record('qtype_lti_submission', array(
-            'id' => $id,
-            'dateupdated' => time(),
-            'gradepercent' => $gradeval,
-            'state' => 2
-        ));
+        $DB->update_record('qtype_lti_submission',
+                        array('id' => $id, 'dateupdated' => time(), 'gradepercent' => $gradeval, 'state' => 2));
     } else {
-        $DB->insert_record('qtype_lti_submission', array(
-        	'username' => $username,
-        	'linkid' => $linkid,
-        	'resultid' => $resultid,
-            'datesubmitted' => time(),
-            'dateupdated' => time(),
-            'gradepercent' => $gradeval,
-            'originalgrade' => $gradeval,
-            'state' => 1
-        ));
-
+        $DB->insert_record('qtype_lti_submission',
+                        array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid, 'datesubmitted' => time(),
+                            'dateupdated' => time(), 'gradepercent' => $gradeval, 'originalgrade' => $gradeval, 'state' => 1));
     }
 
     return $status == GRADE_UPDATE_OK;
 }
 
-function qtype_lti_read_grade($username, $linkid, $resultid){
+function qtype_lti_read_grade($username, $linkid, $resultid) {
     global $CFG, $DB;
     require_once($CFG->libdir . '/gradelib.php');
 
     $ltigrade = floatval($ltiinstance->grade);
 
-    $submission_grade = $DB->get_record('qtype_lti_submission',  array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid));
+    $submissiongrade = $DB->get_record('qtype_lti_submission',
+                                        array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid));
 
-    if($submission_grade) {
+    if ($submissiongrade) {
 
-        return $submission_grade->gradepercent;
+        return $submissiongrade->gradepercent;
     }
     return null;
-    /* */
-    if (!empty($ltigrade) && isset($grades) && isset($grades->items[0]) && is_array($grades->items[0]->grades)) {
-        foreach ($grades->items[0]->grades as $agrade) {
-            $grade = $agrade->grade;
-            if (isset($grade)) {
-                return $grade;
-            }
-        }
-    }
 }
 
 function qtype_lti_delete_grade($username, $linkid, $resultid) {
     global $CFG, $DB;
 
-    
-    $regrade_result_id = '';
-    
-    		
-    $record = $DB->get_record('qtype_lti_submission', array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid), 'id');
-    
-    if($record){
-    	$status = $DB->delete_records('qtype_lti_submission', array(
-    			'id' => $record->id
-    	));
-    }
+    $record = $DB->get_record('qtype_lti_submission', array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid),
+                            'id');
 
+    if ($record) {
+        $status = $DB->delete_records('qtype_lti_submission', array('id' => $record->id));
+    }
 
     return $status == GRADE_UPDATE_OK;
 }
@@ -260,7 +211,7 @@ function qtype_lti_verify_message($key, $sharedsecrets, $body, $headers = null) 
             // TODO: Switch to core oauthlib once implemented - MDL-30149.
             lti\handle_oauth_body_post($key, $secret, $body, $headers);
         } catch (Exception $e) {
-            debugging('LTI message verification failed: '.$e->getMessage());
+            debugging('LTI message verification failed: ' . $e->getMessage());
             $signaturefailed = true;
         }
 
@@ -280,8 +231,8 @@ function qtype_lti_verify_message($key, $sharedsecrets, $body, $headers = null) 
  * @throws Exception
  */
 function qtype_lti_verify_sourcedid($ltiinstance, $parsed) {
-    $sourceid = qtype_lti_build_sourcedid($parsed->instanceid, $parsed->userid,
-        $ltiinstance->servicesalt, $parsed->typeid, $parsed->attemptid, $parsed->ltiid);
+    $sourceid = qtype_lti_build_sourcedid($parsed->instanceid, $parsed->userid, $ltiinstance->servicesalt, $parsed->typeid,
+                                        $parsed->attemptid, $parsed->ltiid);
 
     if ($sourceid->hash != $parsed->sourcedidhash) {
         throw new Exception('SourcedId hash not valid');
@@ -291,7 +242,8 @@ function qtype_lti_verify_sourcedid($ltiinstance, $parsed) {
 /**
  * Extend the LTI services through the ltisource plugins
  *
- * @param stdClass $data LTI request data
+ * @param stdClass $data
+ *        LTI request data
  * @return bool
  * @throws coding_exception
  */

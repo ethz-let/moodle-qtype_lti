@@ -31,7 +31,6 @@ $instanceid = required_param('instanceid', PARAM_INT);
 
 $lti = $DB->get_record('qtype_lti_options', array('id' => $instanceid));
 $course = $DB->get_record('course', array('id' => $lti->course));
-//$cm = get_coursemodule_from_instance('lti', $lti->id, $lti->course, false, MUST_EXIST);
 $context = context_course::instance($lti->course);
 
 require_login($course);

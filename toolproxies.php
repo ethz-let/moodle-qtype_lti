@@ -18,8 +18,7 @@
  * This file contains all necessary code to launch a Tool Proxy registration
  *
  * @package qtype_lti
- * @copyright  2014 Vital Source Technologies http://vitalsource.com
- * @author     Stephen Vickers
+ * @copyright  2019 ETH Zurich
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -88,7 +87,8 @@ switch ($tab) {
 $registertype = get_string('registertype', 'lti');
 $config = get_string('manage_tools', 'lti');
 
-$registertypeurl = "{$CFG->wwwroot}/question/type/lti/registersettings.php?action=add&amp;sesskey={$USER->sesskey}&amp;tab=tool_proxy";
+$registertypeurl = "{$CFG->wwwroot}/question/type/lti/registersettings.php?";
+$registertypeurl .= "action=add&amp;sesskey={$USER->sesskey}&amp;tab=tool_proxy";
 
 $template = <<< EOD
 <div id="tp_tabs" class="yui-navset">

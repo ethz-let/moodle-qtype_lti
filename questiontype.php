@@ -17,26 +17,24 @@
 /**
  * Question type class for the lti question type.
  *
- * @package    qtype
+ * @package qtype
  * @subpackage lti
- * @copyright  2005 Mark Nielsen
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2019 ETH Zurich
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/type/lti/question.php');
-require_once($CFG->dirroot.'/question/type/lti/locallib.php');
+require_once($CFG->dirroot . '/question/type/lti/locallib.php');
 /**
  * The lti question type.
  *
- * @copyright  2005 Mark Nielsen
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2005 Mark Nielsen
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_lti extends question_type {
-	
+
     public function is_manual_graded() {
         return true;
     }
@@ -44,9 +42,8 @@ class qtype_lti extends question_type {
     public function get_question_options($question) {
         global $DB;
 
-        $question->options = $DB->get_record('qtype_lti_options',
-                array('questionid' => $question->id), '*', MUST_EXIST);
-        $question->questiontext = $question->name; // COD-4 for Import and Export title. 
+        $question->options = $DB->get_record('qtype_lti_options', array('questionid' => $question->id), '*', MUST_EXIST);
+        $question->questiontext = $question->name; // COD-4 for Import and Export title.
         parent::get_question_options($question);
     }
 
@@ -56,28 +53,25 @@ class qtype_lti extends question_type {
         $options = $DB->get_record('qtype_lti_options', array('questionid' => $question->id));
 
         $context = $question->context;
-        $question->grade = 100; //Default.
+        $question->grade = 100; // Default.
         $question->timecreated = time();
         $question->timemodified = $question->timecreated;
-       
-       
+
         if (!$options) { // Insertion.
             if (!isset($question->toolurl)) {
                 $question->toolurl = '';
             }
-            
+
             $question->servicesalt = uniqid('', true);
             if (!isset($question->typeid)) {
                 $question->typeid = null;
             }
-
         } else { // Update.
             if ($question->typeid == 0 && isset($question->urlmatchedtypeid)) {
-            	$question->typeid = $question->urlmatchedtypeid;
+                $question->typeid = $question->urlmatchedtypeid;
             }
         }
 
-        
         qtype_lti_load_tool_if_cartridge($question);
 
         qtype_lti_force_type_config_settings($question, qtype_lti_get_type_config_by_instance($question));
@@ -88,12 +82,11 @@ class qtype_lti extends question_type {
 
         qtype_lti_ensure_user_can_use_type($question);
 
-
-        if (!isset($question->instructorchoiceacceptgrades) || $question->instructorchoiceacceptgrades != QTYPE_LTI_SETTING_ALWAYS) {
+        if (!isset($question->instructorchoiceacceptgrades)
+                        || $question->instructorchoiceacceptgrades != QTYPE_LTI_SETTING_ALWAYS) {
             // The instance does not accept grades back from the provider, so set to "No grade" value 0.
             $question->grade = 0;
         }
-
 
         if (!$options) {
             $question->questionid = $question->id;
@@ -107,7 +100,6 @@ class qtype_lti extends question_type {
                 $question->showdescriptionlaunch = 0;
             }
 
-
             $question->questionid = $question->id;
             $question->id = $options->id;
             $DB->update_record('qtype_lti_options', $question);
@@ -119,21 +111,8 @@ class qtype_lti extends question_type {
             if (!isset($question->cmidnumber)) {
                 $question->cmidnumber = '';
             }
-
-          //qtype_lti_grade_item_update($question);
         }
-  }
-
-/*
-  public function set_default_options($question) {
-      if (!isset($question->options)) {
-          $question->options = new stdClass();
-      }
-      if (!isset($question->options->instancecode)) {
-          $question->options->instancecode = uniqid('');
-      }
-  }
-  */
+    }
 
     protected function initialise_question_instance(question_definition $question, $questiondata) {
         parent::initialise_question_instance($question, $questiondata);
@@ -153,29 +132,27 @@ class qtype_lti extends question_type {
         $question->resourcekey = $questiondata->options->resourcekey;
         $question->password = $questiondata->options->password;
         $question->debuglaunch = $questiondata->options->debuglaunch;
-        $question->showtitlelaunch =  $questiondata->options->showtitlelaunch;
-        $question->showdescriptionlaunch =  $questiondata->options->showdescriptionlaunch;
-        $question->servicesalt =  $questiondata->options->servicesalt;
+        $question->showtitlelaunch = $questiondata->options->showtitlelaunch;
+        $question->showdescriptionlaunch = $questiondata->options->showdescriptionlaunch;
+        $question->servicesalt = $questiondata->options->servicesalt;
         $question->instancecode = $questiondata->options->instancecode;
-      	// $question->originalinstancecode =  $questiondata->options->originalinstancecode;
-        $question->icon =  $questiondata->options->icon;
-        $question->secureicon=  $questiondata->options->secureicon;
-        
-        $question->answers =  $questiondata->options->answers;
+        $question->icon = $questiondata->options->icon;
+        $question->secureicon = $questiondata->options->secureicon;
+        $question->answers = $questiondata->options->answers;
     }
 
     public function delete_question($questionid, $contextid) {
-      global $DB;
+        global $DB;
 
-      if (! $basiclti = $DB->get_record("qtype_lti_options", array("questionid" => $questionid))) {
-          return false;
-      }
+        if (!$basiclti = $DB->get_record("qtype_lti_options", array("questionid" => $questionid))) {
+            return false;
+        }
 
-      $ltitype = $DB->get_record('qtype_lti_types', array('id' => $basiclti->typeid));
-      if ($ltitype) {
-          $DB->delete_records('qtype_lti_tool_settings',
-              array('toolproxyid' => $ltitype->toolproxyid, 'questionid' => $questionid));
-      }
+        $ltitype = $DB->get_record('qtype_lti_types', array('id' => $basiclti->typeid));
+        if ($ltitype) {
+            $DB->delete_records('qtype_lti_tool_settings',
+                                array('toolproxyid' => $ltitype->toolproxyid, 'questionid' => $questionid));
+        }
 
         $DB->delete_records('qtype_lti_options', array('questionid' => $questionid));
         parent::delete_question($questionid, $contextid);
@@ -184,7 +161,6 @@ class qtype_lti extends question_type {
     public function get_random_guess_score($questiondata) {
         return 0;
     }
-
 
     public function get_possible_responses($questiondata) {
         $responses = array();
@@ -196,20 +172,16 @@ class qtype_lti extends question_type {
             }
         }
         if (!$starfound) {
-            $responses[0] = new question_possible_response(
-                    get_string('didnotmatchanyanswer', 'question'), 0);
+            $responses[0] = new question_possible_response(get_string('didnotmatchanyanswer', 'question'), 0);
         }
         $responses[null] = question_possible_response::no_response();
         return array($questiondata->id => $responses);
     }
 
-
-
     public function move_files($questionid, $oldcontextid, $newcontextid) {
         parent::move_files($questionid, $oldcontextid, $newcontextid);
         $fs = get_file_storage();
-        $fs->move_area_files_to_new_context($oldcontextid,
-                $newcontextid, 'qtype_lti', 'graderinfo', $questionid);
+        $fs->move_area_files_to_new_context($oldcontextid, $newcontextid, 'qtype_lti', 'graderinfo', $questionid);
     }
 
     protected function delete_files($questionid, $contextid) {
@@ -218,14 +190,16 @@ class qtype_lti extends question_type {
         $fs->delete_area_files($contextid, 'qtype_lti', 'graderinfo', $questionid);
     }
 
-     /**
+    /**
      * Provide export functionality for xml format.
      *
-     * @param question object the question object
-     * @param format object the format object so that helper methods can be used
-     * @param extra mixed any additional format specific data that may be passed by the format (see
+     * @param
+     *        question object the question object
+     * @param
+     *        format object the format object so that helper methods can be used
+     * @param
+     *        extra mixed any additional format specific data that may be passed by the format (see
      *        format code for info)
-     *
      * @return string the data to append to the output buffer or false if error
      */
     public function export_to_xml($question, qformat_xml $format, $extra = null) {
@@ -234,49 +208,34 @@ class qtype_lti extends question_type {
         $contextid = $question->contextid;
 
         // Set the additional fields.
-        $expout .= '    <instancecode>' . $format->writetext($question->options->instancecode) .
-                 "</instancecode>\n";
+        $expout .= '    <instancecode>' . $format->writetext($question->options->instancecode) . "</instancecode>\n";
 
-        $expout .= '    <course>' . $question->options->course .
-        "</course>\n";
-        $expout .= '    <cmid>' . $question->options->cmid .
-        "</cmid>\n";
+        $expout .= '    <course>' . $question->options->course . "</course>\n";
+        $expout .= '    <cmid>' . $question->options->cmid . "</cmid>\n";
 
-        $expout .= '    <typeid>'.$question->options->typeid.'</typeid>\n';
-        $expout .= '    <toolurl>' . $format->writetext($question->options->toolurl) .
-                 "</toolurl>\n";
-        $expout .= '    <securetoolurl>' . $format->writetext($question->options->securetoolurl) .
-                "</securetoolurl>\n";
+        $expout .= '    <typeid>' . $question->options->typeid . '</typeid>\n';
+        $expout .= '    <toolurl>' . $format->writetext($question->options->toolurl) . "</toolurl>\n";
+        $expout .= '    <securetoolurl>' . $format->writetext($question->options->securetoolurl) . "</securetoolurl>\n";
         $expout .= '    <instructorchoicesendname>' . $question->options->instructorchoicesendname .
-                 "</instructorchoicesendname>\n";
+             "</instructorchoicesendname>\n";
         $expout .= '    <instructorchoicesendemailaddr>' . $question->options->instructorchoicesendemailaddr .
-                "</instructorchoicesendemailaddr>\n";
+             "</instructorchoicesendemailaddr>\n";
         $expout .= '    <instructorchoiceallowroster>' . $question->options->instructorchoiceallowroster .
-                "</instructorchoiceallowroster>\n";
+             "</instructorchoiceallowroster>\n";
         $expout .= '    <instructorchoiceallowsetting>' . $question->options->instructorchoiceallowsetting .
-                 "</instructorchoiceallowsetting>\n";
+             "</instructorchoiceallowsetting>\n";
         $expout .= '    <instructorcustomparameters>' . $format->writetext($question->options->instructorcustomparameters) .
-                 "</instructorcustomparameters>\n";
-        $expout .= '    <grade>' . $question->options->grade .
-                "</grade>\n";
-        $expout .= '    <launchcontainer>' . $question->options->launchcontainer .
-                "</launchcontainer>\n";
-        $expout .= '    <resourcekey>' . $format->writetext($question->options->resourcekey) .
-                 "</resourcekey>\n";
-        $expout .= '    <password>' . $format->writetext($question->options->password) .
-                 "</password>\n";
-        $expout .= '    <debuglaunch>' . $question->options->debuglaunch.
-                "</debuglaunch>\n";
-        $expout .= '    <showtitlelaunch>' . $question->options->showtitlelaunch .
-                "</showtitlelaunch>\n";
-        $expout .= '    <showdescriptionlaunch>' . $question->options->showdescriptionlaunch .
-                 "</showdescriptionlaunch>\n";
-        $expout .= '    <servicesalt>' . $format->writetext($question->options->servicesalt) .
-                 "</servicesalt>\n";
-        $expout .= '    <icon>' . $format->writetext($question->options->icon) .
-                "</icon>\n";
-        $expout .= '    <secureicon>' . $format->writetext($question->options->secureicon) .
-                "</secureicon>\n";
+             "</instructorcustomparameters>\n";
+        $expout .= '    <grade>' . $question->options->grade . "</grade>\n";
+        $expout .= '    <launchcontainer>' . $question->options->launchcontainer . "</launchcontainer>\n";
+        $expout .= '    <resourcekey>' . $format->writetext($question->options->resourcekey) . "</resourcekey>\n";
+        $expout .= '    <password>' . $format->writetext($question->options->password) . "</password>\n";
+        $expout .= '    <debuglaunch>' . $question->options->debuglaunch . "</debuglaunch>\n";
+        $expout .= '    <showtitlelaunch>' . $question->options->showtitlelaunch . "</showtitlelaunch>\n";
+        $expout .= '    <showdescriptionlaunch>' . $question->options->showdescriptionlaunch . "</showdescriptionlaunch>\n";
+        $expout .= '    <servicesalt>' . $format->writetext($question->options->servicesalt) . "</servicesalt>\n";
+        $expout .= '    <icon>' . $format->writetext($question->options->icon) . "</icon>\n";
+        $expout .= '    <secureicon>' . $format->writetext($question->options->secureicon) . "</secureicon>\n";
 
         return $expout;
     }
@@ -284,13 +243,16 @@ class qtype_lti extends question_type {
     /**
      * Provide import functionality for xml format.
      *
-     * @param data mixed the segment of data containing the question
-     * @param question object question object processed (so far) by standard import code
-     * @param format object the format object so that helper methods can be used (in particular
+     * @param
+     *        data mixed the segment of data containing the question
+     * @param
+     *        question object question object processed (so far) by standard import code
+     * @param
+     *        format object the format object so that helper methods can be used (in particular
      *        error())
-     * @param extra mixed any additional format specific data that may be passed by the format (see
+     * @param
+     *        extra mixed any additional format specific data that may be passed by the format (see
      *        format code for info)
-     *
      * @return object question object suitable for save_options() call or false if cannot handle
      */
     public function import_from_xml($data, $question, qformat_xml $format, $extra = null) {
@@ -301,99 +263,57 @@ class qtype_lti extends question_type {
         }
         $question = $format->import_headers($data);
         $question->qtype = 'lti';
-
-        $question->instancecode = $format->getpath($data,
-        array('#', 'instancecode', 0, '#', 'text', 0, '#'
-        ), '');
-
-        /*
-        $question->course = $format->getpath($data,
-                array('#', 'course', 0, '#'), 1);
-        */
+        $question->instancecode = $format->getpath($data, array('#', 'instancecode', 0, '#', 'text', 0, '#'), '');
 
         // Update course to be the current import one.
         $question->course = $COURSE->id;
 
-        $question->cmid = $format->getpath($data,
-                array('#', 'cmid', 0, '#'), 1);
+        $question->cmid = $format->getpath($data, array('#', 'cmid', 0, '#'), 1);
 
-        $question->typeid = $format->getpath($data,
-        array('#', 'typeid', 0, '#'), null);
+        $question->typeid = $format->getpath($data, array('#', 'typeid', 0, '#'), null);
 
-        $ltipluginconfig= get_config('qtype_lti');
-        
-        if (!isset($ltipluginconfig->removerestoredlink) || $ltipluginconfig->removerestoredlink == 0){
-        	
-        	$question->toolurl = $format->getpath($data,
-        			array('#', 'toolurl', 0, '#', 'text', 0, '#'
-        			), '');
-        	$question->securetoolurl = $format->getpath($data,
-        			array('#', 'securetoolurl', 0, '#', 'text', 0, '#'
-        			), '');
+        $ltipluginconfig = get_config('qtype_lti');
+
+        if (!isset($ltipluginconfig->removerestoredlink) || $ltipluginconfig->removerestoredlink == 0) {
+
+            $question->toolurl = $format->getpath($data, array('#', 'toolurl', 0, '#', 'text', 0, '#'), '');
+            $question->securetoolurl = $format->getpath($data, array('#', 'securetoolurl', 0, '#', 'text', 0, '#'), '');
         } else {
-        	$question->toolurl = '';
-        	$question->securetoolurl = '';
+            $question->toolurl = '';
+            $question->securetoolurl = '';
         }
 
-        $question->instructorchoicesendname = $format->getpath($data,
-        array('#', 'instructorchoicesendname', 0, '#'), 1);
+        $question->instructorchoicesendname = $format->getpath($data, array('#', 'instructorchoicesendname', 0, '#'), 1);
 
-        $question->instructorchoicesendemailaddr = $format->getpath($data,
-        array('#', 'instructorchoicesendemailaddr', 0, '#'), 1);
+        $question->instructorchoicesendemailaddr = $format->getpath($data, array('#', 'instructorchoicesendemailaddr', 0, '#'), 1);
 
-        $question->instructorchoiceallowroster = $format->getpath($data,
-        array('#', 'instructorchoiceallowroster', 0, '#'), 1);
+        $question->instructorchoiceallowroster = $format->getpath($data, array('#', 'instructorchoiceallowroster', 0, '#'), 1);
 
-        $question->instructorchoiceallowsetting = $format->getpath($data,
-        array('#', 'instructorchoiceallowsetting', 0, '#'), 1);
+        $question->instructorchoiceallowsetting = $format->getpath($data, array('#', 'instructorchoiceallowsetting', 0, '#'), 1);
 
-        $question->instructorchoiceacceptgrades = $format->getpath($data,
-        array('#', 'instructorchoiceacceptgrades', 0, '#'), 1);
+        $question->instructorchoiceacceptgrades = $format->getpath($data, array('#', 'instructorchoiceacceptgrades', 0, '#'), 1);
 
         $question->instructorcustomparameters = $format->getpath($data,
-        array('#', 'instructorcustomparameters', 0, '#', 'text', 0, '#'
-        ), '');
+                                                                array('#', 'instructorcustomparameters',
+                                                                    0, '#', 'text', 0, '#'), '');
 
-        $question->grade = $format->getpath($data,
-        array('#', 'grade', 0, '#'), 100);
+        $question->grade = $format->getpath($data, array('#', 'grade', 0, '#'), 100);
 
+        $question->resourcekey = $format->getpath($data, array('#', 'resourcekey', 0, '#', 'text', 0, '#'), '');
+        $question->password = $format->getpath($data, array('#', 'password', 0, '#', 'text', 0, '#'), '');
 
-        $question->resourcekey = $format->getpath($data,
-        array('#', 'resourcekey', 0, '#', 'text', 0, '#'
-        ), '');
-        $question->password = $format->getpath($data,
-        array('#', 'password', 0, '#', 'text', 0, '#'
-        ), '');
+        $question->launchcontainer = $format->getpath($data, array('#', 'launchcontainer', 0, '#'), 1);
+        $question->debuglaunch = $format->getpath($data, array('#', 'debuglaunch', 0, '#'), 0);
+        $question->showtitlelaunch = $format->getpath($data, array('#', 'showtitlelaunch', 0, '#'), 0);
+        $question->showdescriptionlaunch = $format->getpath($data, array('#', 'showdescriptionlaunch', 0, '#'), 0);
 
-        $question->launchcontainer = $format->getpath($data,
-        array('#', 'launchcontainer', 0, '#'), 1);
-        $question->debuglaunch = $format->getpath($data,
-        array('#', 'debuglaunch', 0, '#'), 0);
-        $question->showtitlelaunch = $format->getpath($data,
-        array('#', 'showtitlelaunch', 0, '#'), 0);
-        $question->showdescriptionlaunch = $format->getpath($data,
-        array('#', 'showdescriptionlaunch', 0, '#'), 0);
+        $question->servicesalt = $format->getpath($data, array('#', 'servicesalt', 0, '#', 'text', 0, '#'), '');
 
-
-        $question->servicesalt = $format->getpath($data,
-        array('#', 'servicesalt', 0, '#', 'text', 0, '#'
-        ), '');
-
-
-        $question->icon = $format->getpath($data,
-        array('#', 'icon', 0, '#', 'text', 0, '#'
-        ), '');
-        $question->secureicon = $format->getpath($data,
-        array('#', 'secureicon', 0, '#', 'text', 0, '#'
-        ), '');
-
-
+        $question->icon = $format->getpath($data, array('#', 'icon', 0, '#', 'text', 0, '#'), '');
+        $question->secureicon = $format->getpath($data, array('#', 'secureicon', 0, '#', 'text', 0, '#'), '');
 
         // Do types, proxy, config etc. KEEP FOR ROUND 2.
 
-
-
         return $question;
     }
-
 }

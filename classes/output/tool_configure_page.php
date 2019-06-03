@@ -22,9 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace qtype_lti\output;
-//require_once($CFG->dirroot.'/question/type/lti/locallib.php');
-
-
+defined('MOODLE_INTERNAL') || die;
 use moodle_url;
 use renderable;
 use templatable;

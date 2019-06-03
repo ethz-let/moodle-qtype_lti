@@ -14,23 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 /**
- * Essay question definition class.
+ * LTI question definition class.
  *
- * @package    qtype
+ * @package qtype
  * @subpackage lti
- * @copyright  2009 The Open University
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2019 ETH Zurich
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 /**
  * Represents an lti question.
  *
- * @copyright  2009 The Open University
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2009 The Open University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_lti_question extends question_graded_automatically_with_countback{
-
+class qtype_lti_question extends question_graded_automatically_with_countback {
 
     public function compute_final_grade($responses, $totaltries) {
         $totalstemscore = 0;
@@ -54,40 +53,42 @@ class qtype_lti_question extends question_graded_automatically_with_countback{
     }
 
     public function get_expected_data() {
-    	return array('answer' => PARAM_RAW, 'instanceid' => PARAM_RAW, 'userid' => PARAM_RAW, 'attemptid' => PARAM_RAW, 'username' => PARAM_RAW, 'linkid' => PARAM_RAW, 'resultid' => PARAM_RAW); //'launchid' => PARAM_RAW,
+        return array('answer' => PARAM_RAW, 'instanceid' => PARAM_RAW, 'userid' => PARAM_RAW,
+                    'attemptid' => PARAM_RAW, 'username' => PARAM_RAW, 'linkid' => PARAM_RAW,
+                    'resultid' => PARAM_RAW);
     }
 
     public function is_complete_response(array $response) {
-      /* lti question type is always complete (i.e. ready for grading) */
-      /* always returns true, since from this point, there is no possibility though to the question_attempt_step */
-      return true;
+        /* LTI question type is always complete (i.e. ready for grading) */
+        /* always returns true, since from this point, there is no possibility though to the question_attempt_step */
+        return true;
     }
 
     public function is_same_response(array $prevresponse, array $newresponse) {
-      /* lti question responses are never the same */
-      /* should return true when there is an answer, and the same answer in the comment field (or answers are empty and/or identical */
-      /* always returns false, since from this point, there is no possibility though to the question_attempt_step */
-       return false;
+        /* LTI question responses are never the same */
+        /*
+         * should return true when there is an answer, and the same answer in the comment field (or answers are empty and/or
+         * identical
+         */
+        /* Always returns false, since from this point, there is no possibility though to the question_attempt_step */
+        return false;
     }
 
     public function is_gradable_response(array $response) {
-      return array_key_exists('answer', $response) &&
-      ($response['answer'] || $response['answer'] === '0' || $response['answer'] === 0);
+        return array_key_exists('answer', $response) &&
+             ($response['answer'] || $response['answer'] === '0' || $response['answer'] === 0);
     }
 
-/*
-    public function make_behaviour(question_attempt $qa, $preferredbehaviour) {
-        return question_engine::make_behaviour('manualgraded', $qa, $preferredbehaviour);
-    }
-    */
     /**
-     * @param moodle_page the page we are outputting to.
+     *
+     * @param
+     *        moodle_page the page we are outputting to.
      * @return qtype_lti_format_renderer_base the response-format-specific renderer.
      */
-
     public function summarise_response(array $response) {
         return null;
     }
+
     public function get_correct_response() {
         return null;
     }
@@ -95,7 +96,6 @@ class qtype_lti_question extends question_graded_automatically_with_countback{
     public function get_validation_error(array $response) {
         return '';
     }
-
 
     public function check_file_access($qa, $options, $component, $filearea, $args, $forcedownload) {
         if ($component == 'question' && $filearea == 'response_attachments') {
@@ -107,41 +107,32 @@ class qtype_lti_question extends question_graded_automatically_with_countback{
         } else if ($component == 'qtype_lti' && $filearea == 'graderinfo') {
             return $options->manualcomment && $args[0] == $this->id;
         } else {
-            return parent::check_file_access($qa, $options, $component,
-                    $filearea, $args, $forcedownload);
+            return parent::check_file_access($qa, $options, $component, $filearea, $args, $forcedownload);
         }
     }
 
-      public function grade_question($question, $answers) {
+    public function grade_question($question, $answers) {
         global $USER, $DB;
 
         $value = 0;
         $instanceid = $answers['instanceid'];
-      //  $launchid = $answers['launchid'];
         $userid = $answers['userid'];
         $attemptid = $answers['attemptid'];
-        
         $username = $answers['username'];
         $linkid = $answers['linkid'];
         $result = $answers['resultid'];
-    //    print_r($answers);exit;
-        $regrade_result_id = '';
-        
-        $submission_grade = $DB->get_record('qtype_lti_submission', array(
-        		'username' => $username,
-        		'linkid' => $linkid,
-        		'resultid' => $result,
-          ));
-        if($submission_grade) {
-            $value = $submission_grade->gradepercent;
+
+        $submissiongrade = $DB->get_record('qtype_lti_submission',
+                                            array('username' => $username, 'linkid' => $linkid, 'resultid' => $result));
+        if ($submissiongrade) {
+            $value = $submissiongrade->gradepercent;
         }
         return $value;
     }
 
-      public function grade_response(array $response) {
-          $grade = $this->grade_question($this, $response);
-          $state = question_state::graded_state_for_fraction($grade);
-          return array($grade, $state);
-      }
-
+    public function grade_response(array $response) {
+        $grade = $this->grade_question($this, $response);
+        $state = question_state::graded_state_for_fraction($grade);
+        return array($grade, $state);
+    }
 }

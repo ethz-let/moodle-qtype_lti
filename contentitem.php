@@ -18,8 +18,7 @@
  * Handle sending a user to a tool provider to initiate a content-item selection.
  *
  * @package qtype_lti
- * @copyright  2015 Vital Source Technologies http://vitalsource.com
- * @author     Stephen Vickers
+ * @copyright  2019 ETH Zurich
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -48,7 +47,8 @@ $returnurlparams = [
 $returnurl = new \moodle_url('/question/type/lti/contentitem_return.php', $returnurlparams);
 
 // Prepare the request.
-$request = qtype_lti_build_content_item_selection_request($id, $course, $returnurl, $title, $text, [], [], false, false, false, false, false, $USER->username, null, 1);
+$request = qtype_lti_build_content_item_selection_request(
+            $id, $course, $returnurl, $title, $text, [], [], false, false, false, false, false, $USER->username, null, 1);
 
 // Get the launch HTML.
 $content = qtype_lti_post_launch_html($request->params, $request->url, false);

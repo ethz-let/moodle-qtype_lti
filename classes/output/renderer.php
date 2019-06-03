@@ -17,29 +17,22 @@
 /**
  * Renderer class for template library.
  *
- * @package    qtype_lti
- * @copyright  2015 Ryan Wyllie <ryan@moodle.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package qtype_lti
+ * @copyright 2019 ETH Zurich
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace qtype_lti\output;
 
-//require_once($CFG->dirroot.'/question/type/lti/lib.php');
-//require_once($CFG->dirroot.'/question/type/lti/locallib.php');
-//include_once($CFG->dirroot.'/question/type/lti/renderer.php');
-
-
-
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
 use plugin_renderer_base;
-
 
 /**
  * Renderer class for template library.
  *
- * @package    qtype_lti
- * @copyright  2015 Ryan Wyllie <ryan@moodle.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package qtype_lti
+ * @copyright 2015 Ryan Wyllie <ryan@moodle.com>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_renderer extends \plugin_renderer_base {
 
@@ -66,6 +59,5 @@ class qtype_renderer extends \plugin_renderer_base {
         $data = $page->export_for_template($this);
         return parent::render_from_template('qtype_lti/external_registration_return', $data);
     }
-    
 }
 

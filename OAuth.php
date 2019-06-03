@@ -54,8 +54,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
-//namespace moodle\question\type\lti;//Using a namespace as the basicLTI module imports classes with the same names
-
 namespace moodle\qtype\lti;//Using a namespace as the basicLTI module imports classes with the same names
 
 defined('MOODLE_INTERNAL') || die;
@@ -103,9 +101,9 @@ class OAuthToken {
      */
     function to_string() {
         return "oauth_token=" .
-        OAuthUtil::urlencode_rfc3986($this->key) .
-        "&oauth_token_secret=" .
-        OAuthUtil::urlencode_rfc3986($this->secret);
+                        OAuthUtil::urlencode_rfc3986($this->key) .
+                        "&oauth_token_secret=" .
+                        OAuthUtil::urlencode_rfc3986($this->secret);
     }
 
     function __toString() {
@@ -134,7 +132,7 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod {
 
         $key_parts = array(
             $consumer->secret,
-             ($token) ? $token->secret : ""
+            ($token) ? $token->secret : ""
         );
 
         $key_parts = OAuthUtil::urlencode_rfc3986($key_parts);
@@ -442,10 +440,10 @@ class OAuthRequest {
                 throw new OAuthException('Arrays not supported in headers');
             }
             $out .= ',' .
-            OAuthUtil::urlencode_rfc3986($k) .
-            '="' .
-            OAuthUtil::urlencode_rfc3986($v) .
-            '"';
+                            OAuthUtil::urlencode_rfc3986($k) .
+                            '="' .
+                            OAuthUtil::urlencode_rfc3986($v) .
+                            '"';
         }
         return $out;
     }
@@ -578,8 +576,8 @@ class OAuthServer {
         }
         if (!in_array($signature_method, array_keys($this->signature_methods))) {
             throw new OAuthException("Signature method '$signature_method' not supported " .
-            "try one of the following: " .
-            implode(", ", array_keys($this->signature_methods)));
+                            "try one of the following: " .
+                            implode(", ", array_keys($this->signature_methods)));
         }
         return $this->signature_methods[$signature_method];
     }
@@ -744,20 +742,17 @@ class OAuthUtil {
 
     // helper to try to sort out headers for people who aren't running apache
     public static function get_headers() {
-
-      if (function_exists('apache_request_headers')) {
-          // we need this to get the actual Authorization: header
-          // because apache tends to tell us it doesn't exist
-          $in = apache_request_headers();
-          $out = array();
-          foreach ($in as $key => $value) {
-              $key = str_replace(" ", "-", ucwords(strtolower(str_replace("-", " ", $key))));
-              $out[$key] = $value;
-          }
-          
-          return $out;
-      }
-
+        if (function_exists('apache_request_headers')) {
+            // we need this to get the actual Authorization: header
+            // because apache tends to tell us it doesn't exist
+            $in = apache_request_headers();
+            $out = array();
+            foreach ($in as $key => $value) {
+                $key = str_replace(" ", "-", ucwords(strtolower(str_replace("-", " ", $key))));
+                $out[$key] = $value;
+            }
+            return $out;
+        }
         // otherwise we don't have apache and are just going to have to hope
         // that $_SERVER actually contains what we need
         $out = array();

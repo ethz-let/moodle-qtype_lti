@@ -1,6 +1,4 @@
 <?php
-use qtype_lti\output;
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,29 +14,28 @@ use qtype_lti\output;
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
 /**
  * This page allows the configuration of external tools that meet the LTI specification.
  *
- * @package    qtype_lti
- * @copyright  2015 Ryan Wyllie <ryan@moodle.com>
- * @author     Ryan Wyllie
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package qtype_lti
+ * @copyright 2019 ETH Zurich
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use qtype_lti\output;
 
 require_once('../../../config.php');
-require_once($CFG->libdir.'/adminlib.php');
+require_once($CFG->libdir . '/adminlib.php');
 
-require_once($CFG->dirroot.'/question/type/lti/lib.php');
-require_once($CFG->dirroot.'/question/type/lti/locallib.php');
-
+require_once($CFG->dirroot . '/question/type/lti/lib.php');
+require_once($CFG->dirroot . '/question/type/lti/locallib.php');
 
 $cartridgeurl = optional_param('cartridgeurl', '', PARAM_URL);
 
 // No guest autologin.
 require_login(0, false);
 admin_externalpage_setup('manageqtypes');
-
 
 if ($cartridgeurl) {
     $type = new stdClass();
@@ -58,7 +55,6 @@ $PAGE->requires->string_for_js('successfullycreatedtooltype', 'qtype_lti');
 $PAGE->requires->string_for_js('failedtocreatetooltype', 'qtype_lti');
 
 $output = $PAGE->get_renderer('qtype_lti');
-
 
 echo $output->header();
 

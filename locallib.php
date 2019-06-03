@@ -13,51 +13,22 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-//
-// This file is part of BasicLTI4Moodle
-//
-// BasicLTI4Moodle is an IMS BasicLTI (Basic Learning Tools for Interoperability)
-// consumer for Moodle 1.9 and Moodle 2.0. BasicLTI is a IMS Standard that allows web
-// based learning tools to be easily integrated in LMS as native ones. The IMS BasicLTI
-// specification is part of the IMS standard Common Cartridge 1.1 Sakai and other main LMS
-// are already supporting or going to support BasicLTI. This project Implements the consumer
-// for Moodle. Moodle is a Free Open source Learning Management System by Martin Dougiamas.
-// BasicLTI4Moodle is a project iniciated and leaded by Ludo(Marc Alier) and Jordi Piguillem
-// at the GESSI research group at UPC.
-// SimpleLTI consumer for Moodle is an implementation of the early specification of LTI
-// by Charles Severance (Dr Chuck) htp://dr-chuck.com , developed by Jordi Piguillem in a
-// Google Summer of Code 2008 project co-mentored by Charles Severance and Marc Alier.
-//
-// BasicLTI4Moodle is copyright 2009 by Marc Alier Forment, Jordi Piguillem and Nikolas Galanis
-// of the Universitat Politecnica de Catalunya http://www.upc.edu
-// Contact info: Marc Alier Forment granludo @ gmail.com or marc.alier @ upc.edu.
 
 /**
  * This file contains the library of functions and constants for the lti module
  *
  * @package qtype_lti
- * @copyright  2009 Marc Alier, Jordi Piguillem, Nikolas Galanis
- *  marc.alier@upc.edu
- * @copyright  2009 Universitat Politecnica de Catalunya http://www.upc.edu
- * @author     Marc Alier
- * @author     Jordi Piguillem
- * @author     Nikolas Galanis
- * @author     Chris Scribner
- * @copyright  2015 Vital Source Technologies http://vitalsource.com
- * @author     Stephen Vickers
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2019 ETH Zurich
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
-defined('MOODLE_INTERNAL') || die;
-
-
-
-require_once($CFG->dirroot.'/question/type/lti/OAuth.php');
+require_once($CFG->dirroot . '/question/type/lti/OAuth.php');
 
 // TODO: Switch to core oauthlib once implemented - MDL-30149.
 use moodle\qtype\lti as lti;
 
-require_once($CFG->libdir.'/weblib.php');
+require_once($CFG->libdir . '/weblib.php');
 require_once($CFG->dirroot . '/course/modlib.php');
 require_once($CFG->dirroot . '/question/type/lti/TrivialStore.php');
 
@@ -94,11 +65,14 @@ define('QTYPE_LTI_VERSION_2', 'LTI-2p0');
 /**
  * Return the launch data required for opening the external tool.
  *
- * @param  stdClass $instance the external tool activity settings
+ * @param stdClass $instance
+ *        the external tool activity settings
  * @return array the endpoint URL and parameters (including the signature)
- * @since  Moodle 3.0
+ * @since Moodle 3.0
  */
-function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, $questionmode = 'create', $manuallygraded_in_moodle = 0, $extra_code_expert_params = array()) {
+function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null,
+                                   $questionmode = 'create', $manuallygradedinmoodle = 0,
+                                   $extracodeexpertparams = array()) {
     global $PAGE, $CFG, $DB;
 
     if (empty($instance->typeid)) {
@@ -157,34 +131,7 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, 
             $secret = '';
         }
     }
-    /*
-    //  Fix COD-7. Porvider has higher rule than url.
-    if ($typeconfig && !empty($typeconfig['toolurl'])) {
-    	
-    	if (!empty($instance->toolurl)) {
-    		// Strip the url domain and merge its suffix with the domain provider.
-    		$stripped_provider = parse_url($instance->toolurl);
-    		
-    		if ($noadminconfigfound == 1) { // Did not match the provider (invalid provider), most probably was deleted or never existed.. so use the URL.
-    			$endpoint = $typeconfig['toolurl'];
-    		} else {
-    			$endpoint = $typeconfig['toolurl'].$stripped_provider['path'];
-    		}
-    			// We shall also update this url in that question.
-    			$update_question = new stdClass;
-    			$update_question->id = $instance->id;
-    			$update_question->toolurl = trim($endpoint);
-    			
-    			$DB->update_record('qtype_lti_options', $update_question);
-    			
-    	} else {
-    		$endpoint = $typeconfig['toolurl'];
-    	}
-    	
-    } else {
-    	$endpoint = !empty($instance->toolurl) ? $instance->toolurl : $typeconfig['toolurl'];
-    }
-    */
+
     $endpoint = !empty($instance->toolurl) ? $instance->toolurl : $typeconfig['toolurl'];
     $endpoint = trim($endpoint);
 
@@ -211,25 +158,28 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, 
     $course = $DB->get_record('course', array('id' => $instance->course));
 
     $islti2 = isset($tool->toolproxyid);
-    $allparams = qtype_lti_build_request($instance, $typeconfig, $course, $typeid, $islti2, $userid, $readonly, $questionmode, $manuallygraded_in_moodle, $extra_code_expert_params);
+    $allparams = qtype_lti_build_request($instance, $typeconfig, $course, $typeid, $islti2, $userid, $readonly, $questionmode,
+                                        $manuallygradedinmoodle, $extracodeexpertparams);
     if ($islti2) {
-        $requestparams = qtype_lti_build_request_lti2($tool, $allparams, $userid, $readonly, $questionmode, $manuallygraded_in_moodle, $extra_code_expert_params);
+        $requestparams = qtype_lti_build_request_lti2($tool, $allparams, $userid, $readonly, $questionmode,
+                                                    $manuallygradedinmoodle, $extracodeexpertparams);
     } else {
         $requestparams = $allparams;
     }
-    $requestparams = array_merge($requestparams, qtype_lti_build_standard_request($instance, $orgid, $islti2, 'basic-lti-launch-request', $extra_code_expert_params));
+    $requestparams = array_merge($requestparams,
+                                qtype_lti_build_standard_request($instance, $orgid, $islti2, 'basic-lti-launch-request',
+                                                                $extracodeexpertparams));
     $customstr = '';
     if (isset($typeconfig['customparameters'])) {
         $customstr = $typeconfig['customparameters'];
     }
-    $requestparams = array_merge($requestparams, qtype_lti_build_custom_parameters($toolproxy, $tool, $instance, $allparams, $customstr,
-        $instance->instructorcustomparameters, $islti2, $userid));
+    $requestparams = array_merge($requestparams,
+                                qtype_lti_build_custom_parameters($toolproxy, $tool, $instance, $allparams, $customstr,
+                                                                $instance->instructorcustomparameters, $islti2, $userid));
 
     $launchcontainer = qtype_lti_get_launch_container($instance, $typeconfig);
-    $returnurlparams = array('course' => $course->id,
-                             'launch_container' => $launchcontainer,
-                             'instanceid' => $instance->id,
-                             'sesskey' => sesskey());
+    $returnurlparams = array('course' => $course->id, 'launch_container' => $launchcontainer, 'instanceid' => $instance->id,
+        'sesskey' => sesskey());
 
     // Add the return URL. We send the launch container along to help us avoid frames-within-frames when the user returns.
     $url = new \moodle_url('/question/type/lti/return.php', $returnurlparams);
@@ -240,17 +190,17 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, 
     }
 
     $target = '';
-    switch($launchcontainer) {
+    switch ($launchcontainer) {
         case QTYPE_LTI_LAUNCH_CONTAINER_EMBED:
         case QTYPE_LTI_LAUNCH_CONTAINER_EMBED_NO_BLOCKS:
             $target = 'iframe';
-            break;
+        break;
         case QTYPE_LTI_LAUNCH_CONTAINER_REPLACE_MOODLE_WINDOW:
             $target = 'frame';
-            break;
+        break;
         case QTYPE_LTI_LAUNCH_CONTAINER_WINDOW:
             $target = 'window';
-            break;
+        break;
     }
     if (!empty($target)) {
         $requestparams['launch_presentation_document_target'] = $target;
@@ -261,8 +211,8 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, 
     // Allow request params to be updated by sub-plugins.
     $plugins = core_component::get_plugin_list('ltisource');
     foreach (array_keys($plugins) as $plugin) {
-        $pluginparams = component_callback('ltisource_'.$plugin, 'before_launch',
-            array($instance, $endpoint, $requestparams), array());
+        $pluginparams = component_callback('ltisource_' . $plugin, 'before_launch', array($instance, $endpoint, $requestparams),
+                                        array());
 
         if (!empty($pluginparams) && is_array($pluginparams)) {
             $requestparams = array_merge($requestparams, $pluginparams);
@@ -283,7 +233,6 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, 
                 }
             }
         }
-
     } else {
         // If no key and secret, do the launch unsigned.
         $returnurlparams['unsigned'] = '1';
@@ -296,12 +245,15 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null, 
 /**
  * Launch an external tool activity.
  *
- * @param  stdClass $instance the external tool activity settings
+ * @param stdClass $instance
+ *        the external tool activity settings
  * @return string The HTML code containing the javascript code for the launch
  */
-function qtype_lti_launch_tool($instance, $userid = null, $readonly = null, $questionmode = 'create', $manuallygraded_in_moodle = 0, $extra_code_expert_params = array()) {
-    list($endpoint, $parms) = qtype_lti_get_launch_data($instance, $userid, $readonly, $questionmode, $manuallygraded_in_moodle, $extra_code_expert_params );
-    $debuglaunch = ( $instance->debuglaunch == 1 );
+function qtype_lti_launch_tool($instance, $userid = null, $readonly = null, $questionmode = 'create', $manuallygradedinmoodle = 0,
+                            $extracodeexpertparams = array()) {
+    list($endpoint, $parms) = qtype_lti_get_launch_data($instance, $userid, $readonly, $questionmode, $manuallygradedinmoodle,
+                                                        $extracodeexpertparams);
+    $debuglaunch = ($instance->debuglaunch == 1);
     $content = qtype_lti_post_launch_html($parms, $endpoint, $debuglaunch);
 
     echo $content;
@@ -309,8 +261,7 @@ function qtype_lti_launch_tool($instance, $userid = null, $readonly = null, $que
 
 /**
  * Prepares an LTI registration request message
- *
- * $param object $instance       Tool Proxy instance object
+ * $param object $instance Tool Proxy instance object
  */
 function qtype_lti_register($toolproxy) {
     $endpoint = $toolproxy->regurl;
@@ -326,11 +277,11 @@ function qtype_lti_register($toolproxy) {
     echo $content;
 }
 
-
 /**
  * Gets the parameters for the regirstration request
  *
- * @param object $toolproxy Tool Proxy instance object
+ * @param object $toolproxy
+ *        Tool Proxy instance object
  * @return array Registration request parameters
  */
 function qtype_lti_build_registration_request($toolproxy) {
@@ -374,13 +325,12 @@ function qtype_lti_build_sourcedid($instanceid, $userid, $servicesalt, $typeid =
 
     $data->instance = $instanceid;
     $data->username = $userid;
-    //$data->typeid = $typeid;
     if (!empty($attemptid)) {
         $data->attemptid = $attemptid;
     } else {
-    	$data->attemptid = uniqid();
+        $data->attemptid = uniqid();
     }
-    
+
     $data->ltiid = $ltiid;
 
     $json = json_encode($data);
@@ -397,42 +347,35 @@ function qtype_lti_build_sourcedid($instanceid, $userid, $servicesalt, $typeid =
 /**
  * This function builds the request that must be sent to the tool producer
  *
- * @param object    $instance       Basic LTI instance object
- * @param array     $typeconfig     Basic LTI tool configuration
- * @param object    $course         Course object
- * @param int|null  $typeid         Basic LTI tool ID
- * @param boolean   $islti2         True if an LTI 2 tool is being launched
- *
- * @return array                    Request details
+ * @param object $instance
+ *        Basic LTI instance object
+ * @param array $typeconfig
+ *        Basic LTI tool configuration
+ * @param object $course
+ *        Course object
+ * @param int|null $typeid
+ *        Basic LTI tool ID
+ * @param boolean $islti2
+ *        True if an LTI 2 tool is being launched
+ * @return array Request details
  */
-function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null, $islti2 = false, $userid, $readonly, $questionmode, $manuallygraded_in_moodle, $extra_code_expert_params) {
+function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null,
+                                $islti2 = false, $userid, $readonly, $questionmode,
+                                $manuallygradedinmoodle, $extracodeexpertparams) {
     global $USER, $CFG, $DB;
     if (empty($instance->cmid)) {
         $instance->cmid = 0;
     }
-    $original_user = $USER;
-    
-    /*
-    if($userid && $USER->id != $userid){ // readonly mode?
-      $original_user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
-    } else {
-      $original_user = $USER;
-    }
-    */
+    $originaluser = $USER;
 
-    $role = qtype_lti_get_ims_role($original_user, $instance->cmid, $instance->course, $islti2);
+    $role = qtype_lti_get_ims_role($originaluser, $instance->cmid, $instance->course, $islti2);
 
-    $requestparams = array(
-        'user_id' => $original_user->id,
-        'lis_person_sourcedid' => $original_user->idnumber,
-        'roles' => $role,
-        'context_id' => $course->id,
-        'context_label' => trim(html_to_text($course->shortname, 0)),
-        'context_title' => trim(html_to_text($course->fullname, 0)),
-    );
+    $requestparams = array('user_id' => $originaluser->id, 'lis_person_sourcedid' => $originaluser->idnumber, 'roles' => $role,
+        'context_id' => $course->id, 'context_label' => trim(html_to_text($course->shortname, 0)),
+        'context_title' => trim(html_to_text($course->fullname, 0)));
 
-    if($readonly){
-      $requestparams['ext_question_readonly_mode'] = 1;
+    if ($readonly) {
+        $requestparams['ext_question_readonly_mode'] = 1;
     }
 
     if (!empty($instance->name)) {
@@ -448,30 +391,33 @@ function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null
         $requestparams['resource_link_description'] = $intro;
     }
     if (!empty($instance->id)) {
-        $requestparams['resource_link_id'] = $instance->instancecode; //$instance->id;
+        $requestparams['resource_link_id'] = $instance->instancecode;
     }
     if (!empty($instance->resource_link_id)) {
-        $requestparams['resource_link_id'] = $instance->instancecode; //$instance->resource_link_id;
+        $requestparams['resource_link_id'] = $instance->instancecode;
     }
-    
-    $requestparams['resource_link_id'] =  $extra_code_expert_params['resourcelinkid'];
-    
+
+    $requestparams['resource_link_id'] = $extracodeexpertparams['resourcelinkid'];
+
     if ($course->format == 'site') {
         $requestparams['context_type'] = 'Group';
     } else {
         $requestparams['context_type'] = 'CourseSection';
-        if(!$course->idnumber || empty($course->idnumber)) {
+        if (!$course->idnumber || empty($course->idnumber)) {
             $course->idnumber = $course->shortname;
         }
         $requestparams['lis_course_section_sourcedid'] = $course->idnumber;
     }
 
-    if (!empty($instance->id) && !empty($instance->servicesalt) && ($islti2 ||
-            $typeconfig['acceptgrades'] == QTYPE_LTI_SETTING_ALWAYS ||
-            ($typeconfig['acceptgrades'] == QTYPE_LTI_SETTING_DELEGATE && $instance->instructorchoiceacceptgrades == QTYPE_LTI_SETTING_ALWAYS))
-    ) {
+    if (!empty($instance->id) && !empty($instance->servicesalt) &&
+         ($islti2 || $typeconfig['acceptgrades'] == QTYPE_LTI_SETTING_ALWAYS ||
+         ($typeconfig['acceptgrades'] == QTYPE_LTI_SETTING_DELEGATE &&
+         $instance->instructorchoiceacceptgrades == QTYPE_LTI_SETTING_ALWAYS))) {
         $placementsecret = $instance->servicesalt;
-        $sourcedid = json_encode(qtype_lti_build_sourcedid($extra_code_expert_params['resultid'], $original_user->username, $placementsecret, $typeid, $extra_code_expert_params['attemptid'], $instance->id));
+        $sourcedid = json_encode(
+                                qtype_lti_build_sourcedid($extracodeexpertparams['resultid'], $originaluser->username,
+                                                        $placementsecret, $typeid, $extracodeexpertparams['attemptid'],
+                                                        $instance->id));
         $requestparams['lis_result_sourcedid'] = $sourcedid;
 
         // Add outcome service URL.
@@ -490,76 +436,63 @@ function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null
         $requestparams['lis_outcome_service_url'] = $serviceurl;
     }
 
-/*
-    // Send user's name and email data if appropriate.
-    if ($islti2 || $typeconfig['sendname'] == QTYPE_LTI_SETTING_ALWAYS ||
-        ($typeconfig['sendname'] == QTYPE_LTI_SETTING_DELEGATE && isset($instance->instructorchoicesendname)
-            && $instance->instructorchoicesendname == QTYPE_LTI_SETTING_ALWAYS)
-    ) {
-      */
-        $requestparams['lis_person_name_given'] = $original_user->firstname;
-        $requestparams['lis_person_name_family'] = $original_user->lastname;
-        $requestparams['lis_person_name_full'] = $original_user->firstname . ' ' . $original_user->lastname;
-        $requestparams['ext_user_username'] = $original_user->username;
-        // in case the teacher wants to see the users submission in review mode.
-        $requestparams['ext_student_username'] = $userid;
-        /*
-    }
-    */
+    $requestparams['lis_person_name_given'] = $originaluser->firstname;
+    $requestparams['lis_person_name_family'] = $originaluser->lastname;
+    $requestparams['lis_person_name_full'] = $originaluser->firstname . ' ' . $originaluser->lastname;
+    $requestparams['ext_user_username'] = $originaluser->username;
+    // In case the teacher wants to see the users submission in review mode.
+    $requestparams['ext_student_username'] = $userid;
 
     /*
-    The workflow used for the launch.
+     * The workflow used for the launch.
+     * The 4 following workflows based on the processes described in Spezifikation Code Expert in Moodle are supported:
+     * "create" Create & Edit Mode describes the process of a Lecturer creating or modifying a Code Expert question in Moodle.
+     * "solve" Solve Task Mode stands for the the student solving a Moodle exam containing Code Expert questions.
+     * The "student" may also be a lecturer impersonating a student to verify his own exam.
+     * "correction" Correction Mode is used by an assistant or a lecturer while correcting an solved exam by one or multiple
+     * students.
+     * "review" for Reviewing the answer (after submission and usually attached to readonly mode).
+     */
 
-    The 4 following workflows based on the processes described in Spezifikation Code Expert in Moodle are supported:
-    "create" Create & Edit Mode describes the process of a Lecturer creating or modifying a Code Expert question in Moodle.
-    "solve" Solve Task Mode stands for the the student solving a Moodle exam containing Code Expert questions.
-    The "student" may also be a lecturer impersonating a student to verify his own exam.
-    "correction" Correction Mode is used by an assistant or a lecturer while correcting an solved exam by one or multiple students.
-    "review" for Reviewing the answer (after submission and usually attached to readonly mode).
-    */
-        
     // Due to inability to control the launch url in question edit mode, questionmodede is defaulted to 1.
     // Transform it to 'create' shall it be 1.
-    
-     if(!$questionmode || $questionmode == '1'){
-     	$questionmode = 'create';
-     }
+
+    if (!$questionmode || $questionmode == '1') {
+        $questionmode = 'create';
+    }
 
     $requestparams['ext_workflow_mode'] = $questionmode;
-    $requestparams['ext_manually_graded'] = $manuallygraded_in_moodle;
+    $requestparams['ext_manually_graded'] = $manuallygradedinmoodle;
 
+    $requestparams['ext_attempt_id'] = $extracodeexpertparams['attemptid'];
+    $requestparams['ext_attempt_state'] = $extracodeexpertparams['attemptstate'];
+    $requestparams['ext_attempt_onlast'] = $extracodeexpertparams['attemptonlast'];
+    $requestparams['ext_quiz_id'] = $extracodeexpertparams['quizid'];
+    $requestparams['ext_quiz_title'] = trim(html_to_text($extracodeexpertparams['quiztitle'], 0));
+    $requestparams['ext_question_id'] = $extracodeexpertparams['questionid'];
+    $requestparams['ext_lti_id'] = $extracodeexpertparams['ltiid'];
+    $requestparams['ext_instancecode'] = $extracodeexpertparams['instancecode'];
+    $requestparams['ext_course_id'] = $extracodeexpertparams['courseid'];
 
-    $requestparams['ext_attempt_id'] = $extra_code_expert_params['attemptid'];
-    $requestparams['ext_attempt_state'] = $extra_code_expert_params['attemptstate'];
-    $requestparams['ext_attempt_onlast'] = $extra_code_expert_params['attemptonlast'];
-    $requestparams['ext_quiz_id'] = $extra_code_expert_params['quizid'];
-    $requestparams['ext_quiz_title'] = trim(html_to_text($extra_code_expert_params['quiztitle'], 0));
-    $requestparams['ext_question_id'] = $extra_code_expert_params['questionid'];
-    $requestparams['ext_lti_id'] = $extra_code_expert_params['ltiid'];
-    $requestparams['ext_instancecode'] = $extra_code_expert_params['instancecode'];
-    $requestparams['ext_course_id'] = $extra_code_expert_params['courseid'];
-
-
-    if ($islti2 || $typeconfig['sendemailaddr'] == QTYPE_LTI_SETTING_ALWAYS ||
-        ($typeconfig['sendemailaddr'] == QTYPE_LTI_SETTING_DELEGATE && isset($instance->instructorchoicesendemailaddr)
-            && $instance->instructorchoicesendemailaddr == QTYPE_LTI_SETTING_ALWAYS)
-    ) {
-        $requestparams['lis_person_contact_email_primary'] = $original_user->email;
+    if ($islti2 || $typeconfig['sendemailaddr'] == QTYPE_LTI_SETTING_ALWAYS || ($typeconfig['sendemailaddr'] ==
+         QTYPE_LTI_SETTING_DELEGATE && isset($instance->instructorchoicesendemailaddr) &&
+         $instance->instructorchoicesendemailaddr == QTYPE_LTI_SETTING_ALWAYS)) {
+        $requestparams['lis_person_contact_email_primary'] = $originaluser->email;
     }
-//print_r($requestparams);
     return $requestparams;
 }
 
 /**
  * This function builds the request that must be sent to an LTI 2 tool provider
  *
- * @param object    $tool           Basic LTI tool object
- * @param array     $params         Custom launch parameters
- *
- * @return array                    Request details
+ * @param object $tool
+ *        Basic LTI tool object
+ * @param array $params
+ *        Custom launch parameters
+ * @return array Request details
  */
-function qtype_lti_build_request_lti2($tool, $params, $userid, $readonly, $questionmode, $manuallygraded_in_moodle,  $extra_code_expert_params) {
-
+function qtype_lti_build_request_lti2($tool, $params, $userid, $readonly, $questionmode, $manuallygradedinmoodle,
+                                    $extracodeexpertparams) {
     $requestparams = array();
 
     $capabilities = qtype_lti_get_capabilities();
@@ -576,31 +509,32 @@ function qtype_lti_build_request_lti2($tool, $params, $userid, $readonly, $quest
     }
 
     return $requestparams;
-
 }
 
 /**
  * This function builds the standard parameters for an LTI 1 or 2 request that must be sent to the tool producer
  *
- * @param stdClass  $instance       Basic LTI instance object
- * @param string    $orgid          Organisation ID
- * @param boolean   $islti2         True if an LTI 2 tool is being launched
- * @param string    $messagetype    The request message type. Defaults to basic-lti-launch-request if empty.
- *
- * @return array                    Request details
+ * @param stdClass $instance
+ *        Basic LTI instance object
+ * @param string $orgid
+ *        Organisation ID
+ * @param boolean $islti2
+ *        True if an LTI 2 tool is being launched
+ * @param string $messagetype
+ *        The request message type. Defaults to basic-lti-launch-request if empty.
+ * @return array Request details
  */
-function qtype_lti_build_standard_request($instance, $orgid, $islti2, $messagetype = 'basic-lti-launch-request', $extra_code_expert_params) {
+function qtype_lti_build_standard_request($instance, $orgid, $islti2,
+                                          $messagetype = 'basic-lti-launch-request', $extracodeexpertparams) {
     global $CFG;
 
     $requestparams = array();
-    if ($instance) {   	
+    if ($instance) {
         global $DB;
-       // print_r($instance);exit;
-       // $resourcelinkid = $DB->get_record('qtype_lti_usage', array('attemptid' => $extra_code_expert_params[attemptid], ''));
-        $requestparams['resource_link_id'] =  $extra_code_expert_params['resourcelinkid'];
-        
+        $requestparams['resource_link_id'] = $extracodeexpertparams['resourcelinkid'];
+
         if (property_exists($instance, 'resource_link_id') and !empty($instance->resource_link_id)) {
-        	$requestparams['resource_link_id'] =  $extra_code_expert_params['resourcelinkid'];
+            $requestparams['resource_link_id'] = $extracodeexpertparams['resourcelinkid'];
         }
     }
 
@@ -637,17 +571,24 @@ function qtype_lti_build_standard_request($instance, $orgid, $islti2, $messagety
 /**
  * This function builds the custom parameters
  *
- * @param object    $toolproxy      Tool proxy instance object
- * @param object    $tool           Tool instance object
- * @param object    $instance       Tool placement instance object
- * @param array     $params         LTI launch parameters
- * @param string    $customstr      Custom parameters defined for tool
- * @param string    $instructorcustomstr      Custom parameters defined for this placement
- * @param boolean   $islti2         True if an LTI 2 tool is being launched
- *
- * @return array                    Custom parameters
+ * @param object $toolproxy
+ *        Tool proxy instance object
+ * @param object $tool
+ *        Tool instance object
+ * @param object $instance
+ *        Tool placement instance object
+ * @param array $params
+ *        LTI launch parameters
+ * @param string $customstr
+ *        Custom parameters defined for tool
+ * @param string $instructorcustomstr
+ *        Custom parameters defined for this placement
+ * @param boolean $islti2
+ *        True if an LTI 2 tool is being launched
+ * @return array Custom parameters
  */
-function qtype_lti_build_custom_parameters($toolproxy, $tool, $instance, $params, $customstr, $instructorcustomstr, $islti2, $userid) {
+function qtype_lti_build_custom_parameters($toolproxy, $tool, $instance, $params,
+                                           $customstr, $instructorcustomstr, $islti2, $userid) {
 
     // Concatenate the custom parameters from the administrator and the instructor
     // Instructor parameters are only taken into consideration if the administrator
@@ -658,13 +599,15 @@ function qtype_lti_build_custom_parameters($toolproxy, $tool, $instance, $params
     }
     if (!isset($typeconfig['allowinstructorcustom']) || $typeconfig['allowinstructorcustom'] != QTYPE_LTI_SETTING_NEVER) {
         if ($instructorcustomstr) {
-            $custom = array_merge(qtype_lti_split_custom_parameters($toolproxy, $tool, $params,
-                $instructorcustomstr, $islti2, $userid), $custom);
+            $custom = array_merge(
+                                qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $instructorcustomstr, $islti2,
+                                                                $userid), $custom);
         }
     }
     if ($islti2) {
-        $custom = array_merge(qtype_lti_split_custom_parameters($toolproxy, $tool, $params,
-            $tool->parameter, true, $userid), $custom);
+        $custom = array_merge(
+                            qtype_lti_split_custom_parameters($toolproxy, $tool, $params,
+                                                              $tool->parameter, true, $userid), $custom);
         $settings = qtype_lti_get_tool_settings($tool->toolproxyid);
         $custom = array_merge($custom, qtype_lti_get_custom_parameters($toolproxy, $tool, $params, $settings));
         if (!empty($instance->course)) {
@@ -683,32 +626,46 @@ function qtype_lti_build_custom_parameters($toolproxy, $tool, $instance, $params
 /**
  * Builds a standard LTI Content-Item selection request.
  *
- * @param int $id The tool type ID.
- * @param stdClass $course The course object.
- * @param moodle_url $returnurl The return URL in the tool consumer (TC) that the tool provider (TP)
- *                              will use to return the Content-Item message.
- * @param string $title The tool's title, if available.
- * @param string $text The text to display to represent the content item. This value may be a long description of the content item.
- * @param array $mediatypes Array of MIME types types supported by the TC. If empty, the TC will support ltilink by default.
- * @param array $presentationtargets Array of ways in which the selected content item(s) can be requested to be opened
- *                                   (via the presentationDocumentTarget element for a returned content item).
- *                                   If empty, "frame", "iframe", and "window" will be supported by default.
- * @param bool $autocreate Indicates whether any content items returned by the TP would be automatically persisted without
- * @param bool $multiple Indicates whether the user should be permitted to select more than one item. False by default.
- *                         any option for the user to cancel the operation. False by default.
- * @param bool $unsigned Indicates whether the TC is willing to accept an unsigned return message, or not.
- *                       A signed message should always be required when the content item is being created automatically in the
- *                       TC without further interaction from the user. False by default.
- * @param bool $canconfirm Flag for can_confirm parameter. False by default.
- * @param bool $copyadvice Indicates whether the TC is able and willing to make a local copy of a content item. False by default.
+ * @param int $id
+ *        The tool type ID.
+ * @param stdClass $course
+ *        The course object.
+ * @param moodle_url $returnurl
+ *        The return URL in the tool consumer (TC) that the tool provider (TP)
+ *        will use to return the Content-Item message.
+ * @param string $title
+ *        The tool's title, if available.
+ * @param string $text
+ *        The text to display to represent the content item. This value may be a long description of the content item.
+ * @param array $mediatypes
+ *        Array of MIME types types supported by the TC. If empty, the TC will support ltilink by default.
+ * @param array $presentationtargets
+ *        Array of ways in which the selected content item(s) can be requested to be opened
+ *        (via the presentationDocumentTarget element for a returned content item).
+ *        If empty, "frame", "iframe", and "window" will be supported by default.
+ * @param bool $autocreate
+ *        Indicates whether any content items returned by the TP would be automatically persisted without
+ * @param bool $multiple
+ *        Indicates whether the user should be permitted to select more than one item. False by default.
+ *        any option for the user to cancel the operation. False by default.
+ * @param bool $unsigned
+ *        Indicates whether the TC is willing to accept an unsigned return message, or not.
+ *        A signed message should always be required when the content item is being created automatically in the
+ *        TC without further interaction from the user. False by default.
+ * @param bool $canconfirm
+ *        Flag for can_confirm parameter. False by default.
+ * @param bool $copyadvice
+ *        Indicates whether the TC is able and willing to make a local copy of a content item. False by default.
  * @return stdClass The object containing the signed request parameters and the URL to the TP's Content-Item selection interface.
  * @throws moodle_exception When the LTI tool type does not exist.`
  * @throws coding_exception For invalid media type and presentation target parameters.
  */
-function qtype_lti_build_content_item_selection_request($id, $course, moodle_url $returnurl, $title = '', $text = '', $mediatypes = [],
-                                                  $presentationtargets = [], $autocreate = false, $multiple = false,
-                                                  $unsigned = false, $canconfirm = false, $copyadvice = false, $userid = null,
-        $readonly = null, $questionmode = 'create', $manuallygraded_in_moodle = 0,  $extra_code_expert_params = array()) {
+function qtype_lti_build_content_item_selection_request($id, $course, moodle_url $returnurl, $title = '',
+                                                        $text = '', $mediatypes = [], $presentationtargets = [],
+                                                        $autocreate = false, $multiple = false, $unsigned = false,
+                                                        $canconfirm = false, $copyadvice = false, $userid = null, $readonly = null,
+                                                        $questionmode = 'create', $manuallygradedinmoodle = 0,
+                                                        $extracodeexpertparams = array()) {
     $tool = qtype_lti_get_type($id);
     // Validate parameters.
     if (!$tool) {
@@ -777,7 +734,8 @@ function qtype_lti_build_content_item_selection_request($id, $course, moodle_url
     // Get base request parameters.
     $instance = new stdClass();
     $instance->course = $course->id;
-    $requestparams = qtype_lti_build_request($instance, $typeconfig, $course, $id, $islti2, $userid, $readonly, $questionmode, $manuallygraded_in_moodle,  $extra_code_expert_params);
+    $requestparams = qtype_lti_build_request($instance, $typeconfig, $course, $id, $islti2, $userid, $readonly, $questionmode,
+                                            $manuallygradedinmoodle, $extracodeexpertparams);
 
     // Get LTI2-specific request parameters and merge to the request parameters if applicable.
     if ($islti2) {
@@ -787,7 +745,8 @@ function qtype_lti_build_content_item_selection_request($id, $course, moodle_url
 
     // Get standard request parameters and merge to the request parameters.
     $orgid = !empty($typeconfig['organizationid']) ? $typeconfig['organizationid'] : '';
-    $standardparams = qtype_lti_build_standard_request(null, $orgid, $islti2, 'ContentItemSelectionRequest', $extra_code_expert_params);
+    $standardparams = qtype_lti_build_standard_request(null, $orgid, $islti2, 'ContentItemSelectionRequest',
+                                                    $extracodeexpertparams);
 
     $requestparams = array_merge($requestparams, $standardparams);
 
@@ -796,13 +755,15 @@ function qtype_lti_build_content_item_selection_request($id, $course, moodle_url
     if (!empty($typeconfig['customparameters'])) {
         $customstr = $typeconfig['customparameters'];
     }
-    $customparams = qtype_lti_build_custom_parameters($toolproxy, $tool, $instance, $requestparams, $customstr, '', $islti2, $userid);
+    $customparams = qtype_lti_build_custom_parameters($toolproxy, $tool, $instance, $requestparams, $customstr, '', $islti2,
+                                                    $userid);
     $requestparams = array_merge($requestparams, $customparams);
 
     // Allow request params to be updated by sub-plugins.
     $plugins = core_component::get_plugin_list('ltisource');
     foreach (array_keys($plugins) as $plugin) {
-        $pluginparams = component_callback('ltisource_' . $plugin, 'before_launch', [$instance, $toolurlout, $requestparams], []);
+        $pluginparams = component_callback('ltisource_' . $plugin, 'before_launch', [$instance, $toolurlout, $requestparams],
+                                        []);
 
         if (!empty($pluginparams) && is_array($pluginparams)) {
             $requestparams = array_merge($requestparams, $pluginparams);
@@ -811,19 +772,13 @@ function qtype_lti_build_content_item_selection_request($id, $course, moodle_url
 
     // Media types. Set to ltilink by default if empty.
     if (empty($mediatypes)) {
-        $mediatypes = [
-            'application/vnd.ims.lti.v1.ltilink',
-        ];
+        $mediatypes = ['application/vnd.ims.lti.v1.ltilink'];
     }
     $requestparams['accept_media_types'] = implode(',', $mediatypes);
 
     // Presentation targets. Supports frame, iframe, window by default if empty.
     if (empty($presentationtargets)) {
-        $presentationtargets = [
-            'frame',
-            'iframe',
-            'window',
-        ];
+        $presentationtargets = ['frame', 'iframe', 'window'];
     }
     $requestparams['accept_presentation_document_targets'] = implode(',', $presentationtargets);
 
@@ -849,13 +804,8 @@ function qtype_lti_build_content_item_selection_request($id, $course, moodle_url
     }
 
     // Check for params that should not be passed. Unset if they are set.
-    $unwantedparams = [
-        'resource_link_id',
-        'resource_link_title',
-        'resource_link_description',
-        'launch_presentation_return_url',
-        'lis_result_sourcedid',
-    ];
+    $unwantedparams = ['resource_link_id', 'resource_link_title', 'resource_link_description', 'launch_presentation_return_url',
+        'lis_result_sourcedid'];
     foreach ($unwantedparams as $param) {
         if (isset($signedparams[$param])) {
             unset($signedparams[$param]);
@@ -872,13 +822,19 @@ function qtype_lti_build_content_item_selection_request($id, $course, moodle_url
 
 /**
  * Processes the tool provider's response to the ContentItemSelectionRequest and builds the configuration data from the
- * selected content item. This configuration data can be then used when adding a tool into the course.
+ * selected content item.
+ * This configuration data can be then used when adding a tool into the course.
  *
- * @param int $typeid The tool type ID.
- * @param string $messagetype The value for the qtype_lti_message_type parameter.
- * @param string $ltiversion The value for the qtype_lti_version parameter.
- * @param string $consumerkey The consumer key.
- * @param string $contentitemsjson The JSON string for the content_items parameter.
+ * @param int $typeid
+ *        The tool type ID.
+ * @param string $messagetype
+ *        The value for the qtype_lti_message_type parameter.
+ * @param string $ltiversion
+ *        The value for the qtype_lti_version parameter.
+ * @param string $consumerkey
+ *        The consumer key.
+ * @param string $contentitemsjson
+ *        The JSON string for the content_items parameter.
  * @return stdClass The array of module information objects.
  * @throws moodle_exception
  * @throws lti\OAuthException
@@ -892,8 +848,7 @@ function qtype_lti_tool_configuration_from_content_item($typeid, $messagetype, $
     // Check qtype_lti_message_type. Show debugging if it's not set to ContentItemSelection.
     // No need to throw exceptions for now since qtype_lti_message_type does not seem to be used in this processing at the moment.
     if ($messagetype !== 'ContentItemSelection') {
-        debugging("lti_message_type is invalid: {$messagetype}. It should be set to 'ContentItemSelection'.",
-            DEBUG_DEVELOPER);
+        debugging("lti_message_type is invalid: {$messagetype}. It should be set to 'ContentItemSelection'.", DEBUG_DEVELOPER);
     }
 
     $typeconfig = qtype_lti_get_type_config($typeid);
@@ -925,8 +880,9 @@ function qtype_lti_tool_configuration_from_content_item($typeid, $messagetype, $
         $expectedversion = QTYPE_LTI_VERSION_2;
     }
     if ($ltiversion !== $expectedversion) {
-        debugging("lti_version from response does not match the tool's configuration. Tool: {$expectedversion}," .
-            " Response: {$ltiversion}", DEBUG_DEVELOPER);
+        debugging(
+                "lti_version from response does not match the tool's configuration. Tool: {$expectedversion}," .
+                     " Response: {$ltiversion}", DEBUG_DEVELOPER);
     }
 
     if ($consumerkey !== $key) {
@@ -969,10 +925,7 @@ function qtype_lti_tool_configuration_from_content_item($typeid, $messagetype, $
             $config->name = $tool->name;
         }
         if (isset($item->text)) {
-            $config->introeditor = [
-                'text' => $item->text,
-                'format' => FORMAT_PLAIN
-            ];
+            $config->introeditor = ['text' => $item->text, 'format' => FORMAT_PLAIN];
         }
         if (isset($item->icon->{'@id'})) {
             $iconurl = new moodle_url($item->icon->{'@id'});
@@ -1044,26 +997,17 @@ function qtype_lti_get_tool_table($tools, $id) {
             $delete = get_string('delete', 'qtype_lti');
 
             if (empty($type->toolproxyid)) {
-                $baseurl = new \moodle_url('/question/type/lti/typessettings.php', array(
-                        'action' => 'accept',
-                        'id' => $type->id,
-                        'sesskey' => sesskey(),
-                        'tab' => $id
-                    ));
+                $baseurl = new \moodle_url('/question/type/lti/typessettings.php',
+                                        array('action' => 'accept', 'id' => $type->id, 'sesskey' => sesskey(), 'tab' => $id));
                 $ref = $type->baseurl;
             } else {
-                $baseurl = new \moodle_url('/question/type/lti/toolssettings.php', array(
-                        'action' => 'accept',
-                        'id' => $type->id,
-                        'sesskey' => sesskey(),
-                        'tab' => $id
-                    ));
+                $baseurl = new \moodle_url('/question/type/lti/toolssettings.php',
+                                        array('action' => 'accept', 'id' => $type->id, 'sesskey' => sesskey(), 'tab' => $id));
                 $ref = $type->tpname;
             }
 
-            $accepthtml = $OUTPUT->action_icon($baseurl,
-                    new \pix_icon('t/check', $accept, '', array('class' => 'iconsmall')), null,
-                    array('title' => $accept, 'class' => 'editing_accept'));
+            $accepthtml = $OUTPUT->action_icon($baseurl, new \pix_icon('t/check', $accept, '', array('class' => 'iconsmall')), null,
+                                            array('title' => $accept, 'class' => 'editing_accept'));
 
             $deleteaction = 'delete';
 
@@ -1076,18 +1020,17 @@ function qtype_lti_get_tool_table($tools, $id) {
                 $delete = get_string('reject', 'qtype_lti');
             }
 
-            $updateurl = clone($baseurl);
+            $updateurl = clone ($baseurl);
             $updateurl->param('action', 'update');
-            $updatehtml = $OUTPUT->action_icon($updateurl,
-                    new \pix_icon('t/edit', $update, '', array('class' => 'iconsmall')), null,
-                    array('title' => $update, 'class' => 'editing_update'));
+            $updatehtml = $OUTPUT->action_icon($updateurl, new \pix_icon('t/edit', $update, '', array('class' => 'iconsmall')),
+                                            null, array('title' => $update, 'class' => 'editing_update'));
 
             if (($type->state != QTYPE_LTI_TOOL_STATE_REJECTED) || empty($type->toolproxyid)) {
-                $deleteurl = clone($baseurl);
+                $deleteurl = clone ($baseurl);
                 $deleteurl->param('action', $deleteaction);
                 $deletehtml = $OUTPUT->action_icon($deleteurl,
-                        new \pix_icon('t/delete', $delete, '', array('class' => 'iconsmall')), null,
-                        array('title' => $delete, 'class' => 'editing_delete'));
+                                                new \pix_icon('t/delete', $delete, '', array('class' => 'iconsmall')), null,
+                                                array('title' => $delete, 'class' => 'editing_delete'));
             } else {
                 $deletehtml = '';
             }
@@ -1119,10 +1062,11 @@ function qtype_lti_get_tool_table($tools, $id) {
 /**
  * This function builds the tab for a category of tool proxies
  *
- * @param object    $toolproxies    Tool proxy instance objects
- * @param string    $id             Category ID
- *
- * @return string                   HTML for tab
+ * @param object $toolproxies
+ *        Tool proxy instance objects
+ * @param string $id
+ *        Category ID
+ * @return string HTML for tab
  */
 function qtype_lti_get_tool_proxy_table($toolproxies, $id) {
     global $OUTPUT;
@@ -1151,22 +1095,14 @@ EOD;
             $update = get_string('update', 'qtype_lti');
             $delete = get_string('delete', 'qtype_lti');
 
-            $baseurl = new \moodle_url('/question/type/lti/registersettings.php', array(
-                    'action' => 'accept',
-                    'id' => $toolproxy->id,
-                    'sesskey' => sesskey(),
-                    'tab' => $id
-                ));
+            $baseurl = new \moodle_url('/question/type/lti/registersettings.php',
+                                    array('action' => 'accept', 'id' => $toolproxy->id, 'sesskey' => sesskey(), 'tab' => $id));
 
-            $registerurl = new \moodle_url('/question/type/lti/register.php', array(
-                    'id' => $toolproxy->id,
-                    'sesskey' => sesskey(),
-                    'tab' => 'tool_proxy'
-                ));
+            $registerurl = new \moodle_url('/question/type/lti/register.php',
+                                        array('id' => $toolproxy->id, 'sesskey' => sesskey(), 'tab' => 'tool_proxy'));
 
-            $accepthtml = $OUTPUT->action_icon($registerurl,
-                    new \pix_icon('t/check', $accept, '', array('class' => 'iconsmall')), null,
-                    array('title' => $accept, 'class' => 'editing_accept'));
+            $accepthtml = $OUTPUT->action_icon($registerurl, new \pix_icon('t/check', $accept, '', array('class' => 'iconsmall')),
+                                            null, array('title' => $accept, 'class' => 'editing_accept'));
 
             $deleteaction = 'delete';
 
@@ -1174,21 +1110,20 @@ EOD;
                 $accepthtml = '';
             }
 
-            if (($toolproxy->state == QTYPE_LTI_TOOL_PROXY_STATE_CONFIGURED) || ($toolproxy->state == QTYPE_LTI_TOOL_PROXY_STATE_PENDING)) {
+            if (($toolproxy->state == QTYPE_LTI_TOOL_PROXY_STATE_CONFIGURED) ||
+                 ($toolproxy->state == QTYPE_LTI_TOOL_PROXY_STATE_PENDING)) {
                 $delete = get_string('cancel', 'qtype_lti');
             }
 
-            $updateurl = clone($baseurl);
+            $updateurl = clone ($baseurl);
             $updateurl->param('action', 'update');
-            $updatehtml = $OUTPUT->action_icon($updateurl,
-                    new \pix_icon('t/edit', $update, '', array('class' => 'iconsmall')), null,
-                    array('title' => $update, 'class' => 'editing_update'));
+            $updatehtml = $OUTPUT->action_icon($updateurl, new \pix_icon('t/edit', $update, '', array('class' => 'iconsmall')),
+                                            null, array('title' => $update, 'class' => 'editing_update'));
 
-            $deleteurl = clone($baseurl);
+            $deleteurl = clone ($baseurl);
             $deleteurl->param('action', $deleteaction);
-            $deletehtml = $OUTPUT->action_icon($deleteurl,
-                    new \pix_icon('t/delete', $delete, '', array('class' => 'iconsmall')), null,
-                    array('title' => $delete, 'class' => 'editing_delete'));
+            $deletehtml = $OUTPUT->action_icon($deleteurl, new \pix_icon('t/delete', $delete, '', array('class' => 'iconsmall')),
+                                            null, array('title' => $delete, 'class' => 'editing_delete'));
             $html .= <<< EOD
             <tr>
                 <td>
@@ -1217,8 +1152,8 @@ EOD;
 /**
  * Extracts the enabled capabilities into an array, including those implicitly declared in a parameter
  *
- * @param object    $tool           Tool instance object
- *
+ * @param object $tool
+ *        Tool instance object
  * @return Array of enabled capabilities
  */
 function qtype_lti_get_enabled_capabilities($tool) {
@@ -1250,23 +1185,27 @@ function qtype_lti_get_enabled_capabilities($tool) {
 /**
  * Splits the custom parameters field to the various parameters
  *
- * @param object    $toolproxy      Tool proxy instance object
- * @param object    $tool           Tool instance object
- * @param array     $params         LTI launch parameters
- * @param string    $customstr      String containing the parameters
- * @param boolean   $islti2         True if an LTI 2 tool is being launched
- *
+ * @param object $toolproxy
+ *        Tool proxy instance object
+ * @param object $tool
+ *        Tool instance object
+ * @param array $params
+ *        LTI launch parameters
+ * @param string $customstr
+ *        String containing the parameters
+ * @param boolean $islti2
+ *        True if an LTI 2 tool is being launched
  * @return array of custom parameters
  */
 function qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $customstr, $islti2 = false, $userid) {
     $customstr = str_replace("\r\n", "\n", $customstr);
     $customstr = str_replace("\n\r", "\n", $customstr);
     $customstr = str_replace("\r", "\n", $customstr);
-    $lines = explode("\n", $customstr);  // Or should this split on "/[\n;]/"?
+    $lines = explode("\n", $customstr); // Or should this split on "/[\n;]/"?
     $retval = array();
     foreach ($lines as $line) {
         $pos = strpos($line, '=');
-        if ( $pos === false || $pos < 1 ) {
+        if ($pos === false || $pos < 1) {
             continue;
         }
         $key = trim(core_text::substr($line, 0, $pos));
@@ -1274,9 +1213,9 @@ function qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $customst
         $val = trim(core_text::substr($line, $pos + 1, strlen($line)));
         $val = qtype_lti_parse_custom_parameter($toolproxy, $tool, $params, $val, $islti2, $userid);
         $key2 = qtype_lti_map_keyname($key);
-        $retval['custom_'.$key2] = $val;
+        $retval['custom_' . $key2] = $val;
         if ($key != $key2) {
-            $retval['custom_'.$key] = $val;
+            $retval['custom_' . $key] = $val;
         }
     }
     return $retval;
@@ -1285,21 +1224,24 @@ function qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $customst
 /**
  * Adds the custom parameters to an array
  *
- * @param object    $toolproxy      Tool proxy instance object
- * @param object    $tool           Tool instance object
- * @param array     $params         LTI launch parameters
- * @param array     $parameters     Array containing the parameters
- *
- * @return array    Array of custom parameters
+ * @param object $toolproxy
+ *        Tool proxy instance object
+ * @param object $tool
+ *        Tool instance object
+ * @param array $params
+ *        LTI launch parameters
+ * @param array $parameters
+ *        Array containing the parameters
+ * @return array Array of custom parameters
  */
 function qtype_lti_get_custom_parameters($toolproxy, $tool, $params, $parameters) {
     $retval = array();
     foreach ($parameters as $key => $val) {
         $key2 = qtype_lti_map_keyname($key);
         $val = qtype_lti_parse_custom_parameter($toolproxy, $tool, $params, $val, true);
-        $retval['custom_'.$key2] = $val;
+        $retval['custom_' . $key2] = $val;
         if ($key != $key2) {
-            $retval['custom_'.$key] = $val;
+            $retval['custom_' . $key] = $val;
         }
     }
     return $retval;
@@ -1308,25 +1250,22 @@ function qtype_lti_get_custom_parameters($toolproxy, $tool, $params, $parameters
 /**
  * Parse a custom parameter to replace any substitution variables
  *
- * @param object    $toolproxy      Tool proxy instance object
- * @param object    $tool           Tool instance object
- * @param array     $params         LTI launch parameters
- * @param string    $value          Custom parameter value
- * @param boolean   $islti2         True if an LTI 2 tool is being launched
- *
+ * @param object $toolproxy
+ *        Tool proxy instance object
+ * @param object $tool
+ *        Tool instance object
+ * @param array $params
+ *        LTI launch parameters
+ * @param string $value
+ *        Custom parameter value
+ * @param boolean $islti2
+ *        True if an LTI 2 tool is being launched
  * @return Parsed value of custom parameter
  */
 function qtype_lti_parse_custom_parameter($toolproxy, $tool, $params, $value, $islti2, $userid) {
     global $USER, $COURSE;
 
-    $original_user = $USER;
-    /*
-    if($userid && $USER->id != $userid){ // readonly mode?
-      $original_user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
-    } else {
-      $original_user = $USER;
-    }
-    */
+    $originaluser = $USER;
 
     if ($value) {
         if (substr($value, 0, 1) == '\\') {
@@ -1344,12 +1283,12 @@ function qtype_lti_parse_custom_parameter($toolproxy, $tool, $params, $value, $i
                         } else {
                             $valarr = explode('->', substr($val, 1), 2);
                             $value = "{${$valarr[0]}->{$valarr[1]}}";
-                            $value = str_replace('<br />' , ' ', $value);
-                            $value = str_replace('<br>' , ' ', $value);
+                            $value = str_replace('<br />', ' ', $value);
+                            $value = str_replace('<br>', ' ', $value);
                             $value = format_string($value);
                         }
                     } else {
-                        $value = qtype_lti_calculate_custom_parameter($value1, $original_user->id);
+                        $value = qtype_lti_calculate_custom_parameter($value1, $originaluser->id);
                     }
                 } else if ($islti2) {
                     $val = $value;
@@ -1371,8 +1310,8 @@ function qtype_lti_parse_custom_parameter($toolproxy, $tool, $params, $value, $i
 /**
  * Calculates the value of a custom parameter that has not been specified earlier
  *
- * @param string    $value          Custom parameter value
- *
+ * @param string $value
+ *        Custom parameter value
  * @return string Calculated value of custom parameter
  */
 function qtype_lti_calculate_custom_parameter($value, $userid) {
@@ -1388,9 +1327,11 @@ function qtype_lti_calculate_custom_parameter($value, $userid) {
 /**
  * Used for building the names of the different custom parameters
  *
- * @param string $key   Parameter name
- * @param bool $tolower Do we want to convert the key into lower case?
- * @return string       Processed name
+ * @param string $key
+ *        Parameter name
+ * @param bool $tolower
+ *        Do we want to convert the key into lower case?
+ * @return string Processed name
  */
 function qtype_lti_map_keyname($key, $tolower = true) {
     $newkey = "";
@@ -1398,7 +1339,7 @@ function qtype_lti_map_keyname($key, $tolower = true) {
         $key = core_text::strtolower(trim($key));
     }
     foreach (str_split($key) as $ch) {
-        if ( ($ch >= 'a' && $ch <= 'z') || ($ch >= '0' && $ch <= '9') || (!$tolower && ($ch >= 'A' && $ch <= 'Z'))) {
+        if (($ch >= 'a' && $ch <= 'z') || ($ch >= '0' && $ch <= '9') || (!$tolower && ($ch >= 'A' && $ch <= 'Z'))) {
             $newkey .= $ch;
         } else {
             $newkey .= '_';
@@ -1410,11 +1351,14 @@ function qtype_lti_map_keyname($key, $tolower = true) {
 /**
  * Gets the IMS role string for the specified user and LTI course module.
  *
- * @param mixed    $user      User object or user id
- * @param int      $cmid      The course module id of the LTI activity
- * @param int      $courseid  The course id of the LTI activity
- * @param boolean  $islti2    True if an LTI 2 tool is being launched
- *
+ * @param mixed $user
+ *        User object or user id
+ * @param int $cmid
+ *        The course module id of the LTI activity
+ * @param int $courseid
+ *        The course id of the LTI activity
+ * @param boolean $islti2
+ *        True if an LTI 2 tool is being launched
  * @return string A role string suitable for passing with an LTI launch
  */
 function qtype_lti_get_ims_role($user, $cmid, $courseid, $islti2) {
@@ -1457,9 +1401,9 @@ function qtype_lti_get_ims_role($user, $cmid, $courseid, $islti2) {
 /**
  * Returns configuration details for the tool
  *
- * @param int $typeid   Basic LTI tool typeid
- *
- * @return array        Tool Configuration
+ * @param int $typeid
+ *        Basic LTI tool typeid
+ * @return array Tool Configuration
  */
 function qtype_lti_get_type_config($typeid) {
     global $DB;
@@ -1482,7 +1426,7 @@ function qtype_lti_get_type_config($typeid) {
 
     $typeconfig = array();
     $configs = $DB->get_records_sql($query,
-        array('typeid1' => $typeid, 'typeid2' => $typeid, 'typeid3' => $typeid, 'typeid4' => $typeid));
+                                    array('typeid1' => $typeid, 'typeid2' => $typeid, 'typeid3' => $typeid, 'typeid4' => $typeid));
 
     if (!empty($configs)) {
         foreach ($configs as $config) {
@@ -1521,17 +1465,12 @@ function qtype_lti_get_tools_by_domain($domain, $state = null, $courseid = null)
                  AND (course = :siteid $coursefilter)
                  $statefilter";
 
-    return $DB->get_records_sql($query, array(
-        'courseid' => $courseid,
-        'siteid' => $SITE->id,
-        'tooldomain' => $domain,
-        'state' => $state
-    ));
+    return $DB->get_records_sql($query,
+                                array('courseid' => $courseid, 'siteid' => $SITE->id, 'tooldomain' => $domain, 'state' => $state));
 }
 
 /**
  * Returns all basicLTI tools configured by the administrator
- *
  */
 function qtype_lti_filter_get_types($course) {
     global $DB;
@@ -1552,8 +1491,10 @@ function qtype_lti_filter_get_types($course) {
 /**
  * Given an array of tools, filter them based on their state
  *
- * @param array $tools An array of qtype_lti_types records
- * @param int $state One of the QTYPE_LTI_TOOL_STATE_* constants
+ * @param array $tools
+ *        An array of qtype_lti_types records
+ * @param int $state
+ *        One of the QTYPE_LTI_TOOL_STATE_* constants
  * @return array
  */
 function qtype_lti_filter_tool_types(array $tools, $state) {
@@ -1569,8 +1510,10 @@ function qtype_lti_filter_tool_types(array $tools, $state) {
 /**
  * Returns all lti types visible in this course
  *
- * @param int $courseid The id of the course to retieve types for
- * @param array $coursevisible options for 'coursevisible' field,
+ * @param int $courseid
+ *        The id of the course to retieve types for
+ * @param array $coursevisible
+ *        options for 'coursevisible' field,
  *        default [QTYPE_LTI_COURSEVISIBLE_PRECONFIGURED, QTYPE_LTI_COURSEVISIBLE_ACTIVITYCHOOSER]
  * @return stdClass[] All the lti types visible in the given course
  */
@@ -1582,16 +1525,6 @@ function qtype_lti_get_lti_types_by_course($courseid, $coursevisible = null) {
     }
 
     list($coursevisiblesql, $coursevisparams) = $DB->get_in_or_equal($coursevisible, SQL_PARAMS_NAMED, 'coursevisible');
-    /*
-    $query = "SELECT *
-                FROM {qtype_lti_types}
-               WHERE coursevisible $coursevisiblesql
-                 AND (course = :siteid OR course = :courseid)
-                 AND state = :active";
-
-    return $DB->get_records_sql($query,
-        array('siteid' => $SITE->id, 'courseid' => $courseid, 'active' => QTYPE_LTI_TOOL_STATE_CONFIGURED) + $coursevisparams);
-        */
 
     $courseconds = [];
     if (has_capability('qtype/lti:adddefaultinstance', context_course::instance($courseid))) {
@@ -1611,8 +1544,8 @@ function qtype_lti_get_lti_types_by_course($courseid, $coursevisible = null) {
     AND state = :active";
 
     return $DB->get_records_sql($query,
-            array('siteid' => $SITE->id, 'courseid' => $courseid, 'active' => QTYPE_LTI_TOOL_STATE_CONFIGURED) + $coursevisparams);
-
+                                array('siteid' => $SITE->id, 'courseid' => $courseid, 'active' => QTYPE_LTI_TOOL_STATE_CONFIGURED) +
+                                     $coursevisparams);
 }
 
 /**
@@ -1626,10 +1559,9 @@ function qtype_lti_get_types_for_add_instance() {
 
     $types = array();
     // Shall we remove Automatic option? For now, No.
-    //  $types[0] = (object)array('name' => get_string('automatic', 'qtype_lti'), 'course' => 0, 'toolproxyid' => null);
-     if (has_capability('qtype/lti:adddefaultinstance', context_course::instance($COURSE->id))) {
-         $types[0] = (object)array('name' => get_string('automatic', 'qtype_lti'), 'course' => 0, 'toolproxyid' => null);
-     }
+    if (has_capability('qtype/lti:adddefaultinstance', context_course::instance($COURSE->id))) {
+        $types[0] = (object)array('name' => get_string('automatic', 'qtype_lti'), 'course' => 0, 'toolproxyid' => null);
+    }
 
     foreach ($admintypes as $type) {
         $types[$type->id] = $type;
@@ -1641,8 +1573,10 @@ function qtype_lti_get_types_for_add_instance() {
 /**
  * Returns a list of configured types in the given course
  *
- * @param int $courseid The id of the course to retieve types for
- * @param int $sectionreturn section to return to for forming the URLs
+ * @param int $courseid
+ *        The id of the course to retieve types for
+ * @param int $sectionreturn
+ *        section to return to for forming the URLs
  * @return array Array of lti types. Each element is object with properties: name, title, icon, help, helplink, link
  */
 function qtype_lti_get_configured_types($courseid, $sectionreturn = 0) {
@@ -1651,15 +1585,15 @@ function qtype_lti_get_configured_types($courseid, $sectionreturn = 0) {
     $admintypes = qtype_lti_get_lti_types_by_course($courseid, [QTYPE_LTI_COURSEVISIBLE_ACTIVITYCHOOSER]);
 
     foreach ($admintypes as $ltitype) {
-        $type           = new stdClass();
+        $type = new stdClass();
         $type->modclass = MOD_CLASS_ACTIVITY;
-        $type->name     = 'lti_type_' . $ltitype->id;
+        $type->name = 'lti_type_' . $ltitype->id;
         // Clean the name. We don't want tags here.
-        $type->title    = clean_param($ltitype->name, PARAM_NOTAGS);
+        $type->title = clean_param($ltitype->name, PARAM_NOTAGS);
         $trimmeddescription = trim($ltitype->description);
         if ($trimmeddescription != '') {
             // Clean the description. We don't want tags here.
-            $type->help     = clean_param($trimmeddescription, PARAM_NOTAGS);
+            $type->help = clean_param($trimmeddescription, PARAM_NOTAGS);
             $type->helplink = get_string('modulename_shortcut_link', 'qtype_lti');
         }
         if (empty($ltitype->icon)) {
@@ -1667,8 +1601,9 @@ function qtype_lti_get_configured_types($courseid, $sectionreturn = 0) {
         } else {
             $type->icon = html_writer::empty_tag('img', array('src' => $ltitype->icon, 'alt' => $ltitype->name, 'class' => 'icon'));
         }
-        $type->link = new moodle_url('/course/modedit.php', array('add' => 'qtype_lti', 'return' => 0, 'course' => $courseid,
-            'sr' => $sectionreturn, 'typeid' => $ltitype->id));
+        $type->link = new moodle_url('/course/modedit.php',
+                                    array('add' => 'qtype_lti', 'return' => 0, 'course' => $courseid, 'sr' => $sectionreturn,
+                                        'typeid' => $ltitype->id));
         $types[] = $type;
     }
     return $types;
@@ -1678,7 +1613,7 @@ function qtype_lti_get_domain_from_url($url) {
     $matches = array();
 
     if (preg_match(QTYPE_LTI_URL_DOMAIN_REGEX, $url, $matches)) {
-  
+
         return $matches[1];
     }
 }
@@ -1690,9 +1625,9 @@ function qtype_lti_get_tool_by_url_match($url, $courseid = null, $state = QTYPE_
 }
 
 function qtype_lti_get_url_thumbprint($url) {
-    // Parse URL requires a schema otherwise everything goes into 'path'.  Fixed 5.4.7 or later.
+    // Parse URL requires a schema otherwise everything goes into 'path'. Fixed 5.4.7 or later.
     if (preg_match('/https?:\/\//', $url) !== 1) {
-        $url = 'http://'.$url;
+        $url = 'http://' . $url;
     }
     $urlparts = parse_url(strtolower($url));
     if (!isset($urlparts['path'])) {
@@ -1749,14 +1684,14 @@ function qtype_lti_get_best_tool_by_url($url, $tools, $courseid = null) {
         }
     }
 
-    $bestmatch = array_reduce($tools, function($value, $tool) {
-        if ($tool->_matchscore > $value->_matchscore) {
-            return $tool;
-        } else {
-            return $value;
-        }
-
-    }, (object)array('_matchscore' => -1));
+    $bestmatch = array_reduce($tools,
+                            function ($value, $tool) {
+                                if ($tool->_matchscore > $value->_matchscore) {
+                                    return $tool;
+                                } else {
+                                    return $value;
+                                }
+                            }, (object)array('_matchscore' => -1));
 
     // None of the tools are suitable for this URL.
     if ($bestmatch->_matchscore <= 0) {
@@ -1790,10 +1725,12 @@ function qtype_lti_get_shared_secrets_by_key($key) {
                FROM {qtype_lti_options}
               WHERE resourcekey = :key3";
 
-    $sharedsecrets = $DB->get_records_sql($query, array('configured1' => QTYPE_LTI_TOOL_STATE_CONFIGURED,
-        'configured2' => QTYPE_LTI_TOOL_STATE_CONFIGURED, 'key1' => $key, 'key2' => $key, 'key3' => $key));
+    $sharedsecrets = $DB->get_records_sql($query,
+                                        array('configured1' => QTYPE_LTI_TOOL_STATE_CONFIGURED,
+                                            'configured2' => QTYPE_LTI_TOOL_STATE_CONFIGURED, 'key1' => $key, 'key2' => $key,
+                                            'key3' => $key));
 
-    $values = array_map(function($item) {
+    $values = array_map(function ($item) {
         return $item->value;
     }, $sharedsecrets);
 
@@ -1805,19 +1742,13 @@ function qtype_lti_get_shared_secrets_by_key($key) {
 /**
  * Delete a Basic LTI configuration
  *
- * @param int $id   Configuration id
+ * @param int $id
+ *        Configuration id
  */
 function qtype_lti_delete_type($id) {
     global $DB;
 
     // We should probably just copy the launch URL to the tool instances in this case... using a single query.
-    /*
-    $instances = $DB->get_records('qtype_lti_options', array('typeid' => $id));
-    foreach ($instances as $instance) {
-        $instance->typeid = 0;
-        $DB->update_record('qtype_lti_options', $instance);
-    }*/
-
     $DB->delete_records('qtype_lti_types', array('id' => $id));
     $DB->delete_records('qtype_lti_types_config', array('typeid' => $id));
 }
@@ -1831,8 +1762,8 @@ function qtype_lti_set_state_for_type($id, $state) {
 /**
  * Transforms a basic LTI object to an array
  *
- * @param object $ltiobject    Basic LTI object
- *
+ * @param object $ltiobject
+ *        Basic LTI object
  * @return array Basic LTI configuration details
  */
 function qtype_lti_get_config($ltiobject) {
@@ -1844,13 +1775,11 @@ function qtype_lti_get_config($ltiobject) {
 }
 
 /**
- *
  * Generates some of the tool configuration based on the instance details
  *
  * @param int $id
  *
  * @return Instance configuration
- *
  */
 function qtype_lti_get_type_config_from_instance($id) {
     global $DB;
@@ -2016,11 +1945,11 @@ function qtype_lti_prepare_type_for_save($type, $config) {
 
     $type->timemodified = time();
 
-    unset ($config->lti_typename);
-    unset ($config->lti_toolurl);
-    unset ($config->lti_description);
-    unset ($config->lti_icon);
-    unset ($config->lti_secureicon);
+    unset($config->lti_typename);
+    unset($config->lti_toolurl);
+    unset($config->lti_description);
+    unset($config->lti_icon);
+    unset($config->lti_secureicon);
 }
 
 function qtype_lti_update_type($type, $config) {
@@ -2035,7 +1964,7 @@ function qtype_lti_update_type($type, $config) {
         $clearcache = isset($type->icon) && (!isset($config->oldicon) || ($config->oldicon !== $type->icon));
     }
     unset($config->oldicon);
-    
+
     if ($DB->update_record('qtype_lti_types', $type)) {
         foreach ($config as $key => $value) {
             if (substr($key, 0, 4) == 'lti_' && !is_null($value)) {
@@ -2046,8 +1975,8 @@ function qtype_lti_update_type($type, $config) {
                 qtype_lti_update_config($record);
             }
         }
-        
-        require_once($CFG->libdir.'/modinfolib.php');
+
+        require_once($CFG->libdir . '/modinfolib.php');
         if ($clearcache) {
             $sql = "SELECT DISTINCT course
                       FROM {qtype_lti_options}
@@ -2089,7 +2018,6 @@ function qtype_lti_add_type($type, $config) {
 
     $id = $DB->insert_record('qtype_lti_types', $type);
 
-
     if ($id) {
         foreach ($config as $key => $value) {
             if (substr($key, 0, 4) == 'lti_' && !is_null($value)) {
@@ -2100,22 +2028,22 @@ function qtype_lti_add_type($type, $config) {
 
                 qtype_lti_add_config($record);
             }
-        
-        //Some records might not be connected to type id but rely on type id. 
-        $loose_questions = $DB->get_records_sql('select id, toolurl from {qtype_lti_options}
-												 where '.$DB->sql_like('toolurl', ':toolurl').' and
-												 typeid = :typeid', array( 'toolurl' => '%'.$type->baseurl.'%', 'typeid' => 0));
-        if($loose_questions) {
-        	foreach($loose_questions as $loose_question) {
-        		$record = new \StdClass();
-        		$record->id = $loose_question->id;
-        		$record->typeid = $id;
-        		$DB->update_record('qtype_lti_options', $record);
-        	}
+
+            // Some records might not be connected to type id but rely on type id.
+            $loosequestions = $DB->get_records_sql(
+                                                    'select id, toolurl from {qtype_lti_options}
+												 where ' . $DB->sql_like('toolurl', ':toolurl') . ' and
+												 typeid = :typeid',
+                                                    array('toolurl' => '%' . $type->baseurl . '%', 'typeid' => 0));
+            if ($loosequestions) {
+                foreach ($loosequestions as $loosequestion) {
+                    $record = new \StdClass();
+                    $record->id = $loosequestion->id;
+                    $record->typeid = $id;
+                    $DB->update_record('qtype_lti_options', $record);
+                }
+            }
         }
-        	
-      }
-    
     }
     return $id;
 }
@@ -2123,9 +2051,10 @@ function qtype_lti_add_type($type, $config) {
 /**
  * Given an array of tool proxies, filter them based on their state
  *
- * @param array $toolproxies An array of qtype_lti_tool_proxies records
- * @param int $state One of the QTYPE_LTI_TOOL_PROXY_STATE_* constants
- *
+ * @param array $toolproxies
+ *        An array of qtype_lti_tool_proxies records
+ * @param int $state
+ *        One of the QTYPE_LTI_TOOL_PROXY_STATE_* constants
  * @return array
  */
 function qtype_lti_filter_tool_proxy_types(array $toolproxies, $state) {
@@ -2141,8 +2070,8 @@ function qtype_lti_filter_tool_proxy_types(array $toolproxies, $state) {
 /**
  * Get the tool proxy instance given its GUID
  *
- * @param string  $toolproxyguid   Tool proxy GUID value
- *
+ * @param string $toolproxyguid
+ *        Tool proxy GUID value
  * @return object
  */
 function qtype_lti_get_tool_proxy_from_guid($toolproxyguid) {
@@ -2156,18 +2085,17 @@ function qtype_lti_get_tool_proxy_from_guid($toolproxyguid) {
 /**
  * Get the tool proxy instance given its registration URL
  *
- * @param string $regurl Tool proxy registration URL
- *
+ * @param string $regurl
+ *        Tool proxy registration URL
  * @return array The record of the tool proxy with this url
  */
 function qtype_lti_get_tool_proxies_from_registration_url($regurl) {
     global $DB;
 
     return $DB->get_records_sql(
-        'SELECT * FROM {qtype_lti_tool_proxies}
-        WHERE '.$DB->sql_compare_text('regurl', 256).' = :regurl',
-        array('regurl' => $regurl)
-    );
+                                'SELECT * FROM {qtype_lti_tool_proxies}
+        WHERE ' . $DB->sql_compare_text('regurl', 256) . ' = :regurl',
+                                array('regurl' => $regurl));
 }
 
 /**
@@ -2187,7 +2115,8 @@ function qtype_lti_get_tool_proxy($id) {
 /**
  * Returns lti tool proxies.
  *
- * @param bool $orphanedonly Only retrieves tool proxies that have no type associated with them
+ * @param bool $orphanedonly
+ *        Only retrieves tool proxies that have no type associated with them
  * @return array of basicLTI types
  */
 function qtype_lti_get_tool_proxies($orphanedonly) {
@@ -2232,9 +2161,9 @@ function qtype_lti_get_tool_proxy_config($id) {
 /**
  * Update the database with a tool proxy instance
  *
- * @param object   $config    Tool proxy definition
- *
- * @return int  Record id number
+ * @param object $config
+ *        Tool proxy definition
+ * @return int Record id number
  */
 function qtype_lti_add_tool_proxy($config) {
     global $USER, $DB;
@@ -2254,7 +2183,7 @@ function qtype_lti_add_tool_proxy($config) {
     if (isset($config->lti_services)) {
         $toolproxy->serviceoffered = implode("\n", $config->lti_services);
     } else {
-        $func = function($s) {
+        $func = function ($s) {
             return $s->get_id();
         };
         $servicenames = array_map($func, qtype_lti_get_services());
@@ -2286,9 +2215,9 @@ function qtype_lti_add_tool_proxy($config) {
 /**
  * Updates a tool proxy in the database
  *
- * @param object  $toolproxy   Tool proxy
- *
- * @return int    Record id number
+ * @param object $toolproxy
+ *        Tool proxy
+ * @return int Record id number
  */
 function qtype_lti_update_tool_proxy($toolproxy) {
     global $DB;
@@ -2302,7 +2231,8 @@ function qtype_lti_update_tool_proxy($toolproxy) {
 /**
  * Delete a Tool Proxy
  *
- * @param int $id   Tool Proxy id
+ * @param int $id
+ *        Tool Proxy id
  */
 function qtype_lti_delete_tool_proxy($id) {
     global $DB;
@@ -2317,8 +2247,8 @@ function qtype_lti_delete_tool_proxy($id) {
 /**
  * Add a tool configuration in the database
  *
- * @param object $config   Tool configuration
- *
+ * @param object $config
+ *        Tool configuration
  * @return int Record id number
  */
 function qtype_lti_add_config($config) {
@@ -2330,8 +2260,8 @@ function qtype_lti_add_config($config) {
 /**
  * Updates a tool configuration in the database
  *
- * @param object  $config   Tool configuration
- *
+ * @param object $config
+ *        Tool configuration
  * @return Record id number
  */
 function qtype_lti_update_config($config) {
@@ -2341,10 +2271,10 @@ function qtype_lti_update_config($config) {
     $old = $DB->get_records('qtype_lti_types_config', array('typeid' => $config->typeid, 'name' => $config->name));
 
     if ($old) {
-    	foreach($old as $o){
-    		$config->id = $o->id;
-    		$return = $DB->update_record('qtype_lti_types_config', $config);
-    	}
+        foreach ($old as $o) {
+            $config->id = $o->id;
+            $return = $DB->update_record('qtype_lti_types_config', $config);
+        }
     } else {
         $return = $DB->insert_record('qtype_lti_types_config', $config);
     }
@@ -2354,18 +2284,20 @@ function qtype_lti_update_config($config) {
 /**
  * Gets the tool settings
  *
- * @param int  $toolproxyid   Id of tool proxy record
- * @param int  $courseid      Id of course (null if system settings)
- * @param int  $instanceid    Id of course module (null if system or context settings)
- *
- * @return array  Array settings
+ * @param int $toolproxyid
+ *        Id of tool proxy record
+ * @param int $courseid
+ *        Id of course (null if system settings)
+ * @param int $instanceid
+ *        Id of course module (null if system or context settings)
+ * @return array Array settings
  */
 function qtype_lti_get_tool_settings($toolproxyid, $courseid = null, $instanceid = null) {
     global $DB;
 
     $settings = array();
-    $settingsstr = $DB->get_field('qtype_lti_tool_settings', 'settings', array('toolproxyid' => $toolproxyid,
-        'course' => $courseid, 'questionid' => $instanceid));
+    $settingsstr = $DB->get_field('qtype_lti_tool_settings', 'settings',
+                                array('toolproxyid' => $toolproxyid, 'course' => $courseid, 'questionid' => $instanceid));
     if ($settingsstr !== false) {
         $settings = json_decode($settingsstr, true);
     }
@@ -2375,17 +2307,21 @@ function qtype_lti_get_tool_settings($toolproxyid, $courseid = null, $instanceid
 /**
  * Sets the tool settings (
  *
- * @param array  $settings      Array of settings
- * @param int    $toolproxyid   Id of tool proxy record
- * @param int    $courseid      Id of course (null if system settings)
- * @param int    $instanceid    Id of course module (null if system or context settings)
+ * @param array $settings
+ *        Array of settings
+ * @param int $toolproxyid
+ *        Id of tool proxy record
+ * @param int $courseid
+ *        Id of course (null if system settings)
+ * @param int $instanceid
+ *        Id of course module (null if system or context settings)
  */
 function qtype_lti_set_tool_settings($settings, $toolproxyid, $courseid = null, $instanceid = null) {
     global $DB;
 
     $json = json_encode($settings);
-    $record = $DB->get_record('qtype_lti_tool_settings', array('toolproxyid' => $toolproxyid,
-        'course' => $courseid, 'questionid' => $instanceid));
+    $record = $DB->get_record('qtype_lti_tool_settings',
+                            array('toolproxyid' => $toolproxyid, 'course' => $courseid, 'questionid' => $instanceid));
     if ($record !== false) {
         $DB->update_record('qtype_lti_tool_settings', array('id' => $record->id, 'settings' => $json, 'timemodified' => time()));
     } else {
@@ -2403,14 +2339,16 @@ function qtype_lti_set_tool_settings($settings, $toolproxyid, $courseid = null, 
 /**
  * Signs the petition to launch the external tool using OAuth
  *
- * @param $oldparms     Parameters to be passed for signing
- * @param $endpoint     url of the external tool
- * @param $method       Method for sending the parameters (e.g. POST)
- * @param $oauth_consumoer_key          Key
- * @param $oauth_consumoer_secret       Secret
+ * @param $oldparms Parameters
+ *        to be passed for signing
+ * @param $endpoint url
+ *        of the external tool
+ * @param $method Method
+ *        for sending the parameters (e.g. POST)
+ * @param $oauth_consumoer_key Key
+ * @param $oauth_consumoer_secret Secret
  */
 function qtype_lti_sign_parameters($oldparms, $endpoint, $method, $oauthconsumerkey, $oauthconsumersecret) {
-
     $parms = $oldparms;
 
     $testtoken = '';
@@ -2429,19 +2367,22 @@ function qtype_lti_sign_parameters($oldparms, $endpoint, $method, $oauthconsumer
 /**
  * Posts the launch petition HTML
  *
- * @param $newparms     Signed parameters
- * @param $endpoint     URL of the external tool
- * @param $debug        Debug (true/false)
+ * @param $newparms Signed
+ *        parameters
+ * @param $endpoint URL
+ *        of the external tool
+ * @param $debug Debug
+ *        (true/false)
  */
-function qtype_lti_post_launch_html($newparms, $endpoint, $debug=false) {
+function qtype_lti_post_launch_html($newparms, $endpoint, $debug = false) {
     $r = "<form action=\"" . $endpoint .
-        "\" name=\"ltiLaunchForm\" id=\"ltiLaunchForm\" method=\"post\" encType=\"application/x-www-form-urlencoded\">\n";
+         "\" name=\"ltiLaunchForm\" id=\"ltiLaunchForm\" method=\"post\" encType=\"application/x-www-form-urlencoded\">\n";
 
     // Contruct html for the launch parameters.
     foreach ($newparms as $key => $value) {
         $key = htmlspecialchars($key);
         $value = htmlspecialchars($value);
-        if ( $key == "ext_submit" ) {
+        if ($key == "ext_submit") {
             $r .= "<input type=\"submit\"";
         } else {
             $r .= "<input type=\"hidden\" name=\"{$key}\"";
@@ -2451,7 +2392,7 @@ function qtype_lti_post_launch_html($newparms, $endpoint, $debug=false) {
         $r .= "\"/>\n";
     }
 
-    if ( $debug ) {
+    if ($debug) {
         $r .= "<script language=\"javascript\"> \n";
         $r .= "  //<![CDATA[ \n";
         $r .= "function basicltiDebugToggle() {\n";
@@ -2466,11 +2407,11 @@ function qtype_lti_post_launch_html($newparms, $endpoint, $debug=false) {
         $r .= "  //]]> \n";
         $r .= "</script>\n";
         $r .= "<a id=\"displayText\" href=\"javascript:basicltiDebugToggle();\">";
-        $r .= get_string("toggle_debug_data", "lti")."</a>\n";
+        $r .= get_string("toggle_debug_data", "lti") . "</a>\n";
         $r .= "<div id=\"basicltiDebug\" style=\"display:none\">\n";
-        $r .= "<b>".get_string("basiclti_endpoint", "lti")."</b><br/>\n";
+        $r .= "<b>" . get_string("basiclti_endpoint", "lti") . "</b><br/>\n";
         $r .= $endpoint . "<br/>\n&nbsp;<br/>\n";
-        $r .= "<b>".get_string("basiclti_parameters", "lti")."</b><br/>\n";
+        $r .= "<b>" . get_string("basiclti_parameters", "lti") . "</b><br/>\n";
         foreach ($newparms as $key => $value) {
             $key = htmlspecialchars($key);
             $value = htmlspecialchars($value);
@@ -2481,12 +2422,10 @@ function qtype_lti_post_launch_html($newparms, $endpoint, $debug=false) {
     }
     $r .= "</form>\n";
 
-    if ( ! $debug ) {
+    if (!$debug) {
         $r .= " <script type=\"text/javascript\"> \n" .
-            "  //<![CDATA[ \n" .
-            "    document.ltiLaunchForm.submit(); \n" .
-            "  //]]> \n" .
-            " </script> \n";
+              "  //<![CDATA[ \n" . "    document.ltiLaunchForm.submit(); \n" . "  //]]> \n" .
+              " </script> \n";
     }
     return $r;
 }
@@ -2519,7 +2458,7 @@ function qtype_lti_get_launch_container($lti, $toolconfig) {
     // Scrolling within the object element doesn't work on iOS or Android
     // Opening the popup window also had some issues in testing
     // For mobile devices, always take up the entire screen to ensure the best experience.
-    if ($devicetype === core_useragent::DEVICETYPE_MOBILE || $devicetype === core_useragent::DEVICETYPE_TABLET ) {
+    if ($devicetype === core_useragent::DEVICETYPE_MOBILE || $devicetype === core_useragent::DEVICETYPE_TABLET) {
         $launchcontainer = QTYPE_LTI_LAUNCH_CONTAINER_REPLACE_MOODLE_WINDOW;
     }
 
@@ -2563,16 +2502,16 @@ function qtype_lti_should_log_request($rawbody) {
 
     try {
         $xml = new \SimpleXMLElement($rawbody);
-        $ns  = $xml->getNamespaces();
-        $ns  = array_shift($ns);
+        $ns = $xml->getNamespaces();
+        $ns = array_shift($ns);
         $xml->registerXPathNamespace('qtype_lti', $ns);
         $requestuserid = '';
         if ($node = $xml->xpath('//lti:userId')) {
             $node = $node[0];
-            $requestuserid = clean_param((string) $node, PARAM_INT);
+            $requestuserid = clean_param((string)$node, PARAM_INT);
         } else if ($node = $xml->xpath('//lti:sourcedId')) {
             $node = $node[0];
-            $resultjson = json_decode((string) $node);
+            $resultjson = json_decode((string)$node);
             $requestuserid = clean_param($resultjson->data->userid, PARAM_INT);
         }
     } catch (Exception $e) {
@@ -2593,8 +2532,8 @@ function qtype_lti_should_log_request($rawbody) {
  */
 function qtype_lti_log_request($rawbody) {
     if ($tempdir = make_temp_directory('qtype_lti', false)) {
-        if ($tempfile = tempnam($tempdir, 'qtype_lti_request'.date('YmdHis'))) {
-            $content  = "Request Headers:\n";
+        if ($tempfile = tempnam($tempdir, 'qtype_lti_request' . date('YmdHis'))) {
+            $content = "Request Headers:\n";
             foreach (moodle\qtype\lti\OAuthUtil::get_headers() as $header => $value) {
                 $content .= "$header: $value\n";
             }
@@ -2610,12 +2549,14 @@ function qtype_lti_log_request($rawbody) {
 /**
  * Log an LTI response.
  *
- * @param string $responsexml The response XML
- * @param Exception $e If there was an exception, pass that too
+ * @param string $responsexml
+ *        The response XML
+ * @param Exception $e
+ *        If there was an exception, pass that too
  */
 function qtype_lti_log_response($responsexml, $e = null) {
     if ($tempdir = make_temp_directory('qtype_lti', false)) {
-        if ($tempfile = tempnam($tempdir, 'qtype_lti_response'.date('YmdHis'))) {
+        if ($tempfile = tempnam($tempdir, 'qtype_lti_response' . date('YmdHis'))) {
             $content = '';
             if ($e instanceof Exception) {
                 $info = get_exception_info($e);
@@ -2665,11 +2606,8 @@ function qtype_lti_get_type_config_by_instance($instance) {
  * @param array $typeconfig
  */
 function qtype_lti_force_type_config_settings($instance, array $typeconfig) {
-    $forced = array(
-        'instructorchoicesendname'      => 'sendname',
-        'instructorchoicesendemailaddr' => 'sendemailaddr',
-        'instructorchoiceacceptgrades'  => 'acceptgrades',
-    );
+    $forced = array('instructorchoicesendname' => 'sendname', 'instructorchoicesendemailaddr' => 'sendemailaddr',
+        'instructorchoiceacceptgrades' => 'acceptgrades');
 
     foreach ($forced as $instanceparam => $typeconfigparam) {
         if (array_key_exists($typeconfigparam, $typeconfig) && $typeconfig[$typeconfigparam] != QTYPE_LTI_SETTING_DELEGATE) {
@@ -2684,48 +2622,25 @@ function qtype_lti_force_type_config_settings($instance, array $typeconfig) {
  * @return array List of capability names (without a dollar sign prefix)
  */
 function qtype_lti_get_capabilities() {
-
-
-    $capabilities = array(
-       'basic-lti-launch-request' => '',
-       'ContentItemSelectionRequest' => '',
-       'ToolProxyRegistrationRequest' => '',
-       'Context.id' => 'context_id',
-       'Context.title' => 'context_title',
-       'Context.label' => 'context_label',
-       'Context.sourcedId' => 'lis_course_section_sourcedid',
-       'Context.longDescription' => '$COURSE->summary',
-       'Context.timeFrame.begin' => '$COURSE->startdate',
-       'CourseSection.title' => 'context_title',
-       'CourseSection.label' => 'context_label',
-       'CourseSection.sourcedId' => 'lis_course_section_sourcedid',
-       'CourseSection.longDescription' => '$COURSE->summary',
-       'CourseSection.timeFrame.begin' => '$COURSE->startdate',
-       'ResourceLink.id' => 'resource_link_id',
-       'ResourceLink.title' => 'resource_link_title',
-       'ResourceLink.description' => 'resource_link_description',
-       'User.id' => 'user_id',
-       'User.username' => '$USER->username',
-       'Person.name.full' => 'lis_person_name_full',
-       'Person.name.given' => 'lis_person_name_given',
-       'Person.name.family' => 'lis_person_name_family',
-       'Person.email.primary' => 'lis_person_contact_email_primary',
-       'Person.sourcedId' => 'lis_person_sourcedid',
-       'Person.name.middle' => '$USER->middlename',
-       'Person.address.street1' => '$USER->address',
-       'Person.address.locality' => '$USER->city',
-       'Person.address.country' => '$USER->country',
-       'Person.address.timezone' => '$USER->timezone',
-       'Person.phone.primary' => '$USER->phone1',
-       'Person.phone.mobile' => '$USER->phone2',
-       'Person.webaddress' => '$USER->url',
-       'Membership.role' => 'roles',
-       'Result.sourcedId' => 'lis_result_sourcedid',
-       'Result.autocreate' => 'lis_outcome_service_url',
-       'Moodle.Person.userGroupIds' => null);
+    $capabilities = array('basic-lti-launch-request' => '', 'ContentItemSelectionRequest' => '',
+        'ToolProxyRegistrationRequest' => '', 'Context.id' => 'context_id', 'Context.title' => 'context_title',
+        'Context.label' => 'context_label', 'Context.sourcedId' => 'lis_course_section_sourcedid',
+        'Context.longDescription' => '$COURSE->summary', 'Context.timeFrame.begin' => '$COURSE->startdate',
+        'CourseSection.title' => 'context_title', 'CourseSection.label' => 'context_label',
+        'CourseSection.sourcedId' => 'lis_course_section_sourcedid', 'CourseSection.longDescription' => '$COURSE->summary',
+        'CourseSection.timeFrame.begin' => '$COURSE->startdate', 'ResourceLink.id' => 'resource_link_id',
+        'ResourceLink.title' => 'resource_link_title', 'ResourceLink.description' => 'resource_link_description',
+        'User.id' => 'user_id', 'User.username' => '$USER->username', 'Person.name.full' => 'lis_person_name_full',
+        'Person.name.given' => 'lis_person_name_given', 'Person.name.family' => 'lis_person_name_family',
+        'Person.email.primary' => 'lis_person_contact_email_primary', 'Person.sourcedId' => 'lis_person_sourcedid',
+        'Person.name.middle' => '$USER->middlename', 'Person.address.street1' => '$USER->address',
+        'Person.address.locality' => '$USER->city', 'Person.address.country' => '$USER->country',
+        'Person.address.timezone' => '$USER->timezone', 'Person.phone.primary' => '$USER->phone1',
+        'Person.phone.mobile' => '$USER->phone2', 'Person.webaddress' => '$USER->url', 'Membership.role' => 'roles',
+        'Result.sourcedId' => 'lis_result_sourcedid', 'Result.autocreate' => 'lis_outcome_service_url',
+        'Moodle.Person.userGroupIds' => null);
 
     return $capabilities;
-
 }
 
 /**
@@ -2734,7 +2649,6 @@ function qtype_lti_get_capabilities() {
  * @return array List of services
  */
 function qtype_lti_get_services() {
-
     $services = array();
     $definedservices = core_component::get_plugin_list('ltiservice');
     foreach ($definedservices as $name => $location) {
@@ -2743,18 +2657,16 @@ function qtype_lti_get_services() {
     }
 
     return $services;
-
 }
 
 /**
  * Initializes an instance of the named service
  *
- * @param string $servicename Name of service
- *
+ * @param string $servicename
+ *        Name of service
  * @return qtype_lti\local\ltiservice\service_base Service
  */
 function qtype_lti_get_service_by_name($servicename) {
-
     $service = false;
     $classname = "\\ltiservice_{$servicename}\\local\\service\\{$servicename}";
     if (class_exists($classname)) {
@@ -2762,19 +2674,18 @@ function qtype_lti_get_service_by_name($servicename) {
     }
 
     return $service;
-
 }
 
 /**
  * Finds a service by id
  *
- * @param array  $services    Array of services
- * @param string $resourceid  ID of resource
- *
+ * @param array $services
+ *        Array of services
+ * @param string $resourceid
+ *        ID of resource
  * @return qtype_lti\local\ltiservice\service_base Service
  */
 function qtype_lti_get_service_by_resource_id($services, $resourceid) {
-
     $service = false;
     foreach ($services as $aservice) {
         foreach ($aservice->get_resources() as $resource) {
@@ -2786,7 +2697,6 @@ function qtype_lti_get_service_by_resource_id($services, $resourceid) {
     }
 
     return $service;
-
 }
 
 /**
@@ -2797,7 +2707,6 @@ function qtype_lti_get_service_by_resource_id($services, $resourceid) {
  * @return array Contexts
  */
 function qtype_lti_get_contexts($json) {
-
     $contexts = array();
     if (isset($json->{'@context'})) {
         foreach ($json->{'@context'} as $context) {
@@ -2808,7 +2717,6 @@ function qtype_lti_get_contexts($json) {
     }
 
     return $contexts;
-
 }
 
 /**
@@ -2820,7 +2728,6 @@ function qtype_lti_get_contexts($json) {
  * @return string Fully-qualified ID
  */
 function qtype_lti_get_fqid($contexts, $id) {
-
     $parts = explode(':', $id, 2);
     if (count($parts) > 1) {
         if (array_key_exists($parts[0], $contexts)) {
@@ -2829,14 +2736,13 @@ function qtype_lti_get_fqid($contexts, $id) {
     }
 
     return $id;
-
 }
 
 /**
  * Returns the icon for the given tool type
  *
- * @param stdClass $type The tool type
- *
+ * @param stdClass $type
+ *        The tool type
  * @return string The url to the tool type's corresponding icon
  */
 function qtype_get_tool_type_icon_url(stdClass $type) {
@@ -2858,34 +2764,34 @@ function qtype_get_tool_type_icon_url(stdClass $type) {
 /**
  * Returns the edit url for the given tool type
  *
- * @param stdClass $type The tool type
- *
+ * @param stdClass $type
+ *        The tool type
  * @return string The url to edit the tool type
  */
 function qtype_get_tool_type_edit_url(stdClass $type) {
     $url = new moodle_url('/question/type/lti/typessettings.php',
-                          array('action' => 'update', 'id' => $type->id, 'sesskey' => sesskey(), 'returnto' => 'toolconfigure'));
+                        array('action' => 'update', 'id' => $type->id, 'sesskey' => sesskey(), 'returnto' => 'toolconfigure'));
     return $url->out();
 }
 
 /**
  * Returns the edit url for the given tool proxy.
  *
- * @param stdClass $proxy The tool proxy
- *
+ * @param stdClass $proxy
+ *        The tool proxy
  * @return string The url to edit the tool type
  */
 function qtype_get_tool_proxy_edit_url(stdClass $proxy) {
     $url = new moodle_url('/question/type/lti/registersettings.php',
-                          array('action' => 'update', 'id' => $proxy->id, 'sesskey' => sesskey(), 'returnto' => 'toolconfigure'));
+                        array('action' => 'update', 'id' => $proxy->id, 'sesskey' => sesskey(), 'returnto' => 'toolconfigure'));
     return $url->out();
 }
 
 /**
  * Returns the course url for the given tool type
  *
- * @param stdClass $type The tool type
- *
+ * @param stdClass $type
+ *        The tool type
  * @return string|void The url to the course of the tool type, void if it is a site wide type
  */
 function qtype_get_tool_type_course_url(stdClass $type) {
@@ -2900,17 +2806,14 @@ function qtype_get_tool_type_course_url(stdClass $type) {
 /**
  * Returns the icon and edit urls for the tool type and the course url if it is a course type.
  *
- * @param stdClass $type The tool type
- *
+ * @param stdClass $type
+ *        The tool type
  * @return string The urls of the tool type
  */
 function qtype_get_tool_type_urls(stdClass $type) {
     $courseurl = qtype_get_tool_type_course_url($type);
 
-    $urls = array(
-        'icon' => qtype_get_tool_type_icon_url($type),
-        'edit' => qtype_get_tool_type_edit_url($type),
-    );
+    $urls = array('icon' => qtype_get_tool_type_icon_url($type), 'edit' => qtype_get_tool_type_edit_url($type));
 
     if ($courseurl) {
         $urls['course'] = $courseurl;
@@ -2922,17 +2825,14 @@ function qtype_get_tool_type_urls(stdClass $type) {
 /**
  * Returns the icon and edit urls for the tool proxy.
  *
- * @param stdClass $proxy The tool proxy
- *
+ * @param stdClass $proxy
+ *        The tool proxy
  * @return string The urls of the tool proxy
  */
 function qtype_get_tool_proxy_urls(stdClass $proxy) {
     global $OUTPUT;
 
-    $urls = array(
-        'icon' => $OUTPUT->image_url('icon', 'qtype_lti')->out(),
-        'edit' => qtype_get_tool_proxy_edit_url($proxy),
-    );
+    $urls = array('icon' => $OUTPUT->image_url('icon', 'qtype_lti')->out(), 'edit' => qtype_get_tool_proxy_edit_url($proxy));
 
     return $urls;
 }
@@ -2940,10 +2840,10 @@ function qtype_get_tool_proxy_urls(stdClass $proxy) {
 /**
  * Returns information on the current state of the tool type
  *
- * @param stdClass $type The tool type
- *
+ * @param stdClass $type
+ *        The tool type
  * @return array An array with a text description of the state, and boolean for whether it is in each state:
- * pending, configured, rejected, unknown
+ *         pending, configured, rejected, unknown
  */
 function qtype_get_tool_type_state_info(stdClass $type) {
     $state = '';
@@ -2955,35 +2855,30 @@ function qtype_get_tool_type_state_info(stdClass $type) {
         case QTYPE_LTI_TOOL_STATE_CONFIGURED:
             $state = get_string('active', 'qtype_lti');
             $isconfigured = true;
-            break;
+        break;
         case QTYPE_LTI_TOOL_STATE_PENDING:
             $state = get_string('pending', 'qtype_lti');
             $ispending = true;
-            break;
+        break;
         case QTYPE_LTI_TOOL_STATE_REJECTED:
             $state = get_string('rejected', 'qtype_lti');
             $isrejected = true;
-            break;
+        break;
         default:
             $state = get_string('unknownstate', 'qtype_lti');
             $isunknown = true;
-            break;
+        break;
     }
 
-    return array(
-        'text' => $state,
-        'pending' => $ispending,
-        'configured' => $isconfigured,
-        'rejected' => $isrejected,
-        'unknown' => $isunknown
-    );
+    return array('text' => $state, 'pending' => $ispending, 'configured' => $isconfigured, 'rejected' => $isrejected,
+        'unknown' => $isunknown);
 }
 
 /**
  * Returns a summary of each LTI capability this tool type requires in plain language
  *
- * @param stdClass $type The tool type
- *
+ * @param stdClass $type
+ *        The tool type
  * @return array An array of text descriptions of each of the capabilities this tool type requires
  */
 function qtype_get_tool_type_capability_groups($type) {
@@ -3018,12 +2913,11 @@ function qtype_get_tool_type_capability_groups($type) {
     return $groups;
 }
 
-
 /**
  * Returns the ids of each instance of this tool type
  *
- * @param stdClass $type The tool type
- *
+ * @param stdClass $type
+ *        The tool type
  * @return array An array of ids of the instances of this tool type
  */
 function qtype_get_tool_type_instance_ids($type) {
@@ -3035,8 +2929,8 @@ function qtype_get_tool_type_instance_ids($type) {
 /**
  * Serialises this tool type
  *
- * @param stdClass $type The tool type
- *
+ * @param stdClass $type
+ *        The tool type
  * @return array An array of values representing this type
  */
 function qtype_serialise_tool_type(stdClass $type) {
@@ -3050,53 +2944,33 @@ function qtype_serialise_tool_type(stdClass $type) {
     } else {
         $description = get_string('editdescription', 'qtype_lti');
     }
-    return array(
-        'id' => $type->id,
-        'name' => $name,
-        'description' => $description,
-        'urls' => qtype_get_tool_type_urls($type),
-        'state' => qtype_get_tool_type_state_info($type),
-        'hascapabilitygroups' => !empty($capabilitygroups),
+    return array('id' => $type->id, 'name' => $name, 'description' => $description, 'urls' => qtype_get_tool_type_urls($type),
+        'state' => qtype_get_tool_type_state_info($type), 'hascapabilitygroups' => !empty($capabilitygroups),
         'capabilitygroups' => $capabilitygroups,
-        // Course ID of 1 means it's not linked to a course.
         'courseid' => $type->course == 1 ? 0 : $type->course,
-        'instanceids' => $instanceids,
-        'instancecount' => count($instanceids)
-    );
+        'instanceids' => $instanceids, 'instancecount' => count($instanceids));
 }
 
 /**
  * Serialises this tool proxy.
  *
- * @param stdClass $proxy The tool proxy
- *
+ * @param stdClass $proxy
+ *        The tool proxy
  * @return array An array of values representing this type
  */
 function qtype_serialise_tool_proxy(stdClass $proxy) {
-    return array(
-        'id' => $proxy->id,
-        'name' => $proxy->name,
-        'description' => get_string('activatetoadddescription', 'qtype_lti'),
+    return array('id' => $proxy->id, 'name' => $proxy->name, 'description' => get_string('activatetoadddescription', 'qtype_lti'),
         'urls' => qtype_get_tool_proxy_urls($proxy),
-        'state' => array(
-            'text' => get_string('pending', 'qtype_lti'),
-            'pending' => true,
-            'configured' => false,
-            'rejected' => false,
-            'unknown' => false
-        ),
-        'hascapabilitygroups' => true,
-        'capabilitygroups' => array(),
-        'courseid' => 0,
-        'instanceids' => array(),
-        'instancecount' => 0
-    );
+        'state' => array('text' => get_string('pending', 'qtype_lti'), 'pending' => true, 'configured' => false,
+            'rejected' => false, 'unknown' => false), 'hascapabilitygroups' => true, 'capabilitygroups' => array(), 'courseid' => 0,
+        'instanceids' => array(), 'instancecount' => 0);
 }
 
 /**
  * Loads the cartridge information into the tool type, if the launch url is for a cartridge file
  *
- * @param stdClass $type The tool type object to be filled in
+ * @param stdClass $type
+ *        The tool type object to be filled in
  * @since Moodle 3.1
  */
 function qtype_lti_load_type_if_cartridge($type) {
@@ -3108,7 +2982,8 @@ function qtype_lti_load_type_if_cartridge($type) {
 /**
  * Loads the cartridge information into the new tool, if the launch url is for a cartridge file
  *
- * @param stdClass $lti The tools config
+ * @param stdClass $lti
+ *        The tools config
  * @since Moodle 3.1
  */
 function qtype_lti_load_tool_if_cartridge($lti) {
@@ -3120,7 +2995,8 @@ function qtype_lti_load_tool_if_cartridge($lti) {
 /**
  * Determines if the given url is for a IMS basic cartridge
  *
- * @param  string $url The url to be checked
+ * @param string $url
+ *        The url to be checked
  * @return True if the url is for a cartridge
  * @since Moodle 3.1
  */
@@ -3135,11 +3011,7 @@ function qtype_lti_is_cartridge($url) {
     }
     // Even if it doesn't have .xml, load the url to check if it's a cartridge..
     try {
-        $toolinfo = qtype_lti_load_cartridge($url,
-            array(
-                "launch_url" => "launchurl"
-            )
-        );
+        $toolinfo = qtype_lti_load_cartridge($url, array("launch_url" => "launchurl"));
         if (!empty($toolinfo['launchurl'])) {
             return true;
         }
@@ -3152,25 +3024,19 @@ function qtype_lti_is_cartridge($url) {
 /**
  * Allows you to load settings for an external tool type from an IMS cartridge.
  *
- * @param  string   $url     The URL to the cartridge
- * @param  stdClass $type    The tool type object to be filled in
+ * @param string $url
+ *        The URL to the cartridge
+ * @param stdClass $type
+ *        The tool type object to be filled in
  * @throws moodle_exception if the cartridge could not be loaded correctly
  * @since Moodle 3.1
  */
 function qtype_lti_load_type_from_cartridge($url, $type) {
     $toolinfo = qtype_lti_load_cartridge($url,
-        array(
-            "title" => "lti_typename",
-            "launch_url" => "lti_toolurl",
-            "description" => "lti_description",
-            "icon" => "lti_icon",
-            "secure_icon" => "lti_secureicon"
-        ),
-        array(
-            "icon_url" => "lti_extension_icon",
-            "secure_icon_url" => "lti_extension_secureicon"
-        )
-    );
+                                        array("title" => "lti_typename", "launch_url" => "lti_toolurl",
+                                            "description" => "lti_description", "icon" => "lti_icon",
+                                            "secure_icon" => "lti_secureicon"),
+                                        array("icon_url" => "lti_extension_icon", "secure_icon_url" => "lti_extension_secureicon"));
     // If an activity name exists, unset the cartridge name so we don't override it.
     if (isset($type->lti_typename)) {
         unset($toolinfo['lti_typename']);
@@ -3195,26 +3061,18 @@ function qtype_lti_load_type_from_cartridge($url, $type) {
 /**
  * Allows you to load in the configuration for an external tool from an IMS cartridge.
  *
- * @param  string   $url    The URL to the cartridge
- * @param  stdClass $lti    LTI object
+ * @param string $url
+ *        The URL to the cartridge
+ * @param stdClass $lti
+ *        LTI object
  * @throws moodle_exception if the cartridge could not be loaded correctly
  * @since Moodle 3.1
  */
 function qtype_lti_load_tool_from_cartridge($url, $lti) {
     $toolinfo = qtype_lti_load_cartridge($url,
-        array(
-            "title" => "name",
-            "launch_url" => "toolurl",
-            "secure_launch_url" => "securetoolurl",
-            "description" => "intro",
-            "icon" => "icon",
-            "secure_icon" => "secureicon"
-        ),
-        array(
-            "icon_url" => "extension_icon",
-            "secure_icon_url" => "extension_secureicon"
-        )
-    );
+                                        array("title" => "name", "launch_url" => "toolurl", "secure_launch_url" => "securetoolurl",
+                                            "description" => "intro", "icon" => "icon", "secure_icon" => "secureicon"),
+                                        array("icon_url" => "extension_icon", "secure_icon_url" => "extension_secureicon"));
     // If an activity name exists, unset the cartridge name so we don't override it.
     if (isset($lti->name)) {
         unset($toolinfo['name']);
@@ -3239,16 +3097,19 @@ function qtype_lti_load_tool_from_cartridge($url, $lti) {
 /**
  * Search for a tag within an XML DOMDocument
  *
- * @param  string $url The url of the cartridge to be loaded
- * @param  array  $map The map of tags to keys in the return array
- * @param  array  $propertiesmap The map of properties to keys in the return array
+ * @param string $url
+ *        The url of the cartridge to be loaded
+ * @param array $map
+ *        The map of tags to keys in the return array
+ * @param array $propertiesmap
+ *        The map of properties to keys in the return array
  * @return array An associative array with the given keys and their values from the cartridge
  * @throws moodle_exception if the cartridge could not be loaded correctly
  * @since Moodle 3.1
  */
 function qtype_lti_load_cartridge($url, $map, $propertiesmap = array()) {
     global $CFG;
-    require_once($CFG->libdir. "/filelib.php");
+    require_once($CFG->libdir . "/filelib.php");
 
     $curl = new curl();
     $response = $curl->get($url);
@@ -3299,10 +3160,13 @@ function qtype_lti_load_cartridge($url, $map, $propertiesmap = array()) {
 /**
  * Search for a tag within an XML DOMDocument
  *
- * @param  stdClass $tagname The name of the tag to search for
- * @param  XPath    $xpath   The XML to find the tag in
- * @param  XPath    $attribute The attribute to search for (if we should search for a child node with the given
- * value for the name attribute
+ * @param stdClass $tagname
+ *        The name of the tag to search for
+ * @param XPath $xpath
+ *        The XML to find the tag in
+ * @param XPath $attribute
+ *        The attribute to search for (if we should search for a child node with the given
+ *        value for the name attribute
  * @since Moodle 3.1
  */
 function qtype_get_tag($tagname, $xpath, $attribute = null) {
@@ -3318,18 +3182,20 @@ function qtype_get_tag($tagname, $xpath, $attribute = null) {
 }
 
 /**
- * Checks if user can add tool. Throws a capability error otherwise.
+ * Checks if user can add tool.
+ * Throws a capability error otherwise.
+ *
  * @param object $lti
  * @return void
  * @throws moodle_exception
  */
 function qtype_lti_ensure_user_can_use_type($lti) {
     global $DB, $SITE, $COURSE;
-    
-    if($lti->course == 1){
-    	$lti->course = $COURSE->id;
+
+    if ($lti->course == 1) {
+        $lti->course = $COURSE->id;
     }
-     
+
     if (empty($lti->typeid)) {
         // Not a global tool.
         require_capability('qtype/lti:adddefaultinstance', context_course::instance($lti->course));

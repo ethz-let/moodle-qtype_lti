@@ -21,8 +21,7 @@
  * and services to be offered to the tool provider.
  *
  * @package qtype_lti
- * @copyright  2014 Vital Source Technologies http://vitalsource.com
- * @author     Stephen Vickers
+ * @copyright  2019 ETH Zurich
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -107,7 +106,8 @@ if ($data = $form->get_data()) {
 }
 
 $PAGE->set_title(format_string($SITE->shortname) . ': ' . get_string('toolsetup', 'qtype_lti'));
-$PAGE->navbar->add(get_string('lti_administration', 'qtype_lti'), $CFG->wwwroot.'/'.$CFG->admin.'/settings.php?section=qtypesettinglti');
+$PAGE->navbar->add(get_string('lti_administration', 'qtype_lti'),
+                $CFG->wwwroot.'/'.$CFG->admin.'/settings.php?section=qtypesettinglti');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('toolsetup', 'qtype_lti'));

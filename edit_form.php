@@ -13,39 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-//
-// This file is part of BasicLTI4Moodle
-//
-// BasicLTI4Moodle is an IMS BasicLTI (Basic Learning Tools for Interoperability)
-// consumer for Moodle 1.9 and Moodle 2.0. BasicLTI is a IMS Standard that allows web
-// based learning tools to be easily integrated in LMS as native ones. The IMS BasicLTI
-// specification is part of the IMS standard Common Cartridge 1.1 Sakai and other main LMS
-// are already supporting or going to support BasicLTI. This project Implements the consumer
-// for Moodle. Moodle is a Free Open source Learning Management System by Martin Dougiamas.
-// BasicLTI4Moodle is a project iniciated and leaded by Ludo(Marc Alier) and Jordi Piguillem
-// at the GESSI research group at UPC.
-// SimpleLTI consumer for Moodle is an implementation of the early specification of LTI
-// by Charles Severance (Dr Chuck) htp://dr-chuck.com , developed by Jordi Piguillem in a
-// Google Summer of Code 2008 project co-mentored by Charles Severance and Marc Alier.
-//
-// BasicLTI4Moodle is copyright 2009 by Marc Alier Forment, Jordi Piguillem and Nikolas Galanis
-// of the Universitat Politecnica de Catalunya http://www.upc.edu
-// Contact info: Marc Alier Forment granludo @ gmail.com or marc.alier @ upc.edu.
-
-/**
- * This file defines de main basiclti configuration form
- *
- * @package qtype_lti
- * @copyright  2009 Marc Alier, Jordi Piguillem, Nikolas Galanis
- *  marc.alier@upc.edu
- * @copyright  2009 Universitat Politecnica de Catalunya http://www.upc.edu
- * @author     Marc Alier
- * @author     Jordi Piguillem
- * @author     Nikolas Galanis
- * @author     Charles Severance
- * @author     Chris Scribner
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -69,11 +36,7 @@ class qtype_lti_edit_types_form extends moodleform{
         $mform->addElement('text', 'lti_toolurl', get_string('toolurl', 'qtype_lti'), array('size' => '64'));
         $mform->setType('lti_toolurl', PARAM_URL);
         $mform->addHelpButton('lti_toolurl', 'toolurl', 'qtype_lti');
-        /*
-        $mform->addElement('textarea', 'lti_description', get_string('tooldescription', 'qtype_lti'), array('rows' => 4, 'cols' => 60));
-        $mform->setType('lti_description', PARAM_TEXT);
-        $mform->addHelpButton('lti_description', 'tooldescription', 'qtype_lti');
-        */
+
         $mform->addElement('hidden', 'lti_description', ' ');
         $mform->setType('lti_description', PARAM_TEXT);
         if (!$istool) {
@@ -94,7 +57,8 @@ class qtype_lti_edit_types_form extends moodleform{
         }
 
         if ($istool) {
-            $mform->addElement('textarea', 'lti_parameters', get_string('parameter', 'qtype_lti'), array('rows' => 4, 'cols' => 60));
+            $mform->addElement('textarea', 'lti_parameters', get_string('parameter', 'qtype_lti'),
+                            array('rows' => 4, 'cols' => 60));
             $mform->setType('lti_parameters', PARAM_TEXT);
             $mform->addHelpButton('lti_parameters', 'parameter', 'qtype_lti');
             $mform->disabledIf('lti_parameters', null);
@@ -176,45 +140,15 @@ class qtype_lti_edit_types_form extends moodleform{
         }
         $mform->addHelpButton('lti_forcessl', 'force_ssl', 'qtype_lti');
 
-
         if (!$istool) {
 
-            // Privacy
+            // Privacy.
             $mform->addElement('hidden', 'lti_sendname', 1);
             $mform->setType('lti_sendname', PARAM_INT);
             $mform->addElement('hidden', 'lti_sendemailaddr', 1);
             $mform->setType('lti_sendemailaddr', PARAM_INT);
             $mform->addElement('hidden', 'lti_acceptgrades', 1);
             $mform->setType('lti_acceptgrades', PARAM_INT);
-            /*
-            // Add privacy preferences fieldset where users choose whether to send their data.
-            $mform->addElement('header', 'privacy', get_string('privacy', 'qtype_lti'));
-
-            $options = array();
-            $options[0] = get_string('never', 'qtype_lti');
-            $options[1] = get_string('always', 'qtype_lti');
-            $options[2] = get_string('delegate', 'qtype_lti');
-
-            $mform->addElement('select', 'lti_sendname', get_string('share_name_admin', 'qtype_lti'), $options);
-            $mform->setType('lti_sendname', PARAM_INT);
-            $mform->setDefault('lti_sendname', '2');
-            $mform->addHelpButton('lti_sendname', 'share_name_admin', 'qtype_lti');
-
-            $mform->addElement('select', 'lti_sendemailaddr', get_string('share_email_admin', 'qtype_lti'), $options);
-            $mform->setType('lti_sendemailaddr', PARAM_INT);
-            $mform->setDefault('lti_sendemailaddr', '2');
-            $mform->addHelpButton('lti_sendemailaddr', 'share_email_admin', 'qtype_lti');
-
-            // LTI Extensions.
-
-            // Add grading preferences fieldset where the tool is allowed to return grades.
-            $mform->addElement('select', 'lti_acceptgrades', get_string('accept_grades_admin', 'qtype_lti'), $options);
-            $mform->setType('lti_acceptgrades', PARAM_INT);
-            $mform->setDefault('lti_acceptgrades', '2');
-            $mform->addHelpButton('lti_acceptgrades', 'accept_grades_admin', 'qtype_lti');
-            */
-
-
 
             if (!empty($this->_customdata->isadmin)) {
                 // Add setup parameters fieldset.
@@ -234,17 +168,6 @@ class qtype_lti_edit_types_form extends moodleform{
                 $mform->addHelpButton('lti_organizationurl', 'organizationurl', 'qtype_lti');
             }
         }
-
-        /* Suppress this for now - Chuck
-         * mform->addElement('text', 'lti_organizationdescr', get_string('organizationdescr', 'qtype_lti'))
-         * mform->setType('lti_organizationdescr', PARAM_TEXT)
-         * mform->addHelpButton('lti_organizationdescr', 'organizationdescr', 'qtype_lti')
-         */
-
-        /*
-        // Add a hidden element to signal a tool fixing operation after a problematic backup - restore process
-        //$mform->addElement('hidden', 'lti_fix');
-        */
 
         $tab = optional_param('tab', '', PARAM_ALPHAEXT);
         $mform->addElement('hidden', 'tab', $tab);

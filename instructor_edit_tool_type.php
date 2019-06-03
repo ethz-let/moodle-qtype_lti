@@ -45,7 +45,10 @@ require_capability('qtype/lti:addcoursetool', context_course::instance($courseid
 if (!empty($typeid)) {
     $type = qtype_lti_get_type($typeid);
     if ($type->course != $courseid) {
-    	throw new Exception('You do not have permissions to edit this tool type. You are trying to edit an LTI qtype tool which does not belong to the question in the course you are in. Tool Course ID: '.$type->course.' and you are currently in Course ID: '.$courseid);
+        throw new Exception('You do not have permissions to edit this tool type.
+                                You are trying to edit an LTI qtype tool which does not belong to
+                                the question in the course you are in.
+                                Tool Course ID: '.$type->course.' and you are currently in Course ID: '.$courseid);
         die;
     }
 }

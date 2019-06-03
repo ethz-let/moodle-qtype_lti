@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ *
  * @package qtype_lti
  * @author Amr Hourani amr.hourani@id.ethz.ch
  * @copyright ETHz 2016 amr.hourani@id.ethz.ch
  */
 defined('MOODLE_INTERNAL') || die();
-
 
 /**
  * Restore plugin class that provides the necessary information
@@ -36,15 +36,16 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         $paths[] = new restore_path_element('lti', $this->get_pathfor('/lti'));
         $paths[] = new restore_path_element('ltitype', $this->get_pathfor('/lti/ltitype'));
         $paths[] = new restore_path_element('ltitypesconfig', $this->get_pathfor('/lti/ltitype/ltitypesconfigs/ltitypesconfig'));
-        $paths[] = new restore_path_element('ltitypesconfigencrypted', $this->get_pathfor('/lti/ltitype/ltitypesconfigs/ltitypesconfigencrypted'));
+        $paths[] = new restore_path_element('ltitypesconfigencrypted',
+                                            $this->get_pathfor('/lti/ltitype/ltitypesconfigs/ltitypesconfigencrypted'));
         $paths[] = new restore_path_element('ltitoolproxy', $this->get_pathfor('/lti/ltitype/ltitoolproxy'));
-        $paths[] = new restore_path_element('ltitoolsetting', $this->get_pathfor('/lti/ltitype/ltitoolproxy/ltitoolsettings/ltitoolsetting'));
+        $paths[] = new restore_path_element('ltitoolsetting',
+                                            $this->get_pathfor('/lti/ltitype/ltitoolproxy/ltitoolsettings/ltitoolsetting'));
         $paths[] = new restore_path_element('ltisubmission', $this->get_pathfor('/lti/ltisubmissions/ltisubmission'));
         $paths[] = new restore_path_element('qtype_lti_usage', $this->get_pathfor('/lti/qtype_lti_usages/qtype_lti_usage'));
         // Return the paths wrapped into standard activity structure.
         return $paths;
     }
-
 
     /**
      * Detect if the question is created or mapped.
@@ -53,7 +54,7 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
      */
     protected function is_question_created() {
         $oldquestionid = $this->get_old_parentid('question');
-        $questioncreated = (bool) $this->get_mappingid('question_created', $oldquestionid);
+        $questioncreated = (bool)$this->get_mappingid('question_created', $oldquestionid);
         return $questioncreated;
     }
 
@@ -69,25 +70,22 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         $oldquestionid = $this->get_old_parentid('question');
         $newquestionid = $this->get_new_parentid('question');
 
-        $questioncreated = (bool) $this->get_mappingid('question_created', $oldquestionid);
-
+        $questioncreated = (bool)$this->get_mappingid('question_created', $oldquestionid);
 
         // Any changes to the list of dates that needs to be rolled should be same during course restore and course reset.
         // See MDL-9367.
         // Grade used to be a float (whole numbers only), restore as int.
-        $data->grade = (int) $data->grade;
+        $data->grade = (int)$data->grade;
         $data->typeid = 0;
         // Try to get resourcekey and password. Null if not possible (DB default).
         $data->resourcekey = isset($data->resourcekey) ? $data->resourcekey : null;
         $data->password = isset($data->password) ? $data->password : null;
-        
-        
-        
-        $ltipluginconfig= get_config('qtype_lti');
-        
-        if (isset($ltipluginconfig->removerestoredlink) && $ltipluginconfig->removerestoredlink == 1){
-        	$data->securetoolurl = '';
-        	$data->toolurl = '';
+
+        $ltipluginconfig = get_config('qtype_lti');
+
+        if (isset($ltipluginconfig->removerestoredlink) && $ltipluginconfig->removerestoredlink == 1) {
+            $data->securetoolurl = '';
+            $data->toolurl = '';
         }
 
         // If the question has been created by restore, we need to create its
@@ -98,11 +96,14 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
             $newitemid = $DB->insert_record('qtype_lti_options', $data);
             // Create mapping (needed for decoding links).
             $this->set_mapping('lti', $oldid, $newitemid);
-          }
+        }
     }
+
     /**
      * Process an lti type restore
-     * @param mixed $data The data from backup XML file
+     *
+     * @param mixed $data
+     *        The data from backup XML file
      * @return void
      */
     public function process_ltitype($data) {
@@ -122,7 +123,7 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         // Try to find existing lti type with the same properties.
         $ltitypeid = $this->find_existing_lti_type($data);
         $this->newltitype = false;
-        if (!$ltitypeid) {// && $data->course == $courseid
+        if (!$ltitypeid) {
             unset($data->toolproxyid); // Course tools can not use LTI2.
             $data->coursevisible = 0;
             $ltitypeid = $DB->insert_record('qtype_lti_types', $data);
@@ -132,8 +133,10 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         // Add the typeid entry back to LTI module.
         $DB->update_record('qtype_lti_options', ['id' => $this->get_new_parentid('lti'), 'typeid' => $ltitypeid]);
     }
+
     /**
      * Attempts to find existing record in lti_type
+     *
      * @param stdClass $data
      * @return int|null field lti_types.id or null if tool is not found
      */
@@ -165,7 +168,8 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         // LTI2 is not possible in the course so we add "lt.toolproxyid IS NULL" to the query.
         $sql = 'SELECT id
             FROM {qtype_lti_types}
-           WHERE ' . $DB->sql_compare_text('baseurl', 255) . ' = ' . $DB->sql_compare_text(':baseurl', 255) . ' AND
+           WHERE ' .
+             $DB->sql_compare_text('baseurl', 255) . ' = ' . $DB->sql_compare_text(':baseurl', 255) . ' AND
                  course = :course AND name = :name AND toolproxyid IS NULL';
         if ($ltitype = $DB->get_record_sql($sql, $params, IGNORE_MULTIPLE)) {
             $this->set_mapping('ltitype', $data->id, $ltitype->id);
@@ -173,9 +177,12 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         }
         return null;
     }
+
     /**
      * Process an lti config restore
-     * @param mixed $data The data from backup XML file
+     *
+     * @param mixed $data
+     *        The data from backup XML file
      */
     public function process_ltitypesconfig($data) {
         global $DB;
@@ -192,9 +199,12 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
             $DB->insert_record('qtype_lti_types_config', $data);
         }
     }
+
     /**
      * Process an lti config restore
-     * @param mixed $data The data from backup XML file
+     *
+     * @param mixed $data
+     *        The data from backup XML file
      */
     public function process_ltitypesconfigencrypted($data) {
         global $DB;
@@ -205,22 +215,28 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         $data->typeid = $this->get_new_parentid('ltitype');
         // Only add configuration if the new lti_type was created.
         if ($data->typeid && $this->newltitype) {
-          //  $data->value = $this->decrypt($data->value);
             if (!is_null($data->value)) {
                 $DB->insert_record('qtype_lti_types_config', $data);
             }
         }
     }
+
     /**
      * Process a restore of LTI tool registration
      * This method is empty because we actually process registration as part of process_ltitype()
-     * @param mixed $data The data from backup XML file
+     *
+     * @param mixed $data
+     *        The data from backup XML file
      */
     public function process_ltitoolproxy($data) {
+
     }
+
     /**
      * Process an lti tool registration settings restore (only settings for the current activity)
-     * @param mixed $data The data from backup XML file
+     *
+     * @param mixed $data
+     *        The data from backup XML file
      */
     public function process_ltitoolsetting($data) {
         global $DB;
@@ -237,9 +253,12 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         $data->questionid = $newquestionid;
         $DB->insert_record('qtype_lti_tool_settings', $data);
     }
+
     /**
      * Process a submission restore
-     * @param mixed $data The data from backup XML file
+     *
+     * @param mixed $data
+     *        The data from backup XML file
      */
     public function process_ltisubmission($data) {
         global $DB;
@@ -255,41 +274,44 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         $newitemid = $DB->insert_record('qtype_lti_submission', $data);
         $this->set_mapping('ltisubmission', $oldid, $newitemid);
     }
+
     /**
      * Process a usage mapping restore
-     * @param mixed $data The data from backup XML file
+     *
+     * @param mixed $data
+     *        The data from backup XML file
      */
     public function process_qtype_lti_usage($data) {
-    	global $DB;
-    	if (!$this->is_question_created()) {
-    		return;
-    	}
+        global $DB;
+        if (!$this->is_question_created()) {
+            return;
+        }
 
-    	$data = (object)$data;
-    	$oldid = $data->id;
-    	$data->ltiid = $this->get_new_parentid('lti');
-    	if ($data->userid > 0) {
-    		$data->userid = $this->get_mappingid('user', $data->userid);
-    	}
+        $data = (object)$data;
+        $oldid = $data->id;
+        $data->ltiid = $this->get_new_parentid('lti');
+        if ($data->userid > 0) {
+            $data->userid = $this->get_mappingid('user', $data->userid);
+        }
 
-    	if ($data->questionid > 0) {
-	    	// Detect if the question is created or mapped.
-	        $oldquestionid = $this->get_old_parentid('question');
-	        $newquestionid = $this->get_new_parentid('question');
-	        $questioncreated = (bool) $this->get_mappingid('question_created', $oldquestionid);
-	        if ($questioncreated) {
-	            $data->questionid = $newquestionid;
-	        }
-    	}
-    	if ($data->courseid > 0) {
-    		$courseid = $this->task->get_courseid();
-    		$data->courseid = ($this->get_mappingid('course', $data->courseid) == $courseid) ? $courseid : SITEID;
-    	}
-    	
-    	$newitemid = $DB->insert_record('qtype_lti_usage', $data);
-    	$this->set_mapping('qtype_lti_usage', $oldid, $newitemid);
+        if ($data->questionid > 0) {
+            // Detect if the question is created or mapped.
+            $oldquestionid = $this->get_old_parentid('question');
+            $newquestionid = $this->get_new_parentid('question');
+            $questioncreated = (bool)$this->get_mappingid('question_created', $oldquestionid);
+            if ($questioncreated) {
+                $data->questionid = $newquestionid;
+            }
+        }
+        if ($data->courseid > 0) {
+            $courseid = $this->task->get_courseid();
+            $data->courseid = ($this->get_mappingid('course', $data->courseid) == $courseid) ? $courseid : SITEID;
+        }
+
+        $newitemid = $DB->insert_record('qtype_lti_usage', $data);
+        $this->set_mapping('qtype_lti_usage', $oldid, $newitemid);
     }
-    
+
     public function recode_response($questionid, $sequencenumber, array $response) {
         if (array_key_exists('_order', $response)) {
             $response['_order'] = $response['_order'];
@@ -297,6 +319,4 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
 
         return $response;
     }
-
-
 }
