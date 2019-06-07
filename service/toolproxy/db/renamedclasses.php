@@ -1,3 +1,4 @@
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,15 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains all necessary code to initiate a tool registration process
- *
- * @package    mod_lti
- * @copyright  2014 Vital Source Technologies http://vitalsource.com
- * @author     Stephen Vickers
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Lists renamed classes so that the autoloader can make the old names still work.
+ * @package qtype_lti
+ * @copyright 2019 ETH Zurich
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
-LTI Service plugins directory
-==============================
-This directory contains LTI service plugins which are discoverable from the Tool
-Consumer Profile.
+$renamedclasses = array(
+    // Changed for PHP 7.0 which now has the word "resource" as a reserved word.
+    'ltiservice_toolproxy\local\resource\toolproxy' => 'ltiservice_toolproxy\local\resources\toolproxy');

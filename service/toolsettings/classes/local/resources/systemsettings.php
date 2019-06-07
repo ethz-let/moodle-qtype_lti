@@ -18,13 +18,12 @@
  * This file contains a class definition for the System Settings resource
  *
  * @package    ltiservice_toolsettings
- * @copyright  2014 Vital Source Technologies http://vitalsource.com
- * @author     Stephen Vickers
+ * @copyright  2019 ETH Zurich
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
-namespace ltiservice_toolsettings\local\resource;
+namespace ltiservice_toolsettings\local\resources;
 
 use ltiservice_toolsettings\local\service\toolsettings;
 

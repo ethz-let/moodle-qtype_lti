@@ -18,8 +18,7 @@
  * This file contains a class definition for the Tool Proxy service
  *
  * @package    ltiservice_toolproxy
- * @copyright  2014 Vital Source Technologies http://vitalsource.com
- * @author     Stephen Vickers
+ * @copyright  2019 ETH Zurich
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -58,7 +57,7 @@ class toolproxy extends \qtype_lti\local\ltiservice\service_base {
 
         if (empty($this->resources)) {
             $this->resources = array();
-            $this->resources[] = new \ltiservice_toolproxy\local\resource\toolproxy($this);
+            $this->resources[] = new \ltiservice_toolproxy\local\resourcess\toolproxy($this);
         }
 
         return $this->resources;

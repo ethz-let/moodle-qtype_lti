@@ -22,9 +22,9 @@
  * @module     qtype_lti/contentitem
  * @class      contentitem
  * @package    qtype_lti
- * @copyright  2016 Jun Pataleta <jun@moodle.com>
+ * @copyright  2019 ETH Zurich
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @since      3.2
+ * @since      3.5
  */
 define(
     [
@@ -84,11 +84,6 @@ define(
             }
         };
 
-        /**
-         * Array of form fields for LTI tool configuration.
-         *
-         * @type {*[]}
-         */
         var ltiFormFields = [
             new FormField('name', FormField.TYPES.TEXT, false, ''),
             new FormField('introeditor', FormField.TYPES.EDITOR, false, ''),

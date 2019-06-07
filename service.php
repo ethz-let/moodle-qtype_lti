@@ -36,7 +36,7 @@ require_once($CFG->dirroot . '/question/type/lti/servicelib.php');
  * @copyright Copyright 2019 ETH Zurich
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class service_exception_handler {
+class qtype_lti_service_exception_handler {
     /**
      * Enable error response logging.
      *
@@ -127,7 +127,7 @@ use moodle\qtype\lti as lti;
 $rawbody = file_get_contents("php://input");
 
 $logrequests = qtype_lti_should_log_request($rawbody);
-$errorhandler = new service_exception_handler($logrequests);
+$errorhandler = new qtype_lti_service_exception_handler($logrequests);
 
 // Register our own error handler so we can always send valid XML response.
 set_exception_handler(array($errorhandler, 'handle'));

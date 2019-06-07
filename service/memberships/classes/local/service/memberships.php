@@ -18,8 +18,7 @@
  * This file contains a class definition for the Memberships service
  *
  * @package    ltiservice_memberships
- * @copyright  2015 Vital Source Technologies http://vitalsource.com
- * @author     Stephen Vickers
+ * @copyright  2019 ETH Zurich
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -67,8 +66,8 @@ class memberships extends \qtype_lti\local\ltiservice\service_base {
 
         if (empty($this->resources)) {
             $this->resources = array();
-            $this->resources[] = new \ltiservice_memberships\local\resource\contextmemberships($this);
-            $this->resources[] = new \ltiservice_memberships\local\resource\linkmemberships($this);
+            $this->resources[] = new \ltiservice_memberships\local\resources\contextmemberships($this);
+            $this->resources[] = new \ltiservice_memberships\local\resources\linkmemberships($this);
         }
 
         return $this->resources;

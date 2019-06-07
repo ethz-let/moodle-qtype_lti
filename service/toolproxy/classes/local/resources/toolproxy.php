@@ -18,13 +18,12 @@
  * This file contains a class definition for the Tool Proxy resource
  *
  * @package    ltiservice_toolproxy
- * @copyright  2014 Vital Source Technologies http://vitalsource.com
- * @author     Stephen Vickers
+ * @copyright  2019 ETH Zurich
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
-namespace ltiservice_toolproxy\local\resource;
+namespace ltiservice_toolproxy\local\resources;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -47,7 +46,7 @@ class toolproxy extends \qtype_lti\local\ltiservice\resource_base {
     /**
      * Class constructor.
      *
-     * @param ltiservice_toolproxy\local\resource\toolproxy $service Service instance
+     * @param ltiservice_toolproxy\local\resources\toolproxy $service Service instance
      */
     public function __construct($service) {
 

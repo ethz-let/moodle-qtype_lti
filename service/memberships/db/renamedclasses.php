@@ -1,3 +1,4 @@
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,14 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Readme file for local customisations
+ * Lists renamed classes so that the autoloader can make the old names still work.
  *
- * @package    mod_lti
- * @copyright  2012 Mark Nielsen
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   qtype_lti
+ * @copyright 2019 ETH Zurich
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-LTI Source plugins directory
-==============================
-This directory contains LTI source plugins which are plugins that can register custom handlers
-to process lti messages.
+ defined('MOODLE_INTERNAL') || die();
+
+ $renamedclasses = array(
+
+     // Changed for PHP 7.0 which now has the word "resource" as a reserved word.
+     'ltiservice_memberships\local\resource\linkmemberships'    => 'ltiservice_memberships\local\resources\linkmemberships',
+     'ltiservice_memberships\local\resource\contextmemberships' => 'ltiservice_memberships\local\resources\contextmemberships',
+
+ );

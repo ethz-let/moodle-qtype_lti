@@ -18,8 +18,7 @@
  * This file contains a class definition for the Tool Settings service
  *
  * @package    ltiservice_toolsettings
- * @copyright  2014 Vital Source Technologies http://vitalsource.com
- * @author     Stephen Vickers
+ * @copyright  2019 ETH Zurich
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -58,9 +57,9 @@ class toolsettings extends \qtype_lti\local\ltiservice\service_base {
 
         if (empty($this->resources)) {
             $this->resources = array();
-            $this->resources[] = new \ltiservice_toolsettings\local\resource\systemsettings($this);
-            $this->resources[] = new \ltiservice_toolsettings\local\resource\contextsettings($this);
-            $this->resources[] = new \ltiservice_toolsettings\local\resource\linksettings($this);
+            $this->resources[] = new \ltiservice_toolsettings\local\resources\systemsettings($this);
+            $this->resources[] = new \ltiservice_toolsettings\local\resources\contextsettings($this);
+            $this->resources[] = new \ltiservice_toolsettings\local\resources\linksettings($this);
         }
 
         return $this->resources;

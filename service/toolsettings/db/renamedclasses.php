@@ -15,16 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Lists renamed classes so that the autoloader can make the old names still work.
  *
- * @package qtype_lti
- * @author Amr Hourani amr.hourani@id.ethz.ch
+ * @package   qtype_lti
  * @copyright 2019 ETH Zurich
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'qtype_lti';
-$plugin->version = 2019060700;
-$plugin->requires = 2018051706; // Moodle >=3.5.
+$renamedclasses = array(
 
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '0.3 for Moodle 3.5+';
+    // Changed for PHP 7.0 which now has the word "resource" as a reserved word.
+    'ltiservice_toolsettings\local\resource\contextsettings' => 'ltiservice_toolsettings\local\resources\contextsettings',
+    'ltiservice_toolsettings\local\resource\linksettings' => 'ltiservice_toolsettings\local\resources\linksettings',
+    'ltiservice_toolsettings\local\resource\systemsettings' => 'ltiservice_toolsettings\local\resources\systemsettings',
+);

@@ -37,7 +37,7 @@ class qtype_lti_service_exception_handler_testcase extends advanced_testcase {
      * Testing service error handling.
      */
     public function test_handle() {
-        $handler = new service_exception_handler(false);
+        $handler = new qtype_lti_service_exception_handler(false);
         $handler->set_message_id('123');
         $handler->set_message_type('testRequest');
         $handler->handle(new Exception('Error happened'));
@@ -53,7 +53,7 @@ class qtype_lti_service_exception_handler_testcase extends advanced_testcase {
      * Testing service error handling when message ID and type are not known yet.
      */
     public function test_handle_early_error() {
-        $handler = new service_exception_handler(false);
+        $handler = new qtype_lti_service_exception_handler(false);
         $handler->handle(new Exception('Error happened'));
 
         $this->expectOutputRegex('/imsx_codeMajor>failure/');
@@ -71,7 +71,7 @@ class qtype_lti_service_exception_handler_testcase extends advanced_testcase {
 
         $this->resetAfterTest();
 
-        $handler = new service_exception_handler(true);
+        $handler = new qtype_lti_service_exception_handler(true);
 
         ob_start();
         $handler->handle(new Exception('Error happened'));
