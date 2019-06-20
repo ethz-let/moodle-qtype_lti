@@ -26,16 +26,16 @@
  * @since 3.1
  */
 define(
-        [ 'jquery', 'core/ajax', 'core/notification', 'qtype_lti/tool_type',
-                'qtype_lti/events', 'qtype_lti/keys', 'core/str' ],
-        function ($, ajax, notification, toolType, ltiEvents, KEYS, str) {
+        ['jquery', 'core/ajax', 'core/notification', 'qtype_lti/tool_type',
+                'qtype_lti/events', 'qtype_lti/keys', 'core/str'],
+        function($, ajax, notification, toolType, ltiEvents, KEYS, str) {
             var SELECTORS = {
-                CARTRIDGE_URL : '#cartridge-url',
-                CONSUMER_KEY : '#registration-key',
-                SHARED_SECRET : '#registration-secret',
-                REGISTRATION_FORM : '#cartridge-registration-form',
-                REGISTRATION_SUBMIT_BUTTON : '#cartridge-registration-submit',
-                REGISTRATION_CANCEL_BUTTON : '#cartridge-registration-cancel',
+                CARTRIDGE_URL: '#cartridge-url',
+                CONSUMER_KEY: '#registration-key',
+                SHARED_SECRET: '#registration-secret',
+                REGISTRATION_FORM: '#cartridge-registration-form',
+                REGISTRATION_SUBMIT_BUTTON: '#cartridge-registration-submit',
+                REGISTRATION_CANCEL_BUTTON: '#cartridge-registration-cancel',
             };
             /**
              * Return the URL the user entered for the cartridge.
@@ -44,7 +44,7 @@ define(
              * @private
              * @return {String}
              */
-            var getCartridgeURL = function () {
+            var getCartridgeURL = function() {
                 return $(SELECTORS.REGISTRATION_FORM)
                         .attr('data-cartridge-url');
             };
@@ -55,7 +55,7 @@ define(
              * @private
              * @return {JQuery} jQuery object
              */
-            var getSubmitButton = function () {
+            var getSubmitButton = function() {
                 return $(SELECTORS.REGISTRATION_SUBMIT_BUTTON);
             };
             /**
@@ -65,7 +65,7 @@ define(
              * @private
              * @return {JQuery} jQuery object
              */
-            var getCancelButton = function () {
+            var getCancelButton = function() {
                 return $(SELECTORS.REGISTRATION_CANCEL_BUTTON);
             };
             /**
@@ -75,7 +75,7 @@ define(
              * @private
              * @return {String} the value entered for consumer key.
              */
-            var getConsumerKey = function () {
+            var getConsumerKey = function() {
                 return $(SELECTORS.CONSUMER_KEY).val();
             };
             /**
@@ -85,7 +85,7 @@ define(
              * @private
              * @return {String} the value entered for shared secret
              */
-            var getSharedSecret = function () {
+            var getSharedSecret = function() {
                 return $(SELECTORS.SHARED_SECRET).val();
             };
             /**
@@ -94,7 +94,7 @@ define(
              * @method startLoading
              * @private
              */
-            var startLoading = function () {
+            var startLoading = function() {
                 getSubmitButton().addClass('loading');
             };
             /**
@@ -103,7 +103,7 @@ define(
              * @method stopLoading
              * @private
              */
-            var stopLoading = function () {
+            var stopLoading = function() {
                 getSubmitButton().removeClass('loading');
             };
             /**
@@ -113,7 +113,7 @@ define(
              * @private
              * @return {Boolean}
              */
-            var isLoading = function () {
+            var isLoading = function() {
                 return getSubmitButton().hasClass('loading');
             };
             /**
@@ -130,7 +130,7 @@ define(
              * @private
              * @return {Promise} jQuery Deferred object
              */
-            var submitCartridgeURL = function () {
+            var submitCartridgeURL = function() {
                 if (isLoading()) {
                     return false;
                 }
@@ -143,19 +143,19 @@ define(
                 var consumerKey = getConsumerKey();
                 var sharedSecret = getSharedSecret();
                 var promise = toolType.create({
-                    cartridgeurl : url,
-                    key : consumerKey,
-                    secret : sharedSecret
+                    cartridgeurl: url,
+                    key: consumerKey,
+                    secret: sharedSecret
                 });
                 promise
                         .done(
-                                function () {
+                                function() {
                                     str
                                             .get_string(
                                                     'successfullycreatedtooltype',
                                                     'qtype_lti')
                                             .done(
-                                                    function (s) {
+                                                    function(s) {
                                                         $(document)
                                                                 .trigger(
                                                                         ltiEvents.NEW_TOOL_TYPE);
@@ -166,19 +166,19 @@ define(
                                                                 .trigger(
                                                                         ltiEvents.REGISTRATION_FEEDBACK,
                                                                         {
-                                                                            message : s
+                                                                            message: s
                                                                         });
                                                     }).fail(
                                                     notification.exception);
                                 })
                         .fail(
-                                function () {
+                                function() {
                                     str
                                             .get_string(
                                                     'failedtocreatetooltype',
                                                     'qtype_lti')
                                             .done(
-                                                    function (s) {
+                                                    function(s) {
                                                         $(document)
                                                                 .trigger(
                                                                         ltiEvents.NEW_TOOL_TYPE);
@@ -189,12 +189,12 @@ define(
                                                                 .trigger(
                                                                         ltiEvents.REGISTRATION_FEEDBACK,
                                                                         {
-                                                                            message : s,
-                                                                            error : true
+                                                                            message: s,
+                                                                            error: true
                                                                         });
                                                     }).fail(
                                                     notification.exception);
-                                }).always(function () {
+                                }).always(function() {
                                     stopLoading();
                                 });
                 return promise;
@@ -205,19 +205,19 @@ define(
              * @method registerEventListeners
              * @private
              */
-            var registerEventListeners = function () {
+            var registerEventListeners = function() {
                 var form = $(SELECTORS.REGISTRATION_FORM);
-                form.submit(function (e) {
+                form.submit(function(e) {
                     e.preventDefault();
                     submitCartridgeURL();
                 });
                 var cancelButton = getCancelButton();
-                cancelButton.click(function (e) {
+                cancelButton.click(function(e) {
                     e.preventDefault();
                     $(document).trigger(ltiEvents.STOP_CARTRIDGE_REGISTRATION);
                 });
                 cancelButton
-                        .keypress(function (e) {
+                        .keypress(function(e) {
                             if (!e.metaKey && !e.shiftKey && !e.altKey
                                     && !e.ctrlKey) {
                                 if (e.keyCode == KEYS.ENTER
