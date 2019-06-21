@@ -1,1 +1,1 @@
-# moodle-qtype_lti v 2018042600 for moodle 2.6+ (2016/04/26)
+# moodle-qtype_lti for moodle 3.5+ (External Tool qtype based on LTI)
