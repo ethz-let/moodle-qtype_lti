@@ -330,11 +330,8 @@ function qtype_lti_build_sourcedid($instanceid, $userid, $servicesalt, $typeid =
     } else {
         $data->attemptid = uniqid();
     }
-
     $data->ltiid = $ltiid;
-
     $json = json_encode($data);
-
     $hash = hash('sha256', $json . $servicesalt, false);
 
     $container = new \stdClass();

@@ -84,10 +84,17 @@ function qtype_lti_parse_grade_replace_message($xml) {
     $parsed = new stdClass();
     $parsed->gradeval = $grade;
 
-    $parsed->instanceid = $resultjson->data->instanceid;
-    $parsed->userid = $resultjson->data->userid;
+    $parsed->instanceid = $resultjson->data->instance;
+    $parsed->userid = $resultjson->data->username;
     $parsed->attemptid = $resultjson->data->attemptid;
     $parsed->typeid = $resultjson->data->typeid;
+    $parsed->ltiid = $resultjson->data->ltiid;
+    $parsed->username = $parsed->userid;
+    $pieces = explode('-', $parsed->instanceid);
+    $parsed->resultid = $pieces[0].'-'.$pieces[1].'-'.$pieces[2];
+    $parsed->linkid = $parsed->instanceid;
+
+
     $parsed->sourcedidhash = $resultjson->hash;
     $parsed->messageid = qtype_lti_parse_message_id($xml);
 
@@ -99,12 +106,17 @@ function qtype_lti_parse_grade_read_message($xml) {
     $resultjson = json_decode((string)$node);
 
     $parsed = new stdClass();
-    $parsed->instanceid = $resultjson->data->instanceid;
-    $parsed->userid = $resultjson->data->userid;
+    $parsed->instanceid = $resultjson->data->instance;
+    $parsed->userid = $resultjson->data->username;
     $parsed->attemptid = $resultjson->data->attemptid;
     $parsed->typeid = $resultjson->data->typeid;
-    $parsed->sourcedidhash = $resultjson->hash;
+    $parsed->ltiid = $resultjson->data->ltiid;
+    $parsed->username = $parsed->userid;
+    $pieces = explode('-', $parsed->instanceid);
+    $parsed->resultid = $pieces[0].'-'.$pieces[1].'-'.$pieces[2];
+    $parsed->linkid = $parsed->instanceid;
 
+    $parsed->sourcedidhash = $resultjson->hash;
     $parsed->messageid = qtype_lti_parse_message_id($xml);
 
     return $parsed;
@@ -115,12 +127,17 @@ function qtype_lti_parse_grade_delete_message($xml) {
     $resultjson = json_decode((string)$node);
 
     $parsed = new stdClass();
-    $parsed->instanceid = $resultjson->data->instanceid;
-    $parsed->userid = $resultjson->data->userid;
+    $parsed->instanceid = $resultjson->data->instance;
+    $parsed->userid = $resultjson->data->username;
     $parsed->attemptid = $resultjson->data->attemptid;
     $parsed->typeid = $resultjson->data->typeid;
-    $parsed->sourcedidhash = $resultjson->hash;
+    $parsed->ltiid = $resultjson->data->ltiid;
+    $parsed->username = $parsed->userid;
+    $pieces = explode('-', $parsed->instanceid);
+    $parsed->resultid = $pieces[0].'-'.$pieces[1].'-'.$pieces[2];
+    $parsed->linkid = $parsed->instanceid;
 
+    $parsed->sourcedidhash = $resultjson->hash;
     $parsed->messageid = qtype_lti_parse_message_id($xml);
 
     return $parsed;
@@ -144,7 +161,7 @@ function qtype_lti_set_session_user($username) {
     }
 }
 
-function qtype_lti_update_grade($username, $linkid, $resultid, $gradeval) {
+function qtype_lti_update_grade($username, $linkid, $resultid, $gradeval, $ltiid) {
     global $CFG, $DB;
     require_once($CFG->libdir . '/gradelib.php');
 
@@ -156,7 +173,7 @@ function qtype_lti_update_grade($username, $linkid, $resultid, $gradeval) {
     $grade->rawgrade = $gradeval;
 
     $record = $DB->get_record('qtype_lti_submission', array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid),
-                            'id');
+                    'id');
     if ($record) {
         $id = $record->id;
     } else {
@@ -168,7 +185,7 @@ function qtype_lti_update_grade($username, $linkid, $resultid, $gradeval) {
                         array('id' => $id, 'dateupdated' => time(), 'gradepercent' => $gradeval, 'state' => 2));
     } else {
         $DB->insert_record('qtype_lti_submission',
-                        array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid, 'datesubmitted' => time(),
+                        array('ltiid' => $ltiid, 'username' => $username, 'linkid' => $linkid, 'resultid' => $resultid, 'datesubmitted' => time(),
                             'dateupdated' => time(), 'gradepercent' => $gradeval, 'originalgrade' => $gradeval, 'state' => 1));
     }
 
@@ -182,7 +199,7 @@ function qtype_lti_read_grade($username, $linkid, $resultid) {
     $ltigrade = floatval($ltiinstance->grade);
 
     $submissiongrade = $DB->get_record('qtype_lti_submission',
-                                        array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid));
+                    array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid));
 
     if ($submissiongrade) {
 
@@ -195,7 +212,7 @@ function qtype_lti_delete_grade($username, $linkid, $resultid) {
     global $CFG, $DB;
 
     $record = $DB->get_record('qtype_lti_submission', array('username' => $username, 'linkid' => $linkid, 'resultid' => $resultid),
-                            'id');
+                    'id');
 
     if ($record) {
         $status = $DB->delete_records('qtype_lti_submission', array('id' => $record->id));
@@ -232,10 +249,10 @@ function qtype_lti_verify_message($key, $sharedsecrets, $body, $headers = null) 
  */
 function qtype_lti_verify_sourcedid($ltiinstance, $parsed) {
     $sourceid = qtype_lti_build_sourcedid($parsed->instanceid, $parsed->userid, $ltiinstance->servicesalt, $parsed->typeid,
-                                        $parsed->attemptid, $parsed->ltiid);
+                    $parsed->attemptid, $parsed->ltiid);
 
     if ($sourceid->hash != $parsed->sourcedidhash) {
-        throw new Exception('SourcedId hash not valid');
+        throw new Exception($parsed->instanceid . ': SourcedId hash not valid');
     }
 }
 

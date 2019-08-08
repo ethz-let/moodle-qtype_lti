@@ -178,7 +178,11 @@ $errorhandler->set_message_type($messagetype);
 switch ($messagetype) {
     case 'replaceResultRequest':
         $parsed = qtype_lti_parse_grade_replace_message($xml);
-        $ltiinstance = $DB->get_record('qtype_lti_options', array('id' => $parsed->instanceid));
+        $ltiinstance = $DB->get_record('qtype_lti_options', array('id' => $parsed->ltiid));
+
+        if (!$ltiinstance) {
+            throw new Exception('No such tool.');
+        }
 
         if (!qtype_lti_accepts_grades($ltiinstance)) {
             throw new Exception('Tool does not accept grades');
@@ -187,7 +191,7 @@ switch ($messagetype) {
         qtype_lti_verify_sourcedid($ltiinstance, $parsed);
         qtype_lti_set_session_user($parsed->username);
 
-        $gradestatus = qtype_lti_update_grade($parsed->username, $parsed->linkid, $parsed->resultid, $parsed->gradeval);
+        $gradestatus = qtype_lti_update_grade($parsed->username, $parsed->linkid, $parsed->resultid, $parsed->gradeval, $parsed->ltiid);
 
         if (!$gradestatus) {
             throw new Exception('Grade replace response');
@@ -197,13 +201,17 @@ switch ($messagetype) {
 
         echo $responsexml->asXML();
 
-    break;
+        break;
 
     case 'readResultRequest':
 
         $parsed = qtype_lti_parse_grade_read_message($xml);
 
-        $ltiinstance = $DB->get_record('qtype_lti_options', array('id' => $parsed->instanceid));
+        $ltiinstance = $DB->get_record('qtype_lti_options', array('id' => $parsed->ltiid));
+
+        if (!$ltiinstance) {
+            throw new Exception('No such tool.');
+        }
 
         if (!qtype_lti_accepts_grades($ltiinstance)) {
             throw new Exception('Tool does not accept grades');
@@ -222,12 +230,16 @@ switch ($messagetype) {
 
         echo $responsexml->asXML();
 
-    break;
+        break;
 
     case 'deleteResultRequest':
         $parsed = qtype_lti_parse_grade_delete_message($xml);
 
-        $ltiinstance = $DB->get_record('qtype_lti_options', array('id' => $parsed->instanceid));
+        $ltiinstance = $DB->get_record('qtype_lti_options', array('id' => $parsed->ltiid));
+
+        if (!$ltiinstance) {
+            throw new Exception('No such tool.');
+        }
 
         if (!qtype_lti_accepts_grades($ltiinstance)) {
             throw new Exception('Tool does not accept grades');
@@ -246,7 +258,7 @@ switch ($messagetype) {
 
         echo $responsexml->asXML();
 
-    break;
+        break;
 
     default:
         // Fire an event if we get a web service request which we don't support directly.
@@ -289,5 +301,5 @@ switch ($messagetype) {
             echo $responsexml->asXML();
         }
 
-    break;
+        break;
 }
