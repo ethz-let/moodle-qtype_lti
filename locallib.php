@@ -470,6 +470,7 @@ function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null
     $requestparams['ext_lti_id'] = $extracodeexpertparams['ltiid'];
     $requestparams['ext_instancecode'] = $extracodeexpertparams['instancecode'];
     $requestparams['ext_course_id'] = $extracodeexpertparams['courseid'];
+    $requestparams['ext_unique_connection'] = $extracodeexpertparams['resultid'];
 
     if ($islti2 || $typeconfig['sendemailaddr'] == QTYPE_LTI_SETTING_ALWAYS || ($typeconfig['sendemailaddr'] ==
          QTYPE_LTI_SETTING_DELEGATE && isset($instance->instructorchoicesendemailaddr) &&

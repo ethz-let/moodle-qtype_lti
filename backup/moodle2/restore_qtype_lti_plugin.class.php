@@ -307,7 +307,9 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
             $courseid = $this->task->get_courseid();
             $data->courseid = ($this->get_mappingid('course', $data->courseid) == $courseid) ? $courseid : SITEID;
         }
-
+        // New attempt has unknown moodle attempt ID, set it to -1.
+        $data->mattemptid = -1;
+        $data->quizid = 0;
         $newitemid = $DB->insert_record('qtype_lti_usage', $data);
         $this->set_mapping('qtype_lti_usage', $oldid, $newitemid);
     }

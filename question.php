@@ -52,10 +52,14 @@ class qtype_lti_question extends question_graded_automatically_with_countback {
         return $totalstemscore / count($this->order);
     }
 
+    public function get_response(question_attempt $qa) {
+        return $qa->get_last_qt_data();
+    }
+
     public function get_expected_data() {
         return array('answer' => PARAM_RAW, 'instanceid' => PARAM_RAW, 'userid' => PARAM_RAW,
                     'attemptid' => PARAM_RAW, 'username' => PARAM_RAW, 'linkid' => PARAM_RAW,
-                    'resultid' => PARAM_RAW);
+            'resultid' => PARAM_RAW, 'currentattemptid' => PARAM_RAW);
     }
 
     public function is_complete_response(array $response) {
@@ -122,11 +126,13 @@ class qtype_lti_question extends question_graded_automatically_with_countback {
         $linkid = $answers['linkid'];
         $result = $answers['resultid'];
 
+
         $submissiongrade = $DB->get_record('qtype_lti_submission',
-                                            array('username' => $username, 'linkid' => $linkid, 'resultid' => $result));
+                        array('username' => $username, 'linkid' => $result, 'resultid' => $linkid, 'ltiid' => $instanceid));
         if ($submissiongrade) {
             $value = $submissiongrade->gradepercent;
         }
+
         return $value;
     }
 

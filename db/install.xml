@@ -141,13 +141,15 @@
         <FIELD NAME="ltiid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the LTI tool instance"/>
         <FIELD NAME="instancecode" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="Question InstanceCode in moodle."/>
         <FIELD NAME="attemptid" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="ID of the CodeExpert tool instance"/>
-        <FIELD NAME="mattemptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="ID of the CodeExpert tool instance"/>
+        <FIELD NAME="mattemptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="ID of moodle attempt"/>
         <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Moodle QuestionID"/>
         <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Moodle QuizID"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="resourcelinkid" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="logged resource_link_id"/>
         <FIELD NAME="resultid"  TYPE="char" LENGTH="250" NOTNULL="true" SEQUENCE="false" COMMENT="logged lis_result_sourcedid"/>
+        <FIELD NAME="parentlti" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="parentattempt" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="origin" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="logged moodle origin"/>
         <FIELD NAME="destination" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="logged CE destination"/>
         <FIELD NAME="timeadded" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>

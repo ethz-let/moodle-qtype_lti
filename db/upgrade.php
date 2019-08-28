@@ -101,6 +101,26 @@ function xmldb_qtype_lti_upgrade($oldversion) {
 
         upgrade_plugin_savepoint(true, 2019031902, 'qtype', 'lti');
     }
+    if ($oldversion < 2019062001) {
+        $DB->delete_records('qtype_lti_usage');
+        // Define field lti_usage to control display of result table.
+        $table = new xmldb_table('qtype_lti_usage');
 
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Add needed columns.
+        if (!$dbman->field_exists($table, 'parentlti')) {
+            $field = new xmldb_field('parentlti', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $dbman->add_field($table, $field);
+        }
+        if (!$dbman->field_exists($table, 'parentattempt')) {
+            $field = new xmldb_field('parentattempt', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, false, null);
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2019062001, 'qtype', 'lti');
+    }
     return true;
 }

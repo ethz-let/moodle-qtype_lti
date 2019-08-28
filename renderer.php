@@ -24,83 +24,115 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->dirroot . '/question/type/rendererbase.php');
 class qtype_lti_renderer extends \qtype_renderer {
 
+    /**
+     * Returns the last response in a question attempt.
+     * @param question_attempt $qa
+     * @return array|mixed
+     */
     protected function qtype_lti_generate_usage_record($ltiid, $instancecode, $userid, $username, $attempt, $questionid, $quizid,
-                                                    $courseid, $toolurl) {
-        global $CFG, $DB;
-
-        // What if backup/restore? then attempt and instancecode never changed.
-        $params = array('ltiid' => $ltiid, 'instancecode' => $instancecode, 'userid' => $userid, 'questionid' => $questionid,
-            'courseid' => $courseid, 'quizid' => $quizid, 'mattemptid' => $attempt);
-
-        $orgceattemptrecords = $DB->get_records_sql(
-                                                    'select id, attemptid from {qtype_lti_usage}
-														where ltiid = :ltiid and  instancecode = :instancecode and userid = :userid
-														and questionid = :questionid and courseid = :courseid and quizid <> :quizid and mattemptid <> :mattemptid limit 1',
-                                                    $params);
-        foreach ($orgceattemptrecords as $orgceattemptrecord) {
-            // Update the record with new values.
-            $userceattemptrecord = new stdClass();
-            $userceattemptrecord->id = $orgceattemptrecord->id;
-            $userceattemptrecord->mattemptid = $attempt;
-            $userceattemptrecord->quizid = $quizid;
-            $userceattemptrecord->origin = $CFG->wwwroot;
-            $userceattemptrecord->destination = $toolurl;
-            $userceattemptrecord->resourcelinkid = $orgceattemptrecord->attemptid . '-' . $instancecode . '-' . $username;
-            $userceattemptrecord->resultid = $userceattemptrecord->resourcelinkid . '-' . uniqid();
-            $DB->update_record('qtype_lti_usage', $userceattemptrecord);
-
-            $updatedceattemptrecord = $DB->get_record('qtype_lti_usage', array('id' => $orgceattemptrecord->id));
-            if ($updatedceattemptrecord) {
-                return $updatedceattemptrecord;
+                    $courseid, $toolurl, $currentanswer, $currentlinkid, $previousresponse) {
+        global $CFG, $DB;//$DB->delete_records('qtype_lti_usage');exit;
+        // Lets delete any deleted attempts in quiz.
+        $delparm = array('quizid' => $quizid);
+        $sql = "delete from {qtype_lti_usage}
+                where mattemptid not in (select id from {quiz_attempts} where quiz = :quizid)
+                and mattemptid <> -1";
+        $DB->execute($sql, $delparm);
+       // $DB->delete_records('qtype_lti_usage'); exit;
+        $checkrecord = $DB->get_record('qtype_lti_usage',
+                        array('mattemptid' => $attempt, 'instancecode' => $instancecode,
+                            'userid' => $userid, 'questionid' => $questionid,
+                            'courseid' => $courseid, 'quizid' => $quizid,
+                            'ltiid' => $ltiid
+                        ));
+        if($checkrecord) {
+            return $checkrecord;
+        } else {
+            // Check if it was restored.
+            $params = array('mattemptid' => -1, 'instancecode' => $instancecode,
+                'userid' => $userid, 'questionid' => $questionid,
+                'courseid' => $courseid, 'quizid' => 0,
+                'ltiid' => $ltiid);
+            if(isset($previousresponse['currentattemptid']) && trim($previousresponse['currentattemptid']) != '') {
+                $params['attemptid'] = trim($previousresponse['currentattemptid']);
             }
-        }
+            if(isset($previousresponse['resultid']) && trim($previousresponse['resultid']) != '') {
+                $params['resultid'] = trim($previousresponse['resultid']);
+            }
+            $checkrecord = $DB->get_record('qtype_lti_usage', $params);
 
-        // Check if actual record exists in usage table.
-        $userceattemptrecord = $DB->get_records('qtype_lti_usage',
-                                                array('mattemptid' => $attempt, 'instancecode' => $instancecode,
-                                                    'userid' => $userid, 'questionid' => $questionid,
-                                                    'courseid' => $courseid, 'quizid' => $quizid
-                                                ), 'id DESC', '*', 0, 1);
-        if (!$userceattemptrecord) {
+            if($checkrecord) {
+              //  foreach($checkrecords as $checkrecord) {
+                    // Map them based on parentattempt.
+                    $updaterecord = new stdClass();
+                    $updaterecord->id = $checkrecord->id;
+                    $updaterecord->mattemptid = $attempt;
+                    $updaterecord->quizid = $quizid;
+                    $DB->update_record('qtype_lti_usage', $updaterecord);
+              //  }
+
+                return $checkrecord;
+            }
+            // Seems to be totally new attempt, insert it.
             $userceattemptrecord = new stdClass();
             $userceattemptrecord->ltiid = $ltiid;
             $userceattemptrecord->instancecode = $instancecode;
-            $userceattemptrecord->attemptid = uniqid();
+            if(isset($previousresponse['currentattemptid']) && trim($previousresponse['currentattemptid']) != '') {
+                $userceattemptrecord->attemptid = trim($previousresponse['currentattemptid']);
+            } else {
+                $userceattemptrecord->attemptid = uniqid();
+            }
             $userceattemptrecord->mattemptid = $attempt;
             $userceattemptrecord->questionid = $questionid;
             $userceattemptrecord->quizid = $quizid;
             $userceattemptrecord->courseid = $courseid;
             $userceattemptrecord->userid = $userid;
             // ResourceLinkId: attemptid + instancecode + username.
-            $userceattemptrecord->resourcelinkid = $userceattemptrecord->attemptid . '-' . $instancecode . '-' . $username;
+            if(isset($previousresponse['linkid']) && trim($previousresponse['linkid']) != '') {
+                $userceattemptrecord->resourcelinkid = trim($previousresponse['linkid']);
+            } else {
+                $userceattemptrecord->resourcelinkid = trim($userceattemptrecord->attemptid . '-' . $instancecode . '-' . $username);
+            }
+             //$userceattemptrecord->resourcelinkid = trim($userceattemptrecord->attemptid . '-' . $instancecode . '-' . $username);
             // RestultID: attemptid + instancecode + username + uniqid().
-            $userceattemptrecord->resultid = $userceattemptrecord->resourcelinkid . '-' . uniqid();
+            if(isset($previousresponse['resultid']) && trim($previousresponse['resultid']) != '') {
+                $userceattemptrecord->resultid = trim($previousresponse['resultid']);
+            } else {
+                $userceattemptrecord->resultid = trim($userceattemptrecord->resourcelinkid . '-' . uniqid());
+            }
+            $userceattemptrecord->resultid = trim($userceattemptrecord->resourcelinkid . '-' . uniqid());
             $userceattemptrecord->origin = $CFG->wwwroot;
             $userceattemptrecord->destination = $toolurl;
+            $userceattemptrecord->parentlti = $ltiid;
+            $userceattemptrecord->parentattempt = $attempt;
             $userceattemptrecord->timeadded = time();
             $insertceattemptecord = $DB->insert_record('qtype_lti_usage', $userceattemptrecord);
-        } else {
-            foreach ($userceattemptrecord as $atrecord) {
-                return $atrecord; // Return only one record.
-            }
+            return $userceattemptrecord;
+
+
         }
-        return $userceattemptrecord;
+
     }
 
     public function formulation_and_controls(question_attempt $qa, question_display_options $options) {
         global $PAGE, $CFG, $DB, $USER;
         $question = $qa->get_question();
+
+        $previousresponse = $question->get_response($qa);
         // Answer field.
         $step = $qa->get_last_step_with_qt_var('answer');
 
         $originaluserid = $step->get_user_id();
 
         $currentanswer = $qa->get_last_qt_var('answer');
+        $currentlinkid = $qa->get_last_qt_var('linkid');
+        $currentattemptid = $qa->get_last_qt_var('currentattemptid');
         $inputname = $qa->get_qt_field_name('answer');
         $instanceid = $qa->get_qt_field_name('instanceid');
         $attemptfieldname = $qa->get_qt_field_name('attemptid');
         $resultidfieldname = $qa->get_qt_field_name('resultid');
         $linkidfieldname = $qa->get_qt_field_name('linkid');
+        $uniqueattemptfieldname = $qa->get_qt_field_name('currentattemptid');
         $usernamefieldname = $qa->get_qt_field_name('username');
         $userid = $qa->get_qt_field_name('userid');
 
@@ -127,7 +159,8 @@ class qtype_lti_renderer extends \qtype_renderer {
 
             $userceattemptrecord = $this->qtype_lti_generate_usage_record($lti->id, $lti->instancecode, $user->id,
                                                                             $user->username, $attempt, $question->id,
-                                                                            $attemptfullrecord->quiz, $COURSE->id, $lti->toolurl);
+                            $attemptfullrecord->quiz, $COURSE->id, $lti->toolurl, $currentanswer, $currentlinkid,
+                            $previousresponse);
 
             $ltiparams = qtype_lti_build_sourcedid($userceattemptrecord->resultid, $user->username, $lti->servicesalt,
                                                     $lti->typeid, $userceattemptrecord->attemptid, $lti->id);
@@ -151,7 +184,7 @@ class qtype_lti_renderer extends \qtype_renderer {
             // Question has never been answered, fill it with response template.
             $step = new question_attempt_step(array('answer' => ''));
         } else {
-            $sstep = $qa->get_current_manual_mark();
+            $step = $qa->get_current_manual_mark();
             // Is there a current value in the current POST data? If so, use that.
             $mark = $qa->get_submitted_var($qa->get_behaviour_field_name('mark'), PARAM_RAW_TRIMMED);
             if ($mark === null) {
@@ -215,9 +248,8 @@ class qtype_lti_renderer extends \qtype_renderer {
              $extracodeexpertparameters . $readonly . 'id=' . $question->id . '&userid=' . $user->id . '&resourcelinkid=' .
              $userceattemptrecord->resourcelinkid . '&resultid=' . $userceattemptrecord->resultid . '" ' . $readonlyclass .
              '></iframe></div>';
-
         $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$inputname\"
-                    id=\"qtype_lti_input_id_" . $question->id . "\">";
+                    value=\"$userceattemptrecord->resultid\" id=\"qtype_lti_input_id_" . $question->id . "\">";
         $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$attemptfieldname\"
                     value=\"$attempt\" id=\"qtype_lti_attempt_id_" . $question->id . "\">";
         $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$instanceid\"
@@ -230,6 +262,8 @@ class qtype_lti_renderer extends \qtype_renderer {
                     value=\"$userceattemptrecord->resourcelinkid\" id=\"qtype_lti_user_id_" . $question->id . "\">";
         $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$usernamefieldname\"
                     value=\"$user->username\" id=\"qtype_lti_user_id_" . $question->id . "\">";
+        $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$uniqueattemptfieldname\"
+        value=\"$userceattemptrecord->attemptid\" id=\"qtype_lti_user_id_" . $question->id . "\">";
 
         // Output script to make the iframe tag be as large as possible.
         $result .= '<script type="text/javascript">
@@ -253,7 +287,7 @@ class qtype_lti_renderer extends \qtype_renderer {
                                     };
 
                                     resize();
-                                    Y.one("#qtype_lti_input_id_"+'.$question->id.').set("value", Math.random());
+                                    Y.one("#qtype_lti_input_id_"+'.$question->id.').set("value", "'.$userceattemptrecord->resultid.'");
                                     Y.on("windowresize", resize);
                                     var quiz_is_timed = 0;
 
