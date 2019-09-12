@@ -91,7 +91,7 @@ function qtype_lti_parse_grade_replace_message($xml) {
     $parsed->ltiid = $resultjson->data->ltiid;
     $parsed->username = $parsed->userid;
     $pieces = explode('-', $parsed->instanceid);
-    $parsed->resultid = $pieces[0].'-'.$pieces[1].'-'.$pieces[2];
+    $parsed->resultid = $pieces[0].'-'.$pieces[1].'-'.$parsed->userid;
     $parsed->linkid = $parsed->instanceid;
 
 
@@ -113,7 +113,7 @@ function qtype_lti_parse_grade_read_message($xml) {
     $parsed->ltiid = $resultjson->data->ltiid;
     $parsed->username = $parsed->userid;
     $pieces = explode('-', $parsed->instanceid);
-    $parsed->resultid = $pieces[0].'-'.$pieces[1].'-'.$pieces[2];
+    $parsed->resultid = $pieces[0].'-'.$pieces[1].'-'.$parsed->userid;
     $parsed->linkid = $parsed->instanceid;
 
     $parsed->sourcedidhash = $resultjson->hash;
@@ -134,7 +134,7 @@ function qtype_lti_parse_grade_delete_message($xml) {
     $parsed->ltiid = $resultjson->data->ltiid;
     $parsed->username = $parsed->userid;
     $pieces = explode('-', $parsed->instanceid);
-    $parsed->resultid = $pieces[0].'-'.$pieces[1].'-'.$pieces[2];
+    $parsed->resultid = $pieces[0].'-'.$pieces[1].'-'.$parsed->userid;
     $parsed->linkid = $parsed->instanceid;
 
     $parsed->sourcedidhash = $resultjson->hash;
