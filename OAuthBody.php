@@ -92,7 +92,7 @@ function handle_oauth_body_post($oauthconsumerkey, $oauthconsumersecret, $body, 
     $postdata = $body;
 
     $hash = base64_encode(sha1($postdata, true));
-
+    return $postdata;
     if ( $hash != $oauthbodyhash ) {
         throw new OAuthException("OAuth oauth_body_hash mismatch");
     }

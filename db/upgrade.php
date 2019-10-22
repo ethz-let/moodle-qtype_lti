@@ -122,5 +122,15 @@ function xmldb_qtype_lti_upgrade($oldversion) {
 
         upgrade_plugin_savepoint(true, 2019062001, 'qtype', 'lti');
     }
+    if ($oldversion < 2019062002) {
+       // $DB->delete_records('qtype_lti_submission');
+        $table = new xmldb_table('qtype_lti_submission');
+        // Add needed columns.
+        if (!$dbman->field_exists($table, 'mattempt')) {
+            $field = new xmldb_field('mattempt', XMLDB_TYPE_INTEGER, '10', null, null, false, null);
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2019062002, 'qtype', 'lti');
+    }
     return true;
 }

@@ -31,14 +31,15 @@ class qtype_lti_renderer extends \qtype_renderer {
      */
     protected function qtype_lti_generate_usage_record($ltiid, $instancecode, $userid, $username, $attempt, $questionid, $quizid,
                     $courseid, $toolurl, $currentanswer, $currentlinkid, $previousresponse) {
-                        global $CFG, $DB;//$DB->delete_records('qtype_lti_usage');exit;
+                        global $CFG, $DB;
+                        $x = $DB->get_records('qtype_lti_usage');
                         // Lets delete any deleted attempts in quiz.
                         $delparm = array('quizid' => $quizid);
                         $sql = "delete from {qtype_lti_usage}
-                where mattemptid not in (select id from {quiz_attempts} where quiz = :quizid)
-                and mattemptid <> -1";
+                                where mattemptid not in (select id from {quiz_attempts} where quiz = :quizid)
+                                and mattemptid <> -1";
                         $DB->execute($sql, $delparm);
-                        // $DB->delete_records('qtype_lti_usage'); exit;
+
                         $checkrecord = $DB->get_record('qtype_lti_usage',
                                         array('mattemptid' => $attempt, 'instancecode' => $instancecode,
                                             'userid' => $userid, 'questionid' => $questionid,
@@ -48,6 +49,7 @@ class qtype_lti_renderer extends \qtype_renderer {
                         if($checkrecord) {
                             return $checkrecord;
                         } else {
+
                             // Check if it was restored.
                             $params = array('mattemptid' => -1, 'instancecode' => $instancecode,
                                 'userid' => $userid, 'questionid' => $questionid,
@@ -59,20 +61,26 @@ class qtype_lti_renderer extends \qtype_renderer {
                             if(isset($previousresponse['resultid']) && trim($previousresponse['resultid']) != '') {
                                 $params['resultid'] = trim($previousresponse['resultid']);
                             }
-                            $checkrecord = $DB->get_record('qtype_lti_usage', $params);
-
-                            if($checkrecord) {
-                                //  foreach($checkrecords as $checkrecord) {
-                                // Map them based on parentattempt.
-                                $updaterecord = new stdClass();
-                                $updaterecord->id = $checkrecord->id;
-                                $updaterecord->mattemptid = $attempt;
-                                $updaterecord->quizid = $quizid;
-                                $DB->update_record('qtype_lti_usage', $updaterecord);
-                                //  }
-
-                                return $checkrecord;
+                            if(isset($previousresponse['linkid']) && trim($previousresponse['linkid']) != '') {
+                                $params['resourcelinkid'] = trim($previousresponse['linkid']);
                             }
+                            $checkrecord = $DB->get_records('qtype_lti_usage', $params);
+                            if($checkrecord) {
+                                foreach($checkrecord as $rec) {
+                                    // Map them based on parentattempt.
+                                    // Only take one record, maybe many restores happened and some are not used yet.
+                                    $updaterecord = new stdClass();
+                                    $updaterecord->id = $rec->id;
+                                    $updaterecord->mattemptid = $attempt;
+                                    $updaterecord->quizid = $quizid;
+                                    $DB->update_record('qtype_lti_usage', $updaterecord);
+                                    $rec->mattemptid = $attempt;
+                                    $rec->quizid = $quizid;
+                                    return $rec;
+                                }
+
+                            }
+
                             // Seems to be totally new attempt, insert it.
                             $userceattemptrecord = new stdClass();
                             $userceattemptrecord->ltiid = $ltiid;
@@ -93,14 +101,24 @@ class qtype_lti_renderer extends \qtype_renderer {
                             } else {
                                 $userceattemptrecord->resourcelinkid = trim($userceattemptrecord->attemptid . '-' . $instancecode . '-' . $username);
                             }
-                            //$userceattemptrecord->resourcelinkid = trim($userceattemptrecord->attemptid . '-' . $instancecode . '-' . $username);
+
+                            // What if onlastattempt = 1 and new attempt?.
+                            $quizinfo = $DB->get_record('quiz', array('id' => $quizid));
+                            if(!$quizinfo){
+                                $quizinfo = new stdClass();
+                                $quizinfo->attemptonlast = 0;
+                            }
+                            if($quizinfo->attemptonlast == 1 && isset($previousresponse['attemptid']) &&  $previousresponse['attemptid'] != $attempt){
+                                unset($previousresponse['resultid']);
+                            }
+
                             // RestultID: attemptid + instancecode + username + uniqid().
                             if(isset($previousresponse['resultid']) && trim($previousresponse['resultid']) != '') {
                                 $userceattemptrecord->resultid = trim($previousresponse['resultid']);
                             } else {
                                 $userceattemptrecord->resultid = trim($userceattemptrecord->resourcelinkid . '-' . uniqid());
                             }
-                            //$userceattemptrecord->resultid = trim($userceattemptrecord->resourcelinkid . '-' . uniqid());
+
                             $userceattemptrecord->origin = $CFG->wwwroot;
                             $userceattemptrecord->destination = $toolurl;
                             $userceattemptrecord->parentlti = $ltiid;
@@ -163,7 +181,7 @@ class qtype_lti_renderer extends \qtype_renderer {
                             $previousresponse);
 
             $ltiparams = qtype_lti_build_sourcedid($userceattemptrecord->resultid, $user->username, $lti->servicesalt,
-                            $lti->typeid, $userceattemptrecord->attemptid, $lti->id);
+                            $lti->typeid, $userceattemptrecord->attemptid, $lti->id, $attempt);
 
             $serialparams = $ltiparams->data;
         } else {
@@ -237,7 +255,8 @@ class qtype_lti_renderer extends \qtype_renderer {
         // Extra Parameters specific to CodeExpert.
 
         $extracodeexpertparameters = 'questionid=' . $question->id . '&ltid=' . $lti->id . '&quizid=' . $attemptfullrecord->quiz .
-        '&attemptid=' . $userceattemptrecord->attemptid . '&attemptstate=' . $attemptfullrecord->state . '&';
+        '&attemptid=' . $userceattemptrecord->attemptid . '&attemptstate=' . $attemptfullrecord->state .
+        '&mattempt=' . $attempt . '&';
 
         $result = '<div id="qtype_lti_framediv_' . $question->id . '" class="qtype_lti_framediv" ' . $readonlydevstyle .
         '><span id="quiz_timer_lti_' . $question->id .

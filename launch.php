@@ -34,6 +34,7 @@ $triggerview = optional_param('triggerview', 1, PARAM_BOOL);
 $readonly = optional_param('readonly', 0, PARAM_BOOL);
 $manuallygradedinmoodle = optional_param('manuallygraded', 0, PARAM_BOOL);
 $attemptid = optional_param('attemptid', '', PARAM_RAW);
+$mattempt = optional_param('mattempt', 0, PARAM_INT);
 $quizid = optional_param('quizid', 0, PARAM_INT);
 $questionid = optional_param('questionid', 0, PARAM_INT);
 $attemptstate = optional_param('attemptstate', 'preview', PARAM_RAW);
@@ -53,11 +54,13 @@ if (!$quiz) {
     $quiz->id = 0;
     $quiz->name = 'noquiz';
     $quiz->attemptonlast = 0;
+    $mattempt = 0;
 }
 
 $extracodeexpertparams = array('attemptid' => $attemptid, 'quizid' => $quiz->id, 'questionid' => $questionid,
     'attemptstate' => $attemptstate, 'instancecode' => $lti->instancecode, 'quiztitle' => $quiz->name, 'courseid' => $course->id,
-    'ltiid' => $lti->id, 'attemptonlast' => $quiz->attemptonlast, 'resourcelinkid' => $resourcelinkid, 'resultid' => $resultid);
+    'ltiid' => $lti->id, 'attemptonlast' => $quiz->attemptonlast, 'resourcelinkid' => $resourcelinkid, 'resultid' => $resultid,
+    'mattempt' => $mattempt);
 
 require_login();
 $lti->cmid = 0;

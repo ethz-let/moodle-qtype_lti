@@ -320,7 +320,7 @@ function qtype_lti_build_registration_request($toolproxy) {
  * @param null|int $launchid
  * @return stdClass
  */
-function qtype_lti_build_sourcedid($instanceid, $userid, $servicesalt, $typeid = null, $attemptid = null, $ltiid = null) {
+function qtype_lti_build_sourcedid($instanceid, $userid, $servicesalt, $typeid = null, $attemptid = null, $ltiid = null, $mattempt) {
     $data = new \stdClass();
 
     $data->instance = $instanceid;
@@ -331,6 +331,7 @@ function qtype_lti_build_sourcedid($instanceid, $userid, $servicesalt, $typeid =
         $data->attemptid = uniqid();
     }
     $data->ltiid = $ltiid;
+    $data->mattempt = $mattempt;
     $json = json_encode($data);
     $hash = hash('sha256', $json . $servicesalt, false);
 
@@ -413,8 +414,8 @@ function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null
         $placementsecret = $instance->servicesalt;
         $sourcedid = json_encode(
                                 qtype_lti_build_sourcedid($extracodeexpertparams['resultid'], $originaluser->username,
-                                                        $placementsecret, $typeid, $extracodeexpertparams['attemptid'],
-                                                        $instance->id));
+                                                          $placementsecret, $typeid, $extracodeexpertparams['attemptid'],
+                                                          $instance->id, $extracodeexpertparams['mattempt']));
         $requestparams['lis_result_sourcedid'] = $sourcedid;
 
         // Add outcome service URL.
@@ -439,6 +440,7 @@ function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null
     $requestparams['ext_user_username'] = $originaluser->username;
     // In case the teacher wants to see the users submission in review mode.
     $requestparams['ext_student_username'] = $userid;
+    $requestparams['ext_moodleattemptid'] = $extracodeexpertparams['mattempt'];
 
     /*
      * The workflow used for the launch.

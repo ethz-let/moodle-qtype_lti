@@ -268,6 +268,7 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         $data = (object)$data;
         $oldid = $data->id;
         $data->ltiid = $this->get_new_parentid('lti');
+        $data->mattempt = -1;
         $data->datesubmitted = $this->apply_date_offset($data->datesubmitted);
         $data->dateupdated = $this->apply_date_offset($data->dateupdated);
 
@@ -283,15 +284,13 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
      */
     public function process_qtype_lti_usage($data) {
         global $DB;
-        if (!$this->is_question_created()) {
-            return;
-        }
-
         $data = (object)$data;
         $oldid = $data->id;
-        $data->ltiid = $this->get_new_parentid('lti');
-        if ($data->userid > 0) {
-            $data->userid = $this->get_mappingid('user', $data->userid);
+        if ($this->is_question_created()) { // This is a quiz Restore.
+            $data->ltiid = $this->get_new_parentid('lti');
+            if ($data->userid > 0) {
+                $data->userid = $this->get_mappingid('user', $data->userid);
+            }
         }
 
         if ($data->questionid > 0) {
