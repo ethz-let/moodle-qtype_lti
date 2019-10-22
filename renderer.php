@@ -32,7 +32,6 @@ class qtype_lti_renderer extends \qtype_renderer {
     protected function qtype_lti_generate_usage_record($ltiid, $instancecode, $userid, $username, $attempt, $questionid, $quizid,
                     $courseid, $toolurl, $currentanswer, $currentlinkid, $previousresponse) {
                         global $CFG, $DB;
-                        $x = $DB->get_records('qtype_lti_usage');
                         // Lets delete any deleted attempts in quiz.
                         $delparm = array('quizid' => $quizid);
                         $sql = "delete from {qtype_lti_usage}
