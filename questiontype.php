@@ -155,6 +155,7 @@ class qtype_lti extends question_type {
         }
 
         $DB->delete_records('qtype_lti_options', array('questionid' => $questionid));
+        $DB->delete_records('qtype_lti_usage', array('questionid' => $questionid));
         parent::delete_question($questionid, $contextid);
     }
 

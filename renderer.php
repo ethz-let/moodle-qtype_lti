@@ -32,12 +32,6 @@ class qtype_lti_renderer extends \qtype_renderer {
     protected function qtype_lti_generate_usage_record($ltiid, $instancecode, $userid, $username, $attempt, $questionid, $quizid,
                     $courseid, $toolurl, $currentanswer, $currentlinkid, $previousresponse) {
                         global $CFG, $DB;
-                        // Lets delete any deleted attempts in quiz.
-                        $delparm = array('quizid' => $quizid);
-                        $sql = "delete from {qtype_lti_usage}
-                                where mattemptid not in (select id from {quiz_attempts} where quiz = :quizid)
-                                and mattemptid <> -1";
-                        $DB->execute($sql, $delparm);
 
                         $checkrecord = $DB->get_record('qtype_lti_usage',
                                         array('mattemptid' => $attempt, 'instancecode' => $instancecode,
@@ -75,6 +69,17 @@ class qtype_lti_renderer extends \qtype_renderer {
                                     $DB->update_record('qtype_lti_usage', $updaterecord);
                                     $rec->mattemptid = $attempt;
                                     $rec->quizid = $quizid;
+                                    // Update any grade submission table in case or restore.
+                                    $gparams = array('mattempt' => -1, 'ltiid' => $ltiid, 'username' => $username,
+                                        'linkid' => $params['resultid'], 'resultid' => $params['resourcelinkid']);
+                                    $gradesneedupdate = $DB->get_record('qtype_lti_submission', $params);
+                                    if($gradesneedupdate) {
+                                        $updategraderec = new stdClass();
+                                        $updategraderec->id = $gradesneedupdate->id;
+                                        $updategraderec->mattempt = $attempt;
+                                        $DB->update_record('qtype_lti_submission', $updategraderec);
+                                    }
+
                                     return $rec;
                                 }
 

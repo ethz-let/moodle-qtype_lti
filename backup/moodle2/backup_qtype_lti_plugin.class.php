@@ -73,7 +73,7 @@ class backup_qtype_lti_plugin extends backup_qtype_plugin {
         $ltisubmissions = new backup_nested_element('ltisubmissions');
 
         $ltisubmission = new backup_nested_element('ltisubmission', array('id'),
-                                                array('username', 'linkid', 'resultid', 'datesubmitted', 'dateupdated',
+                                                array('username', 'ltiid', 'linkid', 'resultid', 'datesubmitted', 'dateupdated',
                                                     'gradepercent', 'originalgrade', 'state', 'mattempt'));
 
         $ltiusagemappings = new backup_nested_element('qtype_lti_usages');

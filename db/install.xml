@@ -122,6 +122,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="ltiid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the LTI tool instance"/>
+        <FIELD NAME="mattempt" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the moodle attempt"/>
         <FIELD NAME="username" TYPE="char" LENGTH="60" NOTNULL="false" SEQUENCE="false" COMMENT="username in moodle."/>
         <FIELD NAME="linkid" TYPE="char" LENGTH="250" NOTNULL="true" SEQUENCE="false" COMMENT="logged resource_link_id"/>
         <FIELD NAME="resultid" TYPE="char" LENGTH="250" NOTNULL="true" SEQUENCE="false" COMMENT="logged lis_result_sourcedid"/>	
