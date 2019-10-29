@@ -26,7 +26,14 @@ defined('MOODLE_INTERNAL') || die();
  * Provides the backup for lti questions.
  */
 class backup_qtype_lti_plugin extends backup_qtype_plugin {
-
+    /**
+     * Get the name of this question type.
+     *
+     * @return string the question type, like 'ddmarker'.
+     */
+    protected static function qtype_name() {
+        return 'lti';
+    }
     /**
      * Returns the qtype information to attach to the question element.
      */
@@ -173,5 +180,14 @@ class backup_qtype_lti_plugin extends backup_qtype_plugin {
             }
         }
         return $record;
+    }
+    /**
+     * Returns one array with filearea => mappingname elements for the qtype
+     *
+     * Used by {@link get_components_and_fileareas} to know about all the qtype
+     * files to be processed both in backup and restore.
+     */
+    public static function get_qtype_fileareas() {
+        return array('toolurl' => 'question_created');
     }
 }
