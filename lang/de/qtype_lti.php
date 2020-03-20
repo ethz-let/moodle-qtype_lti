@@ -20,7 +20,7 @@
  * @author Amr Hourani amr.hourani@id.ethz.ch, Kristina Isacson kristina.isacson@let.ethz.ch
  * @copyright ETHz 2016 amr.hourani@id.ethz.ch
  */
-$string['pluginname'] = 'Externe Verbindung (ETH)';
+$string['pluginname'] = 'Externer Fragetyp (ETH)';
 $string['pluginnamesummary'] = 'Mit der externen Verbindung kann man zu einer, in einem anderen System erstellten Frage, verbinden.';
 $string['pluginname_help'] = 'Mittels einer externen Verbindung werden Fragen in anderen Tools in Moodle eingebunden.';
 $string['pluginname_link'] = 'question/type/lti';
