@@ -21,11 +21,11 @@
  * @copyright ETHz 2016 amr.hourani@id.ethz.ch
  */
 $string['pluginname'] = 'External questiontype (ETH)';
-$string['pluginnamesummary'] = 'With the external connection, one can connect to a question created in a different tool.';
-$string['pluginname_help'] = 'With external connections questions from other tools are included in Moodle.';
+$string['pluginnamesummary'] = 'With the External question type, one can connect to a question created in a different tool.';
+$string['pluginname_help'] = 'With External question types questions from other tools are included in Moodle.';
 $string['pluginname_link'] = 'question/type/lti';
-$string['pluginnameadding'] = 'Adding an external connection';
-$string['pluginnameediting'] = 'Editing an external connection';
+$string['pluginnameadding'] = 'Adding an External question type';
+$string['pluginnameediting'] = 'Editing an External question type';
 $string['generalfeedback'] = 'General Feedback.';
 $string['generalfeedback_help'] = 'The same general feedback is displayed regardless of the answer chosen.';
 $string['stem'] = 'Stem';

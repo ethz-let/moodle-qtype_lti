@@ -242,9 +242,9 @@ Wenn ein Anwenderschlüssel und ein Kennwort eingegegeben werden, wird eine gesc
 Teacher können diese Tools verwenden, wenn sie selber über einen Anwenderschlüssel und ein Kennwort verfügen, oder dies nicht erforderlich ist.
 * **Gesperrt** - Diese Tool-Anbieter sind vom Administrator nicht zur systemweiten Nutzung freigegeben worden.
 Teacher können die Tools dennoch nutzen, wenn sie über einen Anwenderschlüssel und ein Kennwort für dieses Tool verfügen, oder dies nicht erforderlich ist.';
-$string['manage_external_tools'] = 'Tools für externe Verbindungen verwalten';
-$string['manage_tools'] = 'Vorkonfigurierte Tools für externe Verbindungen verwalten';
-$string['manage_tool_proxies'] = 'Registrierung von Tool Proxies für externe Verbindungen verwalten';
+$string['manage_external_tools'] = 'Tools für Externer Fragetypen verwalten';
+$string['manage_tools'] = 'Vorkonfigurierte Tools für Externer Fragetypen verwalten';
+$string['manage_tool_proxies'] = 'Registrierung von Tool Proxies für Externer Fragetypen verwalten';
 $string['manuallyaddtype'] = 'Alternativ können Sie <a href="{$a}">ein Tool manuell konfigurieren</a>.';
 $string['miscellaneous'] = 'Verschiedenes';
 $string['misconfiguredtools'] = 'Es wurden falsch konfiguriertet Tool Instanzen entdeckt';
