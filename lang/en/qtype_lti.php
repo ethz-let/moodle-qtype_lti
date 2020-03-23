@@ -20,7 +20,7 @@
  * @author Amr Hourani amr.hourani@id.ethz.ch
  * @copyright ETHz 2016 amr.hourani@id.ethz.ch
  */
-$string['pluginname'] = 'External questiontype (ETH)';
+$string['pluginname'] = 'External question type (ETH)';
 $string['pluginnamesummary'] = 'With the External question type, one can connect to a question created in a different tool.';
 $string['pluginname_help'] = 'With External question types questions from other tools are included in Moodle.';
 $string['pluginname_link'] = 'question/type/lti';
