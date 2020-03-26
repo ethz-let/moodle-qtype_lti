@@ -21,11 +21,11 @@
  * @copyright ETHz 2016 amr.hourani@id.ethz.ch
  */
 $string['pluginname'] = 'Externer Fragetyp (ETH)';
-$string['pluginnamesummary'] = 'Mit der externen Verbindung kann man zu einer, in einem anderen System erstellten Frage, verbinden.';
-$string['pluginname_help'] = 'Mittels einer externen Verbindung werden Fragen in anderen Tools in Moodle eingebunden.';
+$string['pluginnamesummary'] = 'Mit dem externen Fragetyp kann man zu einer, in einem anderen System erstellten Frage oder Aufgabe, verbinden.';
+$string['pluginname_help'] = 'Mittels dem externen Fragetyp werden Fragen oder Aufgaben in anderen Tools in Moodle eingebunden.';
 $string['pluginname_link'] = 'question/type/lti';
-$string['pluginnameadding'] = 'Eine Verbindung zu einer externen Frage hinzufügen';
-$string['pluginnameediting'] = 'Eine Verbindung zu einer externen Frage bearbeiten';
+$string['pluginnameadding'] = 'Einen externen Fragetyp als Verbindung zu einer externen Frage oder Aufgabe hinzufügen';
+$string['pluginnameediting'] = 'Einen externen Fragetyp bearbeiten';
 $string['generalfeedback'] = 'Allgemeines Feedback.';
 $string['generalfeedback_help'] = 'Allgemeines Feedback wird unabhängig von den gegebenen Antworten angezeigt. Andere Feedbacks sind abhängig von der \'Richtigkeit\' der Antworten.';
 $string['stem'] = 'Aufgabentitel';
