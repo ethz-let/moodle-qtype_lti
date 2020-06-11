@@ -48,16 +48,23 @@ class qtype_lti_renderer extends \qtype_renderer {
                                 'userid' => $userid, 'questionid' => $questionid,
                                 'courseid' => $courseid, 'quizid' => 0,
                                 'ltiid' => $ltiid);
+                            $where_clause = 'where mattemptid = :mattemptid and instancecode = :instancecode
+                                             and userid = :userid and questionid = :questionid and courseid = :courseid
+                                             and quizid = :quizid and ltiid = :ltiid ';
                             if(isset($previousresponse['currentattemptid']) && trim($previousresponse['currentattemptid']) != '') {
                                 $params['attemptid'] = trim($previousresponse['currentattemptid']);
+                                $where_clause .= ' and '. $DB->sql_compare_text('attemptid') . ' = ' . $DB->sql_compare_text(':attemptid');
                             }
                             if(isset($previousresponse['resultid']) && trim($previousresponse['resultid']) != '') {
                                 $params['resultid'] = trim($previousresponse['resultid']);
+                                $where_clause .= ' and '. $DB->sql_compare_text('resultid') . ' = ' . $DB->sql_compare_text(':resultid');
                             }
                             if(isset($previousresponse['linkid']) && trim($previousresponse['linkid']) != '') {
                                 $params['resourcelinkid'] = trim($previousresponse['linkid']);
+                                $where_clause .= ' and '. $DB->sql_compare_text('resourcelinkid') . ' = ' . $DB->sql_compare_text(':resourcelinkid');
                             }
-                            $checkrecord = $DB->get_records('qtype_lti_usage', $params);
+                            // $checkrecord = $DB->get_records('qtype_lti_usage', $params);
+                            $checkrecord = $DB->get_records_sql('select * from {qtype_lti_usage} '.$where_clause, $params);
                             if($checkrecord) {
                                 foreach($checkrecord as $rec) {
                                     // Map them based on parentattempt.
