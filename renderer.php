@@ -277,7 +277,7 @@ class qtype_lti_renderer extends \qtype_renderer {
               '" border="0" height="600px" width="100%" src="' . $CFG->wwwroot . '/question/type/lti/launch.php?' .
               $extracodeexpertparameters . $readonly . 'id=' . $question->id . '&userid=' . $user->id . '&resourcelinkid=' .
               $userceattemptrecord->resourcelinkid . '&resultid=' . $userceattemptrecord->resultid . '" ' . $readonlyclass .
-              '></iframe></div>';
+              ' loading="eager"></iframe></div>';
               $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$inputname\"
               value=\"$userceattemptrecord->resultid\" id=\"qtype_lti_input_id_" . $question->id . "\">";
               $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$attemptfieldname\"
