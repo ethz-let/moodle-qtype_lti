@@ -271,9 +271,9 @@ class qtype_lti_renderer extends \qtype_renderer {
 
         $result = '<div id="qtype_lti_framediv_' . $question->id . '" class="qtype_lti_framediv" ' . $readonlydevstyle .
         '><span id="quiz_timer_lti_' . $question->id .
-        '" style="display:none; margin-top:-1em; background-color:#fff"></span>
+        '" style="display:none; background-color:#fff"></span>
               <span class="qtype_lti_togglebutton" id="qtype_lti_togglebutton_id_' .
-              $question->id . '">&nbsp;</span><iframe id="qtype_lti_contentframe_' . $question->id .
+              $question->id . '" onclick="qtype_lti_fullscreen_'.$question->id.'()">&nbsp;</span><iframe id="qtype_lti_contentframe_' . $question->id .
               '" border="0" height="600px" width="100%" src="' . $CFG->wwwroot . '/question/type/lti/launch.php?' .
               $extracodeexpertparameters . $readonly . 'id=' . $question->id . '&userid=' . $user->id . '&resourcelinkid=' .
               $userceattemptrecord->resourcelinkid . '&resultid=' . $userceattemptrecord->resultid . '" ' . $readonlyclass .
@@ -296,76 +296,145 @@ class qtype_lti_renderer extends \qtype_renderer {
               value=\"$userceattemptrecord->attemptid\" id=\"qtype_lti_user_id_" . $question->id . "\">";
 
               // Output script to make the iframe tag be as large as possible.
-              $result .= '<script type="text/javascript">
-                            //<![CDATA[
-                                YUI().use("node", "event", function(Y) {
-                                    var doc = Y.one("body");
-                                    var lti_iframeid = "#qtype_lti_contentframe_"+'.$question->id.';
-                                    var lti_inputid = "#qtype_lti_input_id_"+'.$question->id.';
-                                    var lti_toggle_btn = "#qtype_lti_togglebutton_id_"+'.$question->id.';
-                                    var lti_question_area_id = "#qtype_lti_framediv_"+'.$question->id.';
-                                    var frame = Y.one("#qtype_lti_contentframe_"+'.$question->id.');
-                                    var padding = 15;
-                                    var lastHeight;
-                                    var resize = function(e) {
-                                    var viewportHeight = doc.get("winHeight");
-                                    if(lastHeight !== Math.min(doc.get("docHeight"), viewportHeight)){
-                                        if(viewportHeight > 500 ) viewportHeight = 500;
-                                            Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", viewportHeight + "px");
-                                            lastHeight = Math.min(doc.get("docHeight"), doc.get("winHeight"));
-                                        }
-                                    };
+              $result .= '
+                            <script type="text/javascript">
+							//<![CDATA[
+									YUI().use("node", "event", function(Y) {
+                                            Y.one("#qtype_lti_input_id_"+'.$question->id.').set("value", "'.$userceattemptrecord->resultid.'");
+											var doc = Y.one("body");
+											var lti_iframeid = "#qtype_lti_contentframe_'.$question->id.'";
+											var lti_toggle_btn = "#qtype_lti_togglebutton_id_'.$question->id.'";
 
-                                    resize();
-                                    Y.one("#qtype_lti_input_id_"+'.$question->id.').set("value", "'.$userceattemptrecord->resultid.'");
-                                    Y.on("windowresize", resize);
-                                    var quiz_is_timed = 0;
+											var frame = Y.one("#qtype_lti_contentframe_'.$question->id.'");
+											var padding = 150;
+											var lastHeight;
+											var resize = function(e) {
 
-                                    Y.one("#qtype_lti_togglebutton_id_"+'.$question->id.').on("click", function (e) {
-                                    Y.one("#qtype_lti_framediv_"+'.$question->id.').toggleClass("qtype_lti_maximized");
-                                    Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height","100%");
-                                    if (Y.one("#qtype_lti_framediv_"+'.$question->id.').hasClass("qtype_lti_maximized")) {
-                                      Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", "100%");
-                                      Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height","100%");
-                                    }else{
-                                      Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height", doc.get("winHeight") - 25 + "px");
-                                    }
-                                    if (document.getElementById("quiz-timer")) {
-                                        var lti_fullsc_'.$question->id.' = document.getElementById("quiz_timer_lti_'.$question->id.'");
-                                        lti_fullsc_'.$question->id.'.appendChild(document.getElementById("quiz-timer").cloneNode(true));
-                                        var quiz_timer_div = document.getElementById("quiz-time-left");
-                                        if(quiz_timer_div && quiz_timer_div && quiz_timer_div.innerHTML === ""){
-                                            Y.one("#quiz_timer_lti_"+'.$question->id.').setStyle("display", "none");
-                                            Y.one("#qtype_lti_contentframe_"+'.$question->id.').setStyle("height","100%");
-                                        } else {
-                                            Y.one("#quiz_timer_lti_"+'.$question->id.').setStyle("display", "block");
-                                        }
-                                    }
+    											var viewportHeight =  window.innerHeight;
+                          var quiz_timer_div = document.getElementById("quiz-time-left");
+                          var lti_fullsc_'.$question->id.' =
+                          document.getElementById("quiz_timer_lti_'.$question->id.'");
+                          if (quiz_timer_div && quiz_timer_div.innerHTML !== "") {
+                               Y.one("#quiz_timer_lti_'.$question->id.'").
+                                setStyle("display", "block");
+                               var calculatedheight =  viewportHeight -
+                                    Y.one("#quiz_timer_lti_'.$question->id.'").get("clientHeight");
+                               Y.one("#qtype_lti_contentframe_'.$question->id.'").
+                                setStyle("height", calculatedheight+ "px");
+                          } else {
+                               var calculatedheight = viewportHeight;
+                               Y.one("#qtype_lti_contentframe_'.$question->id.'").
+                               setStyle("height", calculatedheight+ "px");
+                          }
 
-                                     if (!Y.one("#qtype_lti_framediv_"+'.$question->id.').hasClass("qtype_lti_maximized") && lastHeight > 0) {
-                                         var viewportHeight_resized = doc.get("winHeight");
-                                         if(viewportHeight_resized && viewportHeight_resized > 500) viewportHeight_resized = 500;
-                                              Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height", viewportHeight_resized);
-                                              Y.one("#qtype_lti_contentframe_'.$question->id.'").setStyle("height", viewportHeight_resized + "px");
-                                              if (document.getElementById("quiz-timer")) {
-                                                var lti_fullsc_'.$question->id.' = document.getElementById("quiz_timer_lti_'.$question->id.'");
-                                                lti_fullsc_'.$question->id.'.innerHTML = "";
-                                                Y.one("#quiz_timer_lti_"+'.$question->id.').setStyle("display", "none");
-                                              }
-                                          }
+                          if (!Y.one("#qtype_lti_framediv_'.$question->id.'").
+                            hasClass("qtype_lti_maximized") &&
+                              calculatedheight > 650) {
+                              Y.one("#qtype_lti_contentframe_'.$question->id.'").
+                                setStyle("height", "650px");
+                              Y.one("#qtype_lti_framediv_'.$question->id.'").
+                                setStyle("height", "650px");
+                          } else {
+                              Y.one("#qtype_lti_framediv_'.$question->id.'").
+                              setStyle("height", calculatedheight +"px");
+                              Y.one("#qtype_lti_framediv_'.$question->id.'").
+                              set("height", calculatedheight +"px");
+                          }
 
-                                          if(quiz_timer_div && quiz_timer_div.innerHTML !== "" && Y.one("#qtype_lti_framediv_"+'.$question->id.').hasClass("qtype_lti_maximized")){
-                                             var viewportHeight_resized = doc.get("winHeight");
-                                             var timer_height = document.getElementById("quiz_timer_lti_'.$question->id.'").clientHeight;
-                                             viewportHeight_resized = viewportHeight_resized - timer_height;
-                                             Y.one("#qtype_lti_contentframe_'.$question->id.'").set("height", viewportHeight_resized);
-                                             Y.one("#qtype_lti_contentframe_'.$question->id.'").setStyle("height", viewportHeight_resized + "px");
-                                          }
-                                    });
-                                });
+                  	  };
 
-                            //]]
-                            </script>';
+                      Y.on("domready", function() {
+                        resize();
+                      });
+
+                  	  Y.on("windowresize", resize);
+
+                  	  });
+
+                  function qtype_lti_fullscreen_'.$question->id.'() {
+
+                      var doc = Y.one("body");
+                      var lti_iframeid = "#qtype_lti_contentframe_'.$question->id.'";
+                      var lti_toggle_btn = "#qtype_lti_togglebutton_id_'.$question->id.'";
+
+                      var frame = Y.one("#qtype_lti_contentframe_'.$question->id.'");
+                      var padding = 150;
+                      var lastHeight;
+                      var quiz_is_timed = 0;
+                      Y.one("#qtype_lti_framediv_'.$question->id.'").
+                        toggleClass("qtype_lti_maximized");
+                      Y.one("#qtype_lti_contentframe_'.$question->id.'").
+                        set("height","100%");
+
+                      if (Y.one("#qtype_lti_framediv_'.$question->id.'").
+                          hasClass("qtype_lti_maximized")) {
+                          Y.one("#qtype_lti_framediv_'.$question->id.'").
+                            set("height","100%");
+                          Y.one("#qtype_lti_framediv_'.$question->id.'").
+                            setStyle("height","100%");
+
+                          Y.one("#qtype_lti_contentframe_'.$question->id.'").
+                            set("height","100%");
+                          Y.one("#qtype_lti_contentframe_'.$question->id.'").
+                            setStyle("height","100%");
+
+                          var quiz_timer_div = document.getElementById("quiz-time-left");
+                          var lti_fullsc_'.$question->id.' =
+                              document.getElementById("quiz_timer_lti_'.$question->id.'");
+
+                          if (quiz_timer_div && quiz_timer_div.innerHTML !== "") {
+                               lti_fullsc_'.$question->id.'.
+                                appendChild(document.getElementById("quiz-timer").cloneNode(true));
+                               Y.one("#quiz_timer_lti_'.$question->id.'").
+                                setStyle("display", "block");
+                               Y.one("#quiz_timer_lti_'.$question->id.'").
+                                setStyle("margin-top", "-1em");
+                               var calculatedheight = doc.get("winHeight") -
+                                   Y.one("#quiz_timer_lti_'.$question->id.'").
+                                    get("clientHeight");
+                               Y.one("#qtype_lti_contentframe_'.$question->id.'").
+                                setStyle("height", calculatedheight+ "px");
+                          } else {
+                              if (lti_fullsc_'.$question->id.'.hasChildNodes()) {
+                                  lti_fullsc_'.$question->id.'.
+                                    removeChild(document.getElementById("quiz-timer").cloneNode(true));
+                              }
+                              var  calculatedheight = doc.get("winHeight");
+                              Y.one("#qtype_lti_contentframe_'.$question->id.'").
+                                setStyle("height", calculatedheight+ "px");
+
+                          }
+                      } else {
+
+                      	var viewportHeight = doc.get("winHeight");
+                          if (viewportHeight > 650 || viewportHeight <= 500) viewportHeight = 650;
+                	       Y.one("#qtype_lti_contentframe_'.$question->id.'").
+                          setStyle("height", viewportHeight + "px");
+                          Y.one("#qtype_lti_contentframe_'.$question->id.'").
+                          set("height", viewportHeight + "px");
+
+                          Y.one("#qtype_lti_framediv_'.$question->id.'").
+                          setStyle("height", viewportHeight +"px");
+                          Y.one("#qtype_lti_framediv_'.$question->id.'").
+                          set("height", viewportHeight +"px");
+
+                          if (document.getElementById("quiz-timer")) {
+                               var lti_fullsc_'.$question->id.' =
+                                    document.getElementById("quiz_timer_lti_'.$question->id.'");
+                               lti_fullsc_'.$question->id.'.innerHTML = "";
+                               Y.one("#quiz_timer_lti_'.$question->id.'").setStyle("margin-top", "0em");
+                               Y.one("#quiz_timer_lti_'.$question->id.'").setStyle("display", "none");
+                          }
+
+                      }
+
+                  }
+              //]]
+          </script>
+
+
+
+';
 
               return $result;
     }
