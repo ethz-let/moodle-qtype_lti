@@ -146,7 +146,6 @@ function xmldb_qtype_lti_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2021040100, 'qtype', 'lti');
     }
     if ($oldversion < 2021040101) {
-        $DB->delete_records('qtype_lti_usage');
         // Define field lti_usage to control display of result table.
         $table = new xmldb_table('qtype_lti_usage');
 
