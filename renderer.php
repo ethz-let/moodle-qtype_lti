@@ -129,9 +129,6 @@ class qtype_lti_renderer extends \qtype_renderer {
                             } else {
                                 $userceattemptrecord->resultid = trim($userceattemptrecord->resourcelinkid . '-' . uniqid());
                             }
-
-                            $userceattemptrecord->origin = $CFG->wwwroot;
-                            $userceattemptrecord->destination = $toolurl;
                             $userceattemptrecord->parentlti = $ltiid;
                             $userceattemptrecord->parentattempt = $attempt;
                             $userceattemptrecord->timeadded = time();

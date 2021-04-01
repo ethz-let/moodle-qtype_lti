@@ -151,8 +151,6 @@
         <FIELD NAME="resultid"  TYPE="char" LENGTH="250" NOTNULL="true" SEQUENCE="false" COMMENT="logged lis_result_sourcedid"/>
         <FIELD NAME="parentlti" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="parentattempt" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="origin" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="logged moodle origin"/>
-        <FIELD NAME="destination" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="logged CE destination"/>
         <FIELD NAME="timeadded" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>

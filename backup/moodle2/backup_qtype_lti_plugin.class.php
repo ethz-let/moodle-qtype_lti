@@ -87,7 +87,7 @@ class backup_qtype_lti_plugin extends backup_qtype_plugin {
         $ltiusagemapping = new backup_nested_element('qtype_lti_usage', array('id'),
                                                     array('ltiid', 'instancecode', 'attemptid', 'mattemptid', 'questionid',
                                                         'quizid', 'courseid', 'userid', 'resourcelinkid', 'resultid', 'parentlti','parentattempt',
-                                                        'origin', 'destination', 'timeadded'));
+                                                        'timeadded'));
 
         // Now the qtype tree.
         $pluginwrapper->add_child($lti);

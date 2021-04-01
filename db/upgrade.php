@@ -59,8 +59,6 @@ function xmldb_qtype_lti_upgrade($oldversion) {
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, false, null);
         $table->add_field('resourcelinkid', XMLDB_TYPE_CHAR, '250', null, XMLDB_NOTNULL, false, null);
         $table->add_field('resultid', XMLDB_TYPE_CHAR, '250', null, XMLDB_NOTNULL, false, null);
-        $table->add_field('origin', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, false, null);
-        $table->add_field('destination', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, false, null);
         $table->add_field('timeadded', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, false, null);
 
         // Adding keys to table lti_usage.
@@ -146,6 +144,22 @@ function xmldb_qtype_lti_upgrade($oldversion) {
         $table->add_index('quizid', XMLDB_INDEX_NOTUNIQUE, ['quizid']);
         $table->add_index('mapped_lti_usage_ce', XMLDB_INDEX_UNIQUE, ['ltiid', 'mattemptid', 'instancecode', 'userid', 'questionid', 'courseid', 'quizid']);
         upgrade_plugin_savepoint(true, 2021040100, 'qtype', 'lti');
+    }
+    if ($oldversion < 2021040101) {
+        $DB->delete_records('qtype_lti_usage');
+        // Define field lti_usage to control display of result table.
+        $table = new xmldb_table('qtype_lti_usage');
+
+        // drop unneeded fields.
+        if ($dbman->field_exists($table, 'origin')) {
+            $field = new xmldb_field('origin');
+            $dbman->drop_field($table, $field);
+        }
+        if ($dbman->field_exists($table, 'destination')) {
+            $field = new xmldb_field('destination');
+            $dbman->drop_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2021040101, 'qtype', 'lti');
     }
     return true;
 }
