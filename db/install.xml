@@ -158,6 +158,16 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="ltiid" UNIQUE="false" FIELDS="ltiid"/>
+        <INDEX NAME="mattemptid" UNIQUE="false" FIELDS="mattemptid"/>
+        <INDEX NAME="instancecode" UNIQUE="false" FIELDS="instancecode"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="questionid" UNIQUE="false" FIELDS="questionid"/>
+        <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
+        <INDEX NAME="quizid" UNIQUE="false" FIELDS="quizid"/>
+        <INDEX NAME="mapped_lti_usage_ce" UNIQUE="false" FIELDS="ltiid, mattemptid, instancecode, userid, questionid, courseid, quizid"/>    
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

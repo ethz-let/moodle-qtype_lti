@@ -131,5 +131,21 @@ function xmldb_qtype_lti_upgrade($oldversion) {
         }
         upgrade_plugin_savepoint(true, 2019062002, 'qtype', 'lti');
     }
+    if ($oldversion < 2021040100) {
+        $DB->delete_records('qtype_lti_usage');
+        // Define field lti_usage to control display of result table.
+        $table = new xmldb_table('qtype_lti_usage');
+
+        // Add needed indexes.
+        $table->add_index('ltiid', XMLDB_INDEX_NOTUNIQUE, ['ltiid']);
+        $table->add_index('mattemptid', XMLDB_INDEX_NOTUNIQUE, ['mattemptid']);
+        $table->add_index('instancecode', XMLDB_INDEX_NOTUNIQUE, ['instancecode']);
+        $table->add_index('userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
+        $table->add_index('questionid', XMLDB_INDEX_NOTUNIQUE, ['questionid']);
+        $table->add_index('courseid', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
+        $table->add_index('quizid', XMLDB_INDEX_NOTUNIQUE, ['quizid']);
+        $table->add_index('mapped_lti_usage_ce', XMLDB_INDEX_UNIQUE, ['ltiid', 'mattemptid', 'instancecode', 'userid', 'questionid', 'courseid', 'quizid']);
+        upgrade_plugin_savepoint(true, 2021040100, 'qtype', 'lti');
+    }
     return true;
 }
