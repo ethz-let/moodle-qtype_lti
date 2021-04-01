@@ -148,7 +148,6 @@ function xmldb_qtype_lti_upgrade($oldversion) {
     if ($oldversion < 2021040101) {
         // Define field lti_usage to control display of result table.
         $table = new xmldb_table('qtype_lti_usage');
-
         // drop unneeded fields.
         if ($dbman->field_exists($table, 'origin')) {
             $field = new xmldb_field('origin');
