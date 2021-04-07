@@ -293,9 +293,11 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         global $DB;
         $data = (object)$data;
         $oldid = $data->id;
-
         if (isset($data->userid) &&  $data->userid > 0) {
             $data->userid = $this->get_mappingid('user', $data->userid);
+        }
+        if(!isset($data->userid) || !$data->userid || $data->userid == 0) {
+            return;
         }
         if ($data->questionid > 0) {
             // Detect if the question is created or mapped.

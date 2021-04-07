@@ -77,8 +77,13 @@ class qtype_lti_renderer extends \qtype_renderer {
                                     $rec->mattemptid = $attempt;
                                     $rec->quizid = $quizid;
                                     // Update any grade submission table in case or restore.
-                                    $gparams = array('mattempt' => -1, 'ltiid' => $ltiid, 'username' => $username,
-                                        'linkid' => $params['resultid'], 'resultid' => $params['resourcelinkid']);
+                                    $gparams = array('mattempt' => -1, 'ltiid' => $ltiid, 'username' => $username);
+                                    if(isset($params['resultid']) && trim($params['resultid']) != '') {
+                                        $gparams['linkid'] =  $params['resultid'];
+                                    }
+                                    if(isset($params['resourcelinkid']) && trim($params['resourcelinkid']) != '') {
+                                        $gparams['resultid'] =  $params['resourcelinkid'];
+                                    }
                                     $gradesneedupdate = $DB->get_record('qtype_lti_submission', $gparams);
                                     if($gradesneedupdate) {
                                         $updategraderec = new stdClass();
