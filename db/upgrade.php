@@ -129,7 +129,7 @@ function xmldb_qtype_lti_upgrade($oldversion) {
         }
         upgrade_plugin_savepoint(true, 2019062002, 'qtype', 'lti');
     }
-    if ($oldversion < 2021040800) {
+    if ($oldversion < 2021040801) {
         // Define field lti_usage to control display of result table.
         $table = new xmldb_table('qtype_lti_usage');
         // drop unneeded fields.
@@ -142,15 +142,39 @@ function xmldb_qtype_lti_upgrade($oldversion) {
             $dbman->drop_field($table, $field);
         }
         // Add needed indexes.
-        $table->add_index('ltiid', XMLDB_INDEX_NOTUNIQUE, ['ltiid']);
-        $table->add_index('mattemptid', XMLDB_INDEX_NOTUNIQUE, ['mattemptid']);
-        $table->add_index('instancecode', XMLDB_INDEX_NOTUNIQUE, ['instancecode']);
-        $table->add_index('userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
-        $table->add_index('questionid', XMLDB_INDEX_NOTUNIQUE, ['questionid']);
-        $table->add_index('courseid', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
-        $table->add_index('quizid', XMLDB_INDEX_NOTUNIQUE, ['quizid']);
-        $table->add_index('mapped_lti_usage_ce', XMLDB_INDEX_UNIQUE, ['ltiid', 'mattemptid', 'instancecode', 'userid', 'questionid', 'courseid', 'quizid']);
-        upgrade_plugin_savepoint(true, 2021040800, 'qtype', 'lti');
+        $index = new xmldb_index('ltiid', XMLDB_INDEX_NOTUNIQUE, ['ltiid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $index = new xmldb_index('mattemptid', XMLDB_INDEX_NOTUNIQUE, ['mattemptid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $index = new xmldb_index('instancecode', XMLDB_INDEX_NOTUNIQUE, ['instancecode']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $index = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $index = new xmldb_index('questionid', XMLDB_INDEX_NOTUNIQUE, ['questionid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $index = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $index = new xmldb_index('quizid', XMLDB_INDEX_NOTUNIQUE, ['quizid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $index = new xmldb_index('mapped_lti_usage_ce', XMLDB_INDEX_NOTUNIQUE, ['ltiid', 'mattemptid', 'instancecode', 'userid', 'questionid', 'courseid', 'quizid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        upgrade_plugin_savepoint(true, 2021040801, 'qtype', 'lti');
     }
     return true;
 }
