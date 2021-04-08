@@ -170,10 +170,13 @@ function xmldb_qtype_lti_upgrade($oldversion) {
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
+        // Disable space-taking index until furthers.
+        /*
         $index = new xmldb_index('mapped_lti_usage_ce', XMLDB_INDEX_NOTUNIQUE, ['ltiid', 'mattemptid', 'instancecode', 'userid', 'questionid', 'courseid', 'quizid']);
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
+        */
         upgrade_plugin_savepoint(true, 2021040801, 'qtype', 'lti');
     }
     return true;
