@@ -63,7 +63,6 @@ class qtype_lti_renderer extends \qtype_renderer {
                                 $params['resourcelinkid'] = trim($previousresponse['linkid']);
                                 $where_clause .= ' and '. $DB->sql_compare_text('resourcelinkid') . ' = ' . $DB->sql_compare_text(':resourcelinkid');
                             }
-                            // $checkrecord = $DB->get_records('qtype_lti_usage', $params);
                             $checkrecord = $DB->get_records_sql('select * from {qtype_lti_usage} '.$where_clause, $params);
                             if($checkrecord) {
                                 foreach($checkrecord as $rec) {
@@ -137,6 +136,9 @@ class qtype_lti_renderer extends \qtype_renderer {
                             $userceattemptrecord->parentlti = $ltiid;
                             $userceattemptrecord->parentattempt = $attempt;
                             $userceattemptrecord->timeadded = time();
+                            if(!isset($userid) || $userid == 0 || $userid == '') {
+                                return;
+                            }
                             $insertceattemptecord = $DB->insert_record('qtype_lti_usage', $userceattemptrecord);
                             return $userceattemptrecord;
 
