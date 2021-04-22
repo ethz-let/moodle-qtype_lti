@@ -492,27 +492,7 @@ class qtype_lti_external extends external_api {
      * @throws moodle_exception
      */
     public static function view_lti($ltiid) {
-        global $DB;
-
-        $params = self::validate_parameters(self::view_lti_parameters(),
-                                            array('ltiid' => $ltiid));
-        $warnings = array();
-
-        // Request and permission validation.
-        $lti = $DB->get_record('lti', array('id' => $params['ltiid']), '*', MUST_EXIST);
-        $context = context_course::instance($lti->course);
-        $course = $DB->get_record('course', array('id' => $lti->course));
-
-        self::validate_context($context);
-        require_capability('qtype/lti:view', $context);
-
-        // Trigger course_module_viewed event and completion.
-        qtype_lti_view($lti, $course, $cm, $context);
-
-        $result = array();
-        $result['status'] = true;
-        $result['warnings'] = $warnings;
-        return $result;
+        return;
     }
 
     /**
