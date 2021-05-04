@@ -168,9 +168,9 @@ class qtype_lti_renderer extends \qtype_renderer {
         $uniqueattemptfieldname = $qa->get_qt_field_name('currentattemptid');
         $usernamefieldname = $qa->get_qt_field_name('username');
         $userid = $qa->get_qt_field_name('userid');
-
-        $attemptinfo = $DB->get_record('question_attempt_steps', array('id' => $qa->get_database_id()));
-
+        if(!isset($originaluserid) || $originaluserid == 0) {
+            $originaluserid = $qa->get_last_qt_var('userid');
+        }
         require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 
         $attempt = optional_param('attempt', null, PARAM_INT);
@@ -303,6 +303,8 @@ class qtype_lti_renderer extends \qtype_renderer {
               value=\"$user->username\" id=\"qtype_lti_user_id_" . $question->id . "\">";
               $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"$uniqueattemptfieldname\"
               value=\"$userceattemptrecord->attemptid\" id=\"qtype_lti_user_id_" . $question->id . "\">";
+              $result .= "<input type=\"hidden\" class=\"qtype_lti_input\" name=\"qtype_lti_status_" . $question->id . "\"
+              value=\"0\" id=\"id_qtype_lti_status_" . $question->id . "\">";
 
               // Output script to make the iframe tag be as large as possible.
               $result .= '
@@ -359,9 +361,9 @@ class qtype_lti_renderer extends \qtype_renderer {
                   	  Y.on("windowresize", resize);
 
                   	  });
-
+                  setTimeout(function(){ Y.one("#id_qtype_lti_status_'.$question->id.'").set("value",Math.random()); }, 3000);
                   function qtype_lti_fullscreen_'.$question->id.'() {
-
+                      setTimeout(function(){ Y.one("#id_qtype_lti_status_'.$question->id.'").set("value",Math.random()); }, 1000);
                       var doc = Y.one("body");
                       var lti_iframeid = "#qtype_lti_contentframe_'.$question->id.'";
                       var lti_toggle_btn = "#qtype_lti_togglebutton_id_'.$question->id.'";
