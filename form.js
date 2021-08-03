@@ -49,6 +49,11 @@
                 self.updateAutomaticToolMatch(Y.one('#id_securetoolurl'));
             };
 
+            var eUnlockToolurl = Y.one('#id_unlockabletoolurl');
+            eUnlockToolurl.on('change', function (e) {
+                self.toggleToolUrl(self.settings.questionid);
+            });
+
             var typeSelector = Y.one('#id_typeid');
             typeSelector.on('change',
                     function (e) {
@@ -59,6 +64,7 @@
                         updateToolMatches();
 
                         self.toggleEditButtons();
+                        self.toggleToolUrl(self.settings.questionid);
 
                         if (self.getSelectedToolTypeOption().getAttribute(
                                 'toolproxy')) {
@@ -129,6 +135,32 @@
 
             var allowgrades = Y.one('#id_instructorchoiceacceptgrades');
             updateToolMatches();
+        },
+
+        toggleToolUrl : function(questionid) {
+
+            var typeSelector = Y.one('#id_typeid');
+            var eToolUrl = Y.one('#id_toolurl');
+            var eUnlockToolurl = Y.one('#id_unlockabletoolurl');
+
+            if(typeSelector.get('value') != 0) {
+                eToolUrl.setAttribute("disabled", true);
+                return
+            }
+
+            if (!questionid) {
+                eToolUrl.removeAttribute("disabled");
+            } else {
+                if (!eUnlockToolurl) {
+                    eToolUrl.setAttribute("disabled", true);
+                    return
+                }
+                if (eUnlockToolurl.get('checked')) {
+                    eToolUrl.removeAttribute("disabled");
+                } else {
+                    eToolUrl.setAttribute("disabled", true);
+                }
+            }
         },
 
         toggleGradeSection : function (e) {
@@ -231,7 +263,27 @@
                  * 'id_securetoolurl' || inputfield.get('value'))) {
                  * self.updatePrivacySettings(toolInfo); }
                  */
-                if (toolInfo.toolname) {
+
+                var toolurl = inputfield.get('value');
+
+                var toolurlVerified = toolInfo.verifyltiurl 
+                    && toolInfo.verifyltiurl != ""
+                    && !toolurl.includes(toolInfo.verifyltiurl);
+
+                // The tool configuration requires a certain url path which is not used.
+                if (toolInfo.toolname && toolurlVerified) {
+                    automatchToolDisplay.set('innerHTML',
+                            '<img style="vertical-align:text-bottom" src="'
+                                    + self.settings.warning_icon_url
+                                    + '" />'
+                                    + M.util.get_string(
+                                            'tool_config_not_valid',
+                                            'qtype_lti', {
+                                                toolname: toolInfo.toolname,
+                                                verifytoolurl: toolInfo.verifyltiurl}));
+
+                // Tool configration is used. 
+                } else if (toolInfo.toolname) {
                     automatchToolDisplay.set('innerHTML',
                             '<img style="vertical-align:text-bottom" src="'
                                     + self.settings.green_check_icon_url
@@ -239,8 +291,9 @@
                                     + M.util.get_string(
                                             'using_tool_configuration',
                                             'qtype_lti') + toolInfo.toolname);
+
+                // Inform them custom configuration is in use.
                 } else if (!selectedToolType) {
-                    // Inform them custom configuration is in use.
                     if (key.get('value') === '' || secret.get('value') === '') {
                         automatchToolDisplay.set('innerHTML',
                                 '<img style="vertical-align:text-bottom" src="'
@@ -251,6 +304,7 @@
                                                 'qtype_lti'));
                     }
                 }
+
                 if (toolInfo.cartridge) {
                     automatchToolDisplay.set('innerHTML',
                             '<img style="vertical-align:text-bottom" src="'
@@ -259,15 +313,31 @@
                                     + M.util.get_string('using_tool_cartridge',
                                             'qtype_lti'));
                 }
+
+                // Check if the url is used somewhere else.
+                var duplicatesChecked = toolInfo.checkduplicateltiurl
+                    && toolInfo.checkduplicateltiurl > 0
+                    && toolInfo.duplicates
+                    && toolInfo.duplicates > 0;
+
+                if (duplicatesChecked) {
+                    automatchToolDisplay.append(
+                                '<br><img style="vertical-align:text-bottom" src="'
+                                        + self.settings.warning_icon_url
+                                        + '" />'
+                                        + M.util.get_string(
+                                                'tool_config_duplicate_url',
+                                                'qtype_lti'));
+                }
             };
 
             // Cache urls which have already been checked to increase
             // performance
             // Don't use URL cache if tool type manually selected.
             if (selectedToolType && self.toolTypeCache[selectedToolType]) {
-                return continuation(self.toolTypeCache[selectedToolType]);
-            } else if (self.urlCache[url] && !selectedToolType) {
-                return continuation(self.urlCache[url]);
+                return continuation(self.toolTypeCache[selectedToolType], field);
+            } else if (!selectedToolType && self.urlCache[url]) {
+                return continuation(self.urlCache[url], field);
             } else if (!selectedToolType && !url) {
                 // No tool type or url set.
                 return continuation({}, field);
@@ -285,7 +355,7 @@
                         Y.one('#id_urlmatchedtypeid').set('value',
                                 toolInfo.toolid);
 
-                        continuation(toolInfo);
+                        continuation(toolInfo, field);
                     }
                 });
             }
@@ -596,9 +666,10 @@
 
             Y.io(self.settings.ajax_url, {
                 data : {
-                    action : 'find_tool_config',
+                    action : 'get_toolInfo',
                     course : self.settings.courseId,
-                    toolurl : url,
+                    questionid: self.settings.questionid,
+                    toolurl : encodeURI(url),
                     toolid : toolId || 0
                 },
 

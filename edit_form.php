@@ -37,6 +37,10 @@ class qtype_lti_edit_types_form extends moodleform{
         $mform->setType('lti_toolurl', PARAM_URL);
         $mform->addHelpButton('lti_toolurl', 'toolurl', 'qtype_lti');
 
+        $mform->addElement('text', 'lti_verifyltiurl', get_string('verifyltiurl', 'qtype_lti'), array('size' => '64'));
+        $mform->setType('lti_verifyltiurl', PARAM_TEXT);
+        $mform->addHelpButton('lti_verifyltiurl', 'verifyltiurl', 'qtype_lti');
+
         $mform->addElement('hidden', 'lti_description', ' ');
         $mform->setType('lti_description', PARAM_TEXT);
         if (!$istool) {
@@ -151,6 +155,11 @@ class qtype_lti_edit_types_form extends moodleform{
             $mform->setType('lti_acceptgrades', PARAM_INT);
 
             if (!empty($this->_customdata->isadmin)) {
+
+                $mform->addElement('advcheckbox', 'lti_checkduplicateltiurl', get_string('checkduplicateltiurl', 'qtype_lti'));
+                $mform->setType('lti_checkduplicateltiurl', PARAM_BOOL);
+                $mform->addHelpButton('lti_checkduplicateltiurl', 'checkduplicateltiurl', 'qtype_lti');
+
                 // Add setup parameters fieldset.
                 $mform->addElement('header', 'setupoptions', get_string('miscellaneous', 'qtype_lti'));
 
@@ -166,6 +175,28 @@ class qtype_lti_edit_types_form extends moodleform{
                 $mform->addElement('text', 'lti_organizationurl', get_string('organizationurl', 'qtype_lti'));
                 $mform->setType('lti_organizationurl', PARAM_URL);
                 $mform->addHelpButton('lti_organizationurl', 'organizationurl', 'qtype_lti');
+
+                $additionalfields_user = qtype_lti_get_user_fields();
+
+                $mform->addElement('select', 'lti_userfield_optional', get_string('userfield_optional', 'qtype_lti'), $additionalfields_user);
+                $mform->setDefault('lti_userfield_optional', '');
+                $mform->addHelpButton('lti_userfield_optional', 'userfield_optional', 'qtype_lti');
+                $mform->setType('lti_userfield_optional', PARAM_TEXT);
+
+                $additionalfields_custom = qtype_lti_get_custom_fields();
+
+                $mform->addElement('select', 'lti_userfield_other', get_string('userfield_other', 'qtype_lti'), $additionalfields_custom);
+                $mform->setDefault('lti_userfield_other', '');
+                $mform->addHelpButton('lti_userfield_other', 'userfield_other', 'qtype_lti');
+                $mform->setType('lti_userfield_other', PARAM_INT);
+
+                $radioarray = array();
+                $radioarray[] = $mform->createElement('radio', 'lti_whichadditionalfield', '', get_string('userfield_optional_short', 'qtype_lti'), 'optional', '');
+                $radioarray[] = $mform->createElement('radio', 'lti_whichadditionalfield', '', get_string('userfield_other_short', 'qtype_lti'), 'other', '');
+                $mform->setType('lti_whichadditionalfield', PARAM_TEXT);
+                $mform->addGroup($radioarray, 'lti_whichadditionalfield_group', get_string('whichadditionalfield', 'qtype_lti'), array(' '), false);
+                $mform->addHelpButton('lti_whichadditionalfield_group', 'whichadditionalfield', 'qtype_lti');
+                $mform->setDefault('lti_whichadditionalfield', 'optional');
             }
         }
 

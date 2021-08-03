@@ -42,7 +42,7 @@ class qtype_lti_edit_form extends question_edit_form {
      * @see myquestion_edit_form::qtype()
      */
     public function qtype() {
-        return 'qtype_lti';
+        return 'lti';
     }
 
     /**
@@ -207,12 +207,30 @@ class qtype_lti_edit_form extends question_edit_form {
         // Disable select content button if the selected tool doesn't support content item or it's set to Automatic.
         $allnoncontentitemtypes = $noncontentitemtypes;
         $allnoncontentitemtypes[] = '0'; // Add option value for "Automatic, based on tool URL".
+
         $mform->disabledIf('selectcontent', 'typeid', 'in', $allnoncontentitemtypes);
 
         $mform->addElement('text', 'toolurl', get_string('launch_url', 'qtype_lti'), array('size' => '64'));
         $mform->setType('toolurl', PARAM_URL);
         $mform->addHelpButton('toolurl', 'launch_url', 'qtype_lti');
-        $mform->disabledIf('toolurl', 'typeid', 'in', $noncontentitemtypes);
+
+        $mform->addElement('checkbox', 'unlockabletoolurl', get_string('unlockabletoolurl_edit', 'qtype_lti'));
+        $mform->addHelpButton('unlockabletoolurl', 'unlockabletoolurl_edit', 'qtype_lti');
+
+        if (isset(get_config('qtype_lti')->unlockabletoolurl_adv)) {
+            if (get_config('qtype_lti')->unlockabletoolurl_adv == 1) {
+                $mform->setAdvanced('unlockabletoolurl');
+            }
+        }
+
+        if (isset($this->question->id)) {
+            $mform->disabledIf('toolurl', null);
+        }
+        if (isset(get_config('qtype_lti')->unlockabletoolurl)) {
+            if (get_config('qtype_lti')->unlockabletoolurl == 0) {
+                $mform->disabledIf('unlockabletoolurl', null);
+            }
+        }
 
         $mform->addElement('text', 'securetoolurl', get_string('secure_launch_url', 'qtype_lti'), array('size' => '64'));
         $mform->setType('securetoolurl', PARAM_URL);
@@ -296,6 +314,7 @@ class qtype_lti_edit_form extends question_edit_form {
             'green_check_icon_url' => (string)$OUTPUT->image_url('i/valid'),
             'warning_icon_url' => (string)$OUTPUT->image_url('warning', 'qtype_lti'),
             'instructor_tool_type_edit_url' => $editurl->out(false), 'ajax_url' => $ajaxurl->out(true), 'courseId' => $COURSE->id,
+            'questionid' => isset($this->question->id) ? $this->question->id : null,
             'can_add_course_tool' => has_capability('qtype/lti:addcoursetool', $ctxcourse));
 
         $module = array('name' => 'qtype_lti_edit', 'fullpath' => '/question/type/lti/form.js',
@@ -306,8 +325,9 @@ class qtype_lti_edit_form extends question_edit_form {
                 array('course_tool_types', 'qtype_lti'), array('using_tool_configuration', 'qtype_lti'),
                 array('using_tool_cartridge', 'qtype_lti'), array('domain_mismatch', 'qtype_lti'),
                 array('custom_config', 'qtype_lti'), array('tool_config_not_found', 'qtype_lti'),
-                array('tooltypeadded', 'qtype_lti'), array('tooltypedeleted', 'qtype_lti'),
-                array('tooltypenotdeleted', 'qtype_lti'),
+                array('tool_config_duplicate_url', 'qtype_lti'), array('tool_config_not_valid', 'qtype_lti'),
+                array('tooltypeadded', 'qtype_lti'),
+                array('tooltypedeleted', 'qtype_lti'), array('tooltypenotdeleted', 'qtype_lti'),
                 array('tooltypeupdated', 'qtype_lti'), array('forced_help', 'qtype_lti')));
 
         if (!empty($typeid)) {

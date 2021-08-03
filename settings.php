@@ -161,6 +161,13 @@ EOD;
                 new admin_setting_configcheckbox('qtype_lti/removerestoredlink', get_string('removerestoredlink', 'qtype_lti'),
                                                 get_string('removerestoredlink_help', 'qtype_lti'), 0));
 
+    $setting = new admin_setting_configcheckbox('qtype_lti/unlockabletoolurl',
+            get_string('unlockabletoolurl', 'qtype_lti'),
+            get_string('unlockabletoolurl_help', 'qtype_lti'),
+            0);
+    $setting->set_advanced_flag_options(admin_setting_flag::ENABLED, false);
+    $settings->add($setting);
+
     $settings->add(
                 new admin_setting_heading('qtype_lti_types',
                                         new lang_string('external_tool_types', 'qtype_lti') .

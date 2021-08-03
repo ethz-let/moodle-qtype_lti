@@ -41,8 +41,9 @@ $action = required_param('action', PARAM_TEXT);
 $response = new stdClass();
 
 switch ($action) {
-    case 'find_tool_config':
-        $toolurl = required_param('toolurl', PARAM_RAW);
+    case 'get_toolInfo':
+        $toolurl = required_param('toolurl', PARAM_URL);
+        $questionid = required_param('questionid', PARAM_INT);
         $toolid = optional_param('toolid', 0, PARAM_INT);
 
         require_capability('moodle/question:add', $context);
@@ -71,7 +72,7 @@ switch ($action) {
                     FROM {qtype_lti_types_config}
                     WHERE
                         typeid = :typeid
-                    AND name IN (\'sendname\', \'sendemailaddr\', \'acceptgrades\')
+                    AND name IN (\'sendname\', \'sendemailaddr\', \'acceptgrades\', \'verifyltiurl\', \'checkduplicateltiurl\')
                 ';
 
                 $privacyconfigs = $DB->get_records_sql($query, array('typeid' => $toolid));
@@ -83,6 +84,30 @@ switch ($action) {
                 if (!$success) {
                     $response->error = s(get_string('tool_config_not_found', 'qtype_lti'));
                 }
+            }
+
+            // Check for duplicate Tool Urls.
+            if (empty($questionid)) {
+                $questionid = 0;
+            }
+            if (empty($toolurl)) {
+                $response->duplicates = 0;
+            } else {
+
+                $urlparts = gtype_lti_get_parsed_url($toolurl);
+                $toolurl = $urlparts['host'] . $urlparts['path'] . $urlparts['query'];
+
+                $query = '
+                    SELECT toolurl
+                    FROM {qtype_lti_options}
+                    WHERE 
+                        LOWER(toolurl) LIKE LOWER(:toolurl)
+                    AND 
+                        questionid <> :questionid
+                ';
+    
+                $results = $DB->get_records_sql($query, array('toolurl' => "%$toolurl", 'questionid' => $questionid));
+                $response->duplicates = count($results) ?: 0;
             }
         }
 

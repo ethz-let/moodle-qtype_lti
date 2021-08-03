@@ -474,6 +474,47 @@ function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null
     $requestparams['ext_course_id'] = $extracodeexpertparams['courseid'];
     $requestparams['ext_unique_connection'] = $extracodeexpertparams['resultid'];
 
+    $requestparams["ext_student_matriculationnumber"] = '';
+    if (isset($typeconfig['whichadditionalfield'])) {
+        // Case 1: Get optional userfield
+        if ($typeconfig['whichadditionalfield'] == 'optional') {
+            if (isset($typeconfig['userfield_optional'])) {
+                $param = clean_param($typeconfig['userfield_optional'], PARAM_ALPHAEXT);
+                if (!empty($param) && !in_array($param, ['password'])) {
+        
+                    $dbman = $DB->get_manager();
+                    $table = new xmldb_table('user');
+                    $field = new xmldb_field($param);
+                    if ($dbman->field_exists($table, $field)) {
+                        if ($result = $DB->get_record_select('user', "username = :username", ['username' => $userid], $param)) {
+                            if (!empty($result->{$param})) {
+                                $requestparams["ext_student_matriculationnumber"] = $result->{$param};
+                            }
+                        }
+                    }
+                }
+            }
+        // Case 2: Or get other userfield
+        } else if ($typeconfig['whichadditionalfield'] == 'other') {
+            if (isset($typeconfig['userfield_other'])) {
+                $param = clean_param($typeconfig['userfield_other'], PARAM_INT);
+                if (!empty($param)) {
+        
+                    $sql = "SELECT uda.data
+                            FROM {user_info_data} uda
+                            JOIN {user} u ON u.id = uda.userid
+                            WHERE u.username = :username AND uda.fieldid = :fieldid";
+        
+                    if ($result = $DB->get_record_sql($sql, ['username' => $userid, 'fieldid' => $param], $param)) {
+                        if (!empty($result->data)) {
+                            $requestparams["ext_student_matriculationnumber"]  = $result->data;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     if ($islti2 || $typeconfig['sendemailaddr'] == QTYPE_LTI_SETTING_ALWAYS || ($typeconfig['sendemailaddr'] ==
          QTYPE_LTI_SETTING_DELEGATE && isset($instance->instructorchoicesendemailaddr) &&
          $instance->instructorchoicesendemailaddr == QTYPE_LTI_SETTING_ALWAYS)) {
@@ -1629,7 +1670,22 @@ function qtype_lti_get_url_thumbprint($url) {
     if (preg_match('/https?:\/\//', $url) !== 1) {
         $url = 'http://' . $url;
     }
-    $urlparts = parse_url(strtolower($url));
+    $urlparts = gtype_lti_get_parsed_url(strtolower($url));
+
+    $urllower = $urlparts['host'] . '/' . $urlparts['path'] . $urlparts['query'];
+
+    return $urllower;
+}
+
+function gtype_lti_get_parsed_url($url) {
+    $urlparts = parse_url($url);
+   
+    if (!isset($urlparts['host'])) {
+        $urlparts['host'] = '';
+    }
+
+    $urlparts['host'] = ltrim($urlparts['host'], 'www.');
+
     if (!isset($urlparts['path'])) {
         $urlparts['path'] = '';
     }
@@ -1638,21 +1694,19 @@ function qtype_lti_get_url_thumbprint($url) {
         $urlparts['query'] = '';
     }
 
-    if (!isset($urlparts['host'])) {
-        $urlparts['host'] = '';
-    }
-
-    if (substr($urlparts['host'], 0, 4) === 'www.') {
-        $urlparts['host'] = substr($urlparts['host'], 4);
-    }
-
-    $urllower = $urlparts['host'] . '/' . $urlparts['path'];
-
     if ($urlparts['query'] != '') {
-        $urllower .= '?' . $urlparts['query'];
+        $urlparts['query'] = '?' . $urlparts['query'];
     }
 
-    return $urllower;
+    if (!isset($urlparts['scheme'])) {
+        $urlparts['scheme'] = 'http';
+    }
+
+    if ($urlparts['scheme'] == '') {
+        $urlparts['scheme'] = 'http';
+    }
+
+    return $urlparts;
 }
 
 function qtype_lti_get_best_tool_by_url($url, $tools, $courseid = null) {
@@ -1811,6 +1865,32 @@ function qtype_lti_get_type_config_from_instance($id) {
     return $type;
 }
 
+function qtype_lti_get_user_fields() {
+    global $DB;
+
+    $fields = [''];
+    foreach ($DB->get_columns('user') as $field) {
+        if ($field->name && !in_array($field->name, ['password'])) {
+            $fields[$field->name] = $field->name;
+        }
+    }
+
+    return $fields;
+}
+
+function qtype_lti_get_custom_fields() {
+    global $DB;
+
+    $fields = [''];
+    foreach ($DB->get_records_sql('SELECT DISTINCT id, name FROM {user_info_field}') as $field) {
+        if ($field->id && $field->name) {
+            $fields[$field->id] = $field->name;
+        }
+    }
+
+    return $fields;
+}
+
 /**
  * Generates some of the tool configuration based on the admin configuration details
  *
@@ -1901,6 +1981,26 @@ function qtype_lti_get_type_type_config($id) {
 
     if (isset($config['contentitem'])) {
         $type->lti_contentitem = $config['contentitem'];
+    }
+
+    if (isset($config['verifyltiurl'])) {
+        $type->lti_verifyltiurl = $config['verifyltiurl'];
+    }
+    
+    if (isset($config['checkduplicateltiurl'])) {
+        $type->lti_checkduplicateltiurl = $config['checkduplicateltiurl'];
+    }
+
+    if (isset($config['userfield_optional'])) {
+        $type->lti_userfield_optional = $config['userfield_optional'];
+    }
+
+    if (isset($config['userfield_other'])) {
+        $type->lti_userfield_other = $config['userfield_other'];
+    }
+
+    if (isset($config['whichadditionalfield'])) {
+        $type->lti_whichadditionalfield = $config['whichadditionalfield'];
     }
 
     if (isset($config['debuglaunch'])) {
