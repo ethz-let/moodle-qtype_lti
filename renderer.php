@@ -398,8 +398,6 @@ class qtype_lti_renderer extends \qtype_renderer {
                                 appendChild(document.getElementById("quiz-timer").cloneNode(true));
                                Y.one("#quiz_timer_lti_'.$question->id.'").
                                 setStyle("display", "block");
-                               Y.one("#quiz_timer_lti_'.$question->id.'").
-                                setStyle("margin-top", "-1em");
                                var calculatedheight = doc.get("winHeight") -
                                    Y.one("#quiz_timer_lti_'.$question->id.'").
                                     get("clientHeight");
