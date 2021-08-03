@@ -41,11 +41,11 @@ require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 class qtype_lti_test extends advanced_testcase {
     protected $qtype;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->qtype = new qtype_lti();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->qtype = null;
     }
 
