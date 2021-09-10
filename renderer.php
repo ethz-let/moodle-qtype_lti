@@ -394,8 +394,7 @@ class qtype_lti_renderer extends \qtype_renderer {
                               document.getElementById("quiz_timer_lti_'.$question->id.'");
 
                           if (quiz_timer_div && quiz_timer_div.innerHTML !== "") {
-                               lti_fullsc_'.$question->id.'.
-                                appendChild(document.getElementById("quiz-timer").cloneNode(true));
+                               lti_fullsc_'.$question->id.'.appendChild(document.getElementById("quiz-timer"));
                                Y.one("#quiz_timer_lti_'.$question->id.'").
                                 setStyle("display", "block");
                                var calculatedheight = doc.get("winHeight") -
@@ -426,11 +425,8 @@ class qtype_lti_renderer extends \qtype_renderer {
                           setStyle("height", viewportHeight +"px");
                           Y.one("#qtype_lti_framediv_'.$question->id.'").
                           set("height", viewportHeight +"px");
-
                           if (document.getElementById("quiz-timer")) {
-                               var lti_fullsc_'.$question->id.' =
-                                    document.getElementById("quiz_timer_lti_'.$question->id.'");
-                               lti_fullsc_'.$question->id.'.innerHTML = "";
+                               document.getElementById("quiz-timer-wrapper").appendChild(document.getElementById("quiz-timer"));
                                Y.one("#quiz_timer_lti_'.$question->id.'").setStyle("margin-top", "0em");
                                Y.one("#quiz_timer_lti_'.$question->id.'").setStyle("display", "none");
                           }
