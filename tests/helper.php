@@ -46,6 +46,7 @@ class qtype_lti_test_helper extends question_test_helper {
         test_question_maker::initialise_a_question($q);
         $q->name = 'Please write a code.';
         $q->questiontext = 'Please write a code.';
+        $q->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
         $q->generalfeedback = 'I hope your code had a beginning, a middle and an end.';
         $q->questiontextformat = FORMAT_HTML;
         $q->generalfeedback = "Generalfeedback: Writing a code isn't to hard";
@@ -108,6 +109,7 @@ class qtype_lti_test_helper extends question_test_helper {
     public function get_lti_question_form_data_plain() {
         $q = new stdClass();
         $q->name = 'Please write a code.';
+        $q->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
         $q->questiontext = 'Please write a code.';
         $q->generalfeedback = 'I hope your code had a beginning, a middle and an end.';
         $q->questiontextformat = FORMAT_HTML;
