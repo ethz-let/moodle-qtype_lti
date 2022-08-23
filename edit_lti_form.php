@@ -57,17 +57,17 @@ class qtype_lti_edit_form extends question_edit_form {
         $qtype = $this->qtype();
         $langfile = "qtype_$qtype";
         $mform = $this->_form;
-        
+
         // Standard fields at the start of the form.
         $mform->addElement('header', 'generalheader', get_string("general", 'form'));
-        
+
         if (!isset($this->question->id)) {
             if (!empty($this->question->formoptions->mustbeusable)) {
                 $contexts = $this->contexts->having_add_and_use();
             } else {
                 $contexts = $this->contexts->having_cap('moodle/question:add');
             }
-            
+
             // Adding question.
             $mform->addElement('questioncategory', 'category', get_string('category', 'question'), array('contexts' => $contexts));
         } else if (!($this->question->formoptions->canmove || $this->question->formoptions->cansaveasnew)) {
@@ -96,7 +96,7 @@ class qtype_lti_edit_form extends question_edit_form {
             $currentgrp[0]->freeze();
             $currentgrp[0]->setPersistantFreeze(false);
             $mform->addGroup($currentgrp, 'currentgrp', get_string('categorycurrent', 'question'), null, false);
-            
+
             if (($beingcopied)) {
                 $mform->addElement('questioncategory', 'categorymoveto', get_string('categorymoveto', 'question'),
                                 array('contexts' => array($this->categorycontext)));
@@ -106,7 +106,7 @@ class qtype_lti_edit_form extends question_edit_form {
                 }
             }
         }
-        
+
         if (class_exists('qbank_editquestion\\editquestion_helper') && !empty($this->question->id) && !$this->question->beingcopied) {
             // Add extra information from plugins when editing a question (e.g.: Authors, version control and usage).
             $functionname = 'edit_form_display';
@@ -120,7 +120,7 @@ class qtype_lti_edit_form extends question_edit_form {
             $mform->addElement('static', 'versioninfo', get_string('versioninfo', 'qbank_editquestion'),
                             $PAGE->get_renderer('qbank_editquestion')->render_question_info($questiondata));
         }
-        
+
         $mform->addElement('text', 'name', get_string('tasktitle', 'qtype_lti'),
                         array('size' => 50, 'maxlength' => 255));
         $mform->setType('name', PARAM_TEXT);
@@ -146,7 +146,7 @@ class qtype_lti_edit_form extends question_edit_form {
         $mform->setType('questiontext', PARAM_RAW);
 
         $mform->setDefault('questiontext', array('text' => ' '));
-        
+
         if (class_exists('qbank_editquestion\\editquestion_helper')) {
             $mform->addElement('select', 'status', get_string('status', 'qbank_editquestion'),
                             \qbank_editquestion\editquestion_helper::get_question_status_list());
@@ -156,11 +156,11 @@ class qtype_lti_edit_form extends question_edit_form {
                         array('rows' => 10), $this->editoroptions);
         $mform->setType('generalfeedback', PARAM_RAW);
         $mform->addHelpButton('generalfeedback', 'generalfeedback', 'qtype_lti');
-        
+
         $mform->addElement('text', 'idnumber', get_string('idnumber', 'question'), 'maxlength="100"  size="10"');
         $mform->addHelpButton('idnumber', 'idnumber', 'question');
         $mform->setType('idnumber', PARAM_RAW);
-        
+
 
         // Any questiontype specific fields.
 
@@ -424,23 +424,23 @@ class qtype_lti_edit_form extends question_edit_form {
                         \core\plugininfo\qbank::is_plugin_enabled('qbank_tagquestion')) {
                             $this->add_tag_fields($mform);
                         }
-                        
+
                         if (!empty($this->customfieldpluginenabled) && $this->customfieldpluginenabled) {
                             // Add custom fields to the form.
                             $this->customfieldhandler = qbank_customfields\customfield\question_handler::create();
                             $this->customfieldhandler->set_parent_context($this->categorycontext); // For question handler only.
                             $this->customfieldhandler->instance_form_definition($mform, empty($this->question->id) ? 0 : $this->question->id);
                         }
-                        
+
 
         $this->add_interactive_settings(true, true);
 
         $mform->addElement('hidden', 'qtype');
         $mform->setType('qtype', PARAM_ALPHA);
-        
+
         $mform->addElement('hidden', 'makecopy');
         $mform->setType('makecopy', PARAM_INT);
-        
+
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'updatebutton', get_string('savechangesandcontinueediting', 'question'));
         if ($this->can_preview()) {
@@ -450,14 +450,17 @@ class qtype_lti_edit_form extends question_edit_form {
                                     $this->context, true);
                     $buttonarray[] = $mform->createElement('static', 'previewlink', '', $previewlink);
                 }
+            } else {
+                $previewlink = $PAGE->get_renderer('core_question')->question_preview_link($this->question->id, $this->context, true);
+                $buttonarray[] = $mform->createElement('static', 'previewlink', '', $previewlink);
             }
         }
-        
+
         $mform->addGroup($buttonarray, 'updatebuttonar', '', array(' '), false);
         $mform->closeHeaderBefore('updatebuttonar');
-        
+
         $this->add_action_buttons(true, get_string('savechanges'));
-        
+
         if ((!empty($this->question->id)) && (!($this->question->formoptions->canedit || $this->question->formoptions->cansaveasnew))) {
             $mform->hardFreezeAllVisibleExcept(array('categorymoveto', 'buttonar', 'currentgrp'));
         }
