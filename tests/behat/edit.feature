@@ -1,4 +1,4 @@
-@qtype @qtype_lti
+@qtype @qtype_lti @qtype_lti_edit
 Feature: Test editing an lti question
   As a teacher
   In order to be able to update my lti question
@@ -19,20 +19,19 @@ Feature: Test editing an lti question
       | Course       | C1        | Test questions |
     And the following "questions" exist:
       | questioncategory | qtype | name      | template         |
-      | Test questions   | lti | lti-001 | editor           |
-      | Test questions   | lti | lti-002 | editorfilepicker |
-      | Test questions   | lti | lti-003 | plain            |
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I navigate to "Question bank" node in "Course administration"
+      | Test questions   | lti   | lti-001   | plain            |
+
 
   Scenario: Edit an lti question
-    When I click on "Edit" "link" in the "lti-001" "table_row"
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I navigate to "Question bank" in current page administration
+    And I choose "Edit question" action for "lti-001" in the question bank
     And I set the following fields to these values:
-      | Question name | |
+      | id_name | |
     And I press "id_submitbutton"
     Then I should see "You must supply a value here."
     When I set the following fields to these values:
-      | Question name   | Edited lti-001 name |
+      | id_name   | Edited lti-001 name |
     And I press "id_submitbutton"
     Then I should see "Edited lti-001 name"
