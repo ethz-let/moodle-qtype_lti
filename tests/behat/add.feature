@@ -1,4 +1,4 @@
-@qtype @qtype_lti
+@qtype @qtype_lti @qtype_lti_add
 Feature: Test creating an lti question
   As a teacher
   In order to test my students
@@ -14,20 +14,19 @@ Feature: Test creating an lti question
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I navigate to "Question bank" node in "Course administration"
 
-  Scenario: Create an lti question with Response format set to 'HTML editor'
-    When I add a "lti" question filling the form with:
-      | Question name            | lti-001                      |
-      | Question text            | Write a java code. |
-      | General feedback         | This is general feedback       |
+
+  Scenario: Create an lti question
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I navigate to "Question bank" in current page administration
+    And I press "Create a new question ..."
+    And I set the field "item_qtype_lti" to "1"
+    And I press "submitbutton"
+    And I should see "Adding an External question"
+    Then I set the following fields to these values:
+      | id_name                  | lti-001                      |
+      | id_generalfeedback       | This is general feedback     |
+    And I press "id_updatebutton"
     Then I should see "lti-001"
 
-  Scenario: Create an lti question with Response format set to 'HTML editor with the file picker'
-    When I add a "lti" question filling the form with:
-      | Question name            | lti-002                      |
-      | Question text            | Write a java code. |
-      | General feedback         | This is general feedback       |
-    Then I should see "lti-002"
