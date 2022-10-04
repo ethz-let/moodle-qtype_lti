@@ -1,4 +1,4 @@
-@qtype @qtype_lti
+@qtype @qtype_lti @qtype_lti_preview
 Feature: Preview lti questions
   As a teacher
   In order to check my lti questions will work for students
@@ -18,19 +18,23 @@ Feature: Preview lti questions
       | contextlevel | reference | name           |
       | Course       | C1        | Test questions |
     And the following "questions" exist:
-      | questioncategory | qtype | name      |
-      | Test questions   | lti | lti-001 |
-      | Test questions   | lti | lti-002 |
-      | Test questions   | lti | lti-003 |
-    Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I navigate to "Question bank" node in "Course administration"
+      | questioncategory | qtype | name      | template         |
+      | Test questions   | lti   | lti-001   | plain            |
+      | Test questions   | lti   | lti-002   | plain            |
+      | Test questions   | lti   | lti-003   | plain            |
+
 
   @javascript @_switch_window
   Scenario: Preview an lti question and submit a partially correct response.
-    When I click on "Preview" "link" in the "lti-003" "table_row"
-    And I switch to "questionpreview" window
+    Given I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I navigate to "Question bank" in current page administration
+    And I choose "Preview" action for "lti-003" in the question bank
+  #  And I switch to "questionpreview" window ###: Apparently, preview from qbank now opens in same window...
+    And I expand all fieldsets
     And I set the field "How questions behave" to "Immediate feedback"
     And I press "Start again with these options"
-    And I should see "Write a java code."
-    And I switch to the main window
+    And I press "Check"
+    Then I should see "I hope your code had a beginning, a middle and an end."
+    And I press "Close preview"
+    And I should see "lti-001"
