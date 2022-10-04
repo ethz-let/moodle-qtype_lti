@@ -1,4 +1,4 @@
-@qtype @qtype_lti @core_backup @javascript
+@qtype @qtype_lti @core_backup @javascript @qtype_lti_restore_preconf
 Feature: Restoring Moodle 2 backup restores LTI qtype configuration
 
   Background:
@@ -10,29 +10,29 @@ Feature: Restoring Moodle 2 backup restores LTI qtype configuration
       | Course 1 | C1 | 0 |
       | Course 2 | C2 | 0 |
     And the following "course enrolments" exist:
-      | user | course | role |
+      | user | course | role           |
       | teacher1 | C1 | editingteacher |
       | teacher1 | C2 | editingteacher |
 
+  @qtype_lti_restore_preconf_1
   Scenario: Backup and restore course with preconfigured site LTI qtype tool on the same site
     When I log in as "admin"
-    And I navigate to "LTI (ETH)" node in "Site administration > Plugins > Question types"
+    And I navigate to "Plugins > Activity modules > External tool > Manage tools" in site administration
+    And I follow "Manage preconfigured tools"
     And I follow "Add preconfigured tool"
     And I set the following fields to these values:
-      | Tool name | My site tool |
-      | Tool URL | https://www.moodle.org |
-      | lti_coursevisible | 1 |
+      | Tool name         | My site tool           |
+      | Tool URL          | https://www.moodle.org |
     And I press "Save changes"
-    And I navigate to "Manage tools" node in "Site administration > Plugins > Activity modules > External tool"
-    And "This tool has not yet been used" "text" should exist in the "//div[contains(@id,'tool-card-container') and contains(., 'My site tool')]" "xpath_element"
+    And I navigate to "Plugins > Activity modules > External tool > Manage tools" in site administration
+    Then "This tool has not yet been used" "text" should exist in the "//*[text()='My site tool']/../following::div[@class='tool-card-footer']" "xpath_element"
     And I am on site homepage
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "External tool" to section "1" and I fill the form with:
-        | Activity name | My LTI module |
-        | Preconfigured tool | My site tool |
-        | Launch container | Embed |
-    And I follow "Course 1"
+        | Activity name      | My LTI module |
+        | Preconfigured tool | My site tool  |
+        | Launch container   | Embed         |
     And I should see "My LTI module"
     And I backup "Course 1" course using this options:
       | Confirmation | Filename | test_backup.mbz |
@@ -42,8 +42,8 @@ Feature: Restoring Moodle 2 backup restores LTI qtype configuration
     And I open "My LTI module" actions menu
     And I choose "Edit settings" in the open action menu
     Then the field "Preconfigured tool" matches value "My site tool"
-    And I navigate to "Manage tools" node in "Site administration > Plugins > Activity modules > External tool"
-    And "This tool is being used 2 times" "text" should exist in the "//div[contains(@id,'tool-card-container') and contains(., 'My site tool')]" "xpath_element"
+    And I navigate to "Plugins > > Activity modules > External tool > Manage tools" in site administration
+    And "This tool is being used 2 times" "text" should exist in the "//div[contains(@class,'tool-card') and contains(., 'My site tool')]" "xpath_element"
 
   @javascript @_switch_window
   Scenario: Backup and restore course with preconfigured course LTI tool on the same site
