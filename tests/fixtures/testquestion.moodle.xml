@@ -1,40 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quiz>
-<!-- question: 0  -->
-  <question type="category">
-    <category>
-        <text>$course$/Default for C1</text>
-
-    </category>
+  <!-- question: 399002  -->
+  <question type="lti">
+    <name>
+      <text>lti-001</text>
+    </name>
+    <questiontext format="html">
+      <text>lti-001</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">General feedback<br></p>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <instancecode><text>633c208daa7b6</text>
+    </instancecode>
+    <course>194000</course>
+    <cmid>0</cmid>
+    <typeid>0</typeid>\n    <toolurl><text>https://www.dummytool.org</text>
+  </toolurl>
+    <securetoolurl><text></text>
+    </securetoolurl>
+    <instructorchoicesendname>1</instructorchoicesendname>
+    <instructorchoicesendemailaddr>1</instructorchoicesendemailaddr>
+    <instructorchoiceallowroster>1</instructorchoiceallowroster>
+    <instructorchoiceallowsetting>1</instructorchoiceallowsetting>
+    <instructorcustomparameters><text></text>
+    </instructorcustomparameters>
+    <grade>100</grade>
+    <launchcontainer>1</launchcontainer>
+    <resourcekey><text></text>
+    </resourcekey>
+    <password><text></text>
+    </password>
+    <debuglaunch>0</debuglaunch>
+    <showtitlelaunch>1</showtitlelaunch>
+    <showdescriptionlaunch>1</showdescriptionlaunch>
+    <servicesalt><text>633c20df518046.64863019</text>
+    </servicesalt>
+    <icon><text></text>
+    </icon>
+    <secureicon><text></text>
+    </secureicon>
   </question>
-  <!-- question: 141249  -->
-    <question type="lti">
-      <name><text>lti-001</text></name>
-      <questiontext format="html"><text>LTI Question</text></questiontext>
-      <generalfeedback format="html"><text><![CDATA[<p>general feedback</p>]]></text></generalfeedback>
-      <defaultgrade>1.0000000</defaultgrade>
-      <penalty>0.3333333</penalty>
-      <hidden>0</hidden>
-      <instancecode><text>xyzmdoej20dk</text></instancecode>
-      <course>98217</course>
-      <cmid>0</cmid>
-      <typeid>1</typeid>
-      <toolurl><text>https://example.com/lti</text></toolurl>
-      <securetoolurl><text></text></securetoolurl>
-      <instructorchoicesendname>1</instructorchoicesendname>
-      <instructorchoicesendemailaddr>1</instructorchoicesendemailaddr>
-      <instructorchoiceallowroster></instructorchoiceallowroster>
-      <instructorchoiceallowsetting></instructorchoiceallowsetting>
-      <instructorcustomparameters><text></text></instructorcustomparameters>
-      <grade>100</grade>
-      <launchcontainer>1</launchcontainer>
-      <resourcekey><text></text></resourcekey>
-      <password><text></text></password>
-      <debuglaunch>0</debuglaunch>
-      <showtitlelaunch>1</showtitlelaunch>
-      <showdescriptionlaunch>1</showdescriptionlaunch>
-      <servicesalt><text>5b45eb6a73a359.93739034</text></servicesalt>
-      <icon><text></text></icon>
-      <secureicon><text></text></secureicon>
-    </question>
+
 </quiz>
