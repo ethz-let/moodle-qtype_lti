@@ -294,7 +294,8 @@ class qtype_lti_edit_form extends question_edit_form {
             $mform->addElement('html', '<div class="fitem advanced">');
         }
 
-        $mform->addElement('passwordunmask', 'password', get_string('password', 'qtype_lti'));
+        // Disable Auto-fill in a nasty way.
+        $mform->addElement('password', 'password', get_string('password', 'qtype_lti'), array('readonly'=>'true', 'onfocus'=>'this.removeAttribute("readonly");'));
         $mform->setType('password', PARAM_TEXT);
         $mform->setAdvanced('password', true);
         $mform->addHelpButton('password', 'password', 'qtype_lti');
