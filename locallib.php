@@ -357,9 +357,10 @@ function qtype_lti_build_sourcedid($mattempt, $instanceid, $userid, $servicesalt
  *        True if an LTI 2 tool is being launched
  * @return array Request details
  */
-function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null,
+function qtype_lti_build_request($instance, $typeconfig, $course,
                                 $islti2 = false, $userid, $readonly, $questionmode,
-                                $manuallygradedinmoodle, $extracodeexpertparams) {
+                                $manuallygradedinmoodle, $extracodeexpertparams,
+				$typeid = null) {
     global $USER, $CFG, $DB;
     if (empty($instance->cmid)) {
         $instance->cmid = 0;
