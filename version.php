@@ -23,8 +23,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_lti';
-$plugin->version = 2023060400;
-$plugin->requires = 2021050100; // Moodle >=3.11+.
+$plugin->version = 2023082900;
+$plugin->requires = 2022041910; // Moodle 4.0.
 
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '4 possible from Moodle 3.11 (Transitional)';
+$plugin->release = '4.0 to 4.1';
