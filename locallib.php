@@ -158,8 +158,8 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null,
     $course = $DB->get_record('course', array('id' => $instance->course));
 
     $islti2 = isset($tool->toolproxyid);
-    $allparams = qtype_lti_build_request($instance, $typeconfig, $course, $typeid, $islti2, $userid, $readonly, $questionmode,
-                                        $manuallygradedinmoodle, $extracodeexpertparams);
+    $allparams = qtype_lti_build_request($instance, $typeconfig, $course, $islti2, $userid, $readonly, $questionmode,
+                                        $manuallygradedinmoodle, $extracodeexpertparams, $typeid);
     if ($islti2) {
         $requestparams = qtype_lti_build_request_lti2($tool, $allparams, $userid, $readonly, $questionmode,
                                                     $manuallygradedinmoodle, $extracodeexpertparams);
@@ -776,8 +776,8 @@ function qtype_lti_build_content_item_selection_request($id, $course, moodle_url
     // Get base request parameters.
     $instance = new stdClass();
     $instance->course = $course->id;
-    $requestparams = qtype_lti_build_request($instance, $typeconfig, $course, $id, $islti2, $userid, $readonly, $questionmode,
-                                            $manuallygradedinmoodle, $extracodeexpertparams);
+    $requestparams = qtype_lti_build_request($instance, $typeconfig, $course, $islti2, $userid, $readonly, $questionmode,
+                                            $manuallygradedinmoodle, $extracodeexpertparams, $id);
 
     // Get LTI2-specific request parameters and merge to the request parameters if applicable.
     if ($islti2) {
