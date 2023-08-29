@@ -637,19 +637,19 @@ function qtype_lti_build_custom_parameters($toolproxy, $tool, $instance, $params
     // has given permission.
     $custom = array();
     if ($customstr) {
-        $custom = qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $customstr, $islti2, $userid);
+        $custom = qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $customstr, $userid, $islti2);
     }
     if (!isset($typeconfig['allowinstructorcustom']) || $typeconfig['allowinstructorcustom'] != QTYPE_LTI_SETTING_NEVER) {
         if ($instructorcustomstr) {
             $custom = array_merge(
-                                qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $instructorcustomstr, $islti2,
-                                                                $userid), $custom);
+                                qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $instructorcustomstr,
+                                                                $userid, $islti2), $custom);
         }
     }
     if ($islti2) {
         $custom = array_merge(
                             qtype_lti_split_custom_parameters($toolproxy, $tool, $params,
-                                                              $tool->parameter, true, $userid), $custom);
+                                                              $tool->parameter, $userid, true), $custom);
         $settings = qtype_lti_get_tool_settings($tool->toolproxyid);
         $custom = array_merge($custom, qtype_lti_get_custom_parameters($toolproxy, $tool, $params, $settings));
         if (!empty($instance->course)) {
@@ -1239,7 +1239,7 @@ function qtype_lti_get_enabled_capabilities($tool) {
  *        True if an LTI 2 tool is being launched
  * @return array of custom parameters
  */
-function qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $customstr, $islti2 = false, $userid) {
+function qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $customstr, $userid, $islti2 = false) {
     $customstr = str_replace("\r\n", "\n", $customstr);
     $customstr = str_replace("\n\r", "\n", $customstr);
     $customstr = str_replace("\r", "\n", $customstr);
