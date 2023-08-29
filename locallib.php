@@ -167,8 +167,8 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null,
         $requestparams = $allparams;
     }
     $requestparams = array_merge($requestparams,
-                                qtype_lti_build_standard_request($instance, $orgid, $islti2, 'basic-lti-launch-request',
-                                                                $extracodeexpertparams));
+                                qtype_lti_build_standard_request($instance, $orgid, $islti2,
+                                                                $extracodeexpertparams, 'basic-lti-launch-request'));
     $customstr = '';
     if (isset($typeconfig['customparameters'])) {
         $customstr = $typeconfig['customparameters'];
@@ -567,7 +567,7 @@ function qtype_lti_build_request_lti2($tool, $params, $userid, $readonly, $quest
  * @return array Request details
  */
 function qtype_lti_build_standard_request($instance, $orgid, $islti2,
-                                          $messagetype = 'basic-lti-launch-request', $extracodeexpertparams) {
+                                          $extracodeexpertparams, $messagetype = 'basic-lti-launch-request') {
     global $CFG;
 
     $requestparams = array();
@@ -787,8 +787,8 @@ function qtype_lti_build_content_item_selection_request($id, $course, moodle_url
 
     // Get standard request parameters and merge to the request parameters.
     $orgid = !empty($typeconfig['organizationid']) ? $typeconfig['organizationid'] : '';
-    $standardparams = qtype_lti_build_standard_request(null, $orgid, $islti2, 'ContentItemSelectionRequest',
-                                                    $extracodeexpertparams);
+    $standardparams = qtype_lti_build_standard_request(null, $orgid, $islti2,
+                                                    $extracodeexpertparams, 'ContentItemSelectionRequest');
 
     $requestparams = array_merge($requestparams, $standardparams);
 
