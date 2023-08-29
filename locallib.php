@@ -320,7 +320,7 @@ function qtype_lti_build_registration_request($toolproxy) {
  * @param null|int $launchid
  * @return stdClass
  */
-function qtype_lti_build_sourcedid($instanceid, $userid, $servicesalt, $typeid = null, $attemptid = null, $ltiid = null, $mattempt) {
+function qtype_lti_build_sourcedid($mattempt, $instanceid, $userid, $servicesalt, $typeid = null, $attemptid = null, $ltiid = null) {
     $data = new \stdClass();
 
     $data->instance = $instanceid;
