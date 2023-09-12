@@ -413,10 +413,19 @@ function qtype_lti_build_request($instance, $typeconfig, $course,
          ($typeconfig['acceptgrades'] == QTYPE_LTI_SETTING_DELEGATE &&
          $instance->instructorchoiceacceptgrades == QTYPE_LTI_SETTING_ALWAYS))) {
         $placementsecret = $instance->servicesalt;
+	 /*   
         $sourcedid = json_encode(
                                 qtype_lti_build_sourcedid($extracodeexpertparams['resultid'], $originaluser->username,
                                                           $placementsecret, $typeid, $extracodeexpertparams['attemptid'],
                                                           $instance->id, $extracodeexpertparams['mattempt']));
+	 */   
+        $sourcedid = json_encode(
+                                qtype_lti_build_sourcedid($extracodeexpertparams['mattempt'], $instance->id,
+                                                          $originaluser->username,
+                                                          $placementsecret, $typeid,
+                                                          $extracodeexpertparams['attemptid'],
+                                                          $extracodeexpertparams['ltiid']
+                                                        ));
         $requestparams['lis_result_sourcedid'] = $sourcedid;
 
         // Add outcome service URL.
