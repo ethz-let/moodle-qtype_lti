@@ -421,7 +421,7 @@ function qtype_lti_build_request($instance, $typeconfig, $course,
 	 */   
         $sourcedid = json_encode(
                                 qtype_lti_build_sourcedid($extracodeexpertparams['resultid'], $extracodeexpertparams['mattempt'],
-                                                          $originaluser->username,
+                                                          $userid,
                                                           $placementsecret, $typeid,
                                                           $extracodeexpertparams['attemptid'],
                                                           $instance->id
