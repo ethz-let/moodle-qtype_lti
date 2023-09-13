@@ -320,7 +320,7 @@ function qtype_lti_build_registration_request($toolproxy) {
  * @param null|int $launchid
  * @return stdClass
  */
-function qtype_lti_build_sourcedid($mattempt, $instanceid, $userid, $servicesalt, $typeid = null, $attemptid = null, $ltiid = null) {
+function qtype_lti_build_sourcedid($instanceid, $mattempt, $userid, $servicesalt, $typeid = null, $attemptid = null, $ltiid = null) {
     $data = new \stdClass();
 
     $data->instance = $instanceid;
@@ -420,11 +420,11 @@ function qtype_lti_build_request($instance, $typeconfig, $course,
                                                           $instance->id, $extracodeexpertparams['mattempt']));
 	 */   
         $sourcedid = json_encode(
-                                qtype_lti_build_sourcedid($extracodeexpertparams['mattempt'], $instance->id,
+                                qtype_lti_build_sourcedid($extracodeexpertparams['resultid'], $extracodeexpertparams['mattempt'],
                                                           $originaluser->username,
                                                           $placementsecret, $typeid,
                                                           $extracodeexpertparams['attemptid'],
-                                                          $extracodeexpertparams['ltiid']
+                                                          $instance->id
                                                         ));
         $requestparams['lis_result_sourcedid'] = $sourcedid;
 
