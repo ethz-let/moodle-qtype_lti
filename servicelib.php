@@ -251,7 +251,7 @@ function qtype_lti_verify_message($key, $sharedsecrets, $body, $headers = null) 
  * @throws Exception
  */
 function qtype_lti_verify_sourcedid($ltiinstance, $parsed) {
-    $sourceid = qtype_lti_build_sourcedid($parsed->mattempt, $parsed->instanceid, $parsed->userid, $ltiinstance->servicesalt, $parsed->typeid,
+    $sourceid = qtype_lti_build_sourcedid($parsed->instanceid, $parsed->mattempt, $parsed->userid, $ltiinstance->servicesalt, $parsed->typeid,
                     $parsed->attemptid, $parsed->ltiid);
 
     if ($sourceid->hash != $parsed->sourcedidhash) {
