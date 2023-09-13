@@ -190,7 +190,7 @@ class qtype_lti_renderer extends \qtype_renderer {
             $user = $DB->get_record('user', array('id' => $originaluserid), 'id,username', MUST_EXIST);
             global $COURSE;
             if(!isset($user) || !isset($user->id) || $user->id == 0) {
-                $ltiparams = qtype_lti_build_sourcedid($attempt, 'XX_TEST_XX', 'XX_UNKNOWN_USER_XX', $lti->servicesalt,
+                $ltiparams = qtype_lti_build_sourcedid('XX_TEST_XX', $attempt, 'XX_UNKNOWN_USER_XX', $lti->servicesalt,
                                 $lti->typeid, 'XX_TEST_XX', $lti->id);
                 $serialparams = '';
             } else {
@@ -199,7 +199,7 @@ class qtype_lti_renderer extends \qtype_renderer {
                                 $attemptfullrecord->quiz, $COURSE->id, $lti->toolurl, $currentanswer, $currentlinkid,
                                 $previousresponse);
 
-                $ltiparams = qtype_lti_build_sourcedid($attempt, $userceattemptrecord->resultid, $user->username, $lti->servicesalt,
+                $ltiparams = qtype_lti_build_sourcedid($userceattemptrecord->resultid, $attempt, $user->username, $lti->servicesalt,
                                 $lti->typeid, $userceattemptrecord->attemptid, $lti->id);
 
                 $serialparams = $ltiparams->data;
