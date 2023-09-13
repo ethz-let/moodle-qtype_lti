@@ -131,6 +131,7 @@ class qtype_lti_question extends question_graded_automatically_with_countback {
                         array('username' => $username, 'linkid' => $result, 'resultid' => $linkid, 'ltiid' => $instanceid,
                               'mattempt' => $mattempt
                         ));
+        
         if ($submissiongrade) {
             $value = $submissiongrade->gradepercent;
         }
