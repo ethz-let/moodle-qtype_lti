@@ -158,8 +158,8 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null,
     $course = $DB->get_record('course', array('id' => $instance->course));
 
     $islti2 = isset($tool->toolproxyid);
-    $allparams = qtype_lti_build_request($instance, $typeconfig, $course, $userid, $readonly, $questionmode,
-                                        $manuallygradedinmoodle, $extracodeexpertparams, $typeid, $islti2);
+    $allparams = qtype_lti_build_request($instance, $typeconfig, $course, $typeid, $islti2, $userid, $readonly, $questionmode,
+                                        $manuallygradedinmoodle, $extracodeexpertparams);
     if ($islti2) {
         $requestparams = qtype_lti_build_request_lti2($tool, $allparams, $userid, $readonly, $questionmode,
                                                     $manuallygradedinmoodle, $extracodeexpertparams);
@@ -167,8 +167,8 @@ function qtype_lti_get_launch_data($instance, $userid = null, $readonly = null,
         $requestparams = $allparams;
     }
     $requestparams = array_merge($requestparams,
-                                qtype_lti_build_standard_request($instance, $orgid, $islti2,
-                                                                $extracodeexpertparams, 'basic-lti-launch-request'));
+                                qtype_lti_build_standard_request($instance, $orgid, $islti2, 'basic-lti-launch-request',
+                                                                $extracodeexpertparams));
     $customstr = '';
     if (isset($typeconfig['customparameters'])) {
         $customstr = $typeconfig['customparameters'];
@@ -320,7 +320,7 @@ function qtype_lti_build_registration_request($toolproxy) {
  * @param null|int $launchid
  * @return stdClass
  */
-function qtype_lti_build_sourcedid($instanceid, $mattempt, $userid, $servicesalt, $typeid = null, $attemptid = null, $ltiid = null) {
+function qtype_lti_build_sourcedid($instanceid, $userid, $servicesalt, $typeid = null, $attemptid = null, $ltiid = null, $mattempt) {
     $data = new \stdClass();
 
     $data->instance = $instanceid;
@@ -357,10 +357,9 @@ function qtype_lti_build_sourcedid($instanceid, $mattempt, $userid, $servicesalt
  *        True if an LTI 2 tool is being launched
  * @return array Request details
  */
-function qtype_lti_build_request($instance, $typeconfig, $course,
-                                $userid, $readonly, $questionmode,
-                                $manuallygradedinmoodle, $extracodeexpertparams,
-				$typeid = null, $islti2 = false) {
+function qtype_lti_build_request($instance, $typeconfig, $course, $typeid = null,
+                                $islti2 = false, $userid, $readonly, $questionmode,
+                                $manuallygradedinmoodle, $extracodeexpertparams) {
     global $USER, $CFG, $DB;
     if (empty($instance->cmid)) {
         $instance->cmid = 0;
@@ -413,19 +412,10 @@ function qtype_lti_build_request($instance, $typeconfig, $course,
          ($typeconfig['acceptgrades'] == QTYPE_LTI_SETTING_DELEGATE &&
          $instance->instructorchoiceacceptgrades == QTYPE_LTI_SETTING_ALWAYS))) {
         $placementsecret = $instance->servicesalt;
-	 /*   
         $sourcedid = json_encode(
                                 qtype_lti_build_sourcedid($extracodeexpertparams['resultid'], $originaluser->username,
                                                           $placementsecret, $typeid, $extracodeexpertparams['attemptid'],
                                                           $instance->id, $extracodeexpertparams['mattempt']));
-	 */   
-        $sourcedid = json_encode(
-                                qtype_lti_build_sourcedid($extracodeexpertparams['resultid'], $extracodeexpertparams['mattempt'],
-                                                          $userid,
-                                                          $placementsecret, $typeid,
-                                                          $extracodeexpertparams['attemptid'],
-                                                          $instance->id
-                                                        ));
         $requestparams['lis_result_sourcedid'] = $sourcedid;
 
         // Add outcome service URL.
@@ -576,7 +566,7 @@ function qtype_lti_build_request_lti2($tool, $params, $userid, $readonly, $quest
  * @return array Request details
  */
 function qtype_lti_build_standard_request($instance, $orgid, $islti2,
-                                          $extracodeexpertparams, $messagetype = 'basic-lti-launch-request') {
+                                          $messagetype = 'basic-lti-launch-request', $extracodeexpertparams) {
     global $CFG;
 
     $requestparams = array();
@@ -646,19 +636,19 @@ function qtype_lti_build_custom_parameters($toolproxy, $tool, $instance, $params
     // has given permission.
     $custom = array();
     if ($customstr) {
-        $custom = qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $customstr, $userid, $islti2);
+        $custom = qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $customstr, $islti2, $userid);
     }
     if (!isset($typeconfig['allowinstructorcustom']) || $typeconfig['allowinstructorcustom'] != QTYPE_LTI_SETTING_NEVER) {
         if ($instructorcustomstr) {
             $custom = array_merge(
-                                qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $instructorcustomstr,
-                                                                $userid, $islti2), $custom);
+                                qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $instructorcustomstr, $islti2,
+                                                                $userid), $custom);
         }
     }
     if ($islti2) {
         $custom = array_merge(
                             qtype_lti_split_custom_parameters($toolproxy, $tool, $params,
-                                                              $tool->parameter, $userid, true), $custom);
+                                                              $tool->parameter, true, $userid), $custom);
         $settings = qtype_lti_get_tool_settings($tool->toolproxyid);
         $custom = array_merge($custom, qtype_lti_get_custom_parameters($toolproxy, $tool, $params, $settings));
         if (!empty($instance->course)) {
@@ -785,8 +775,8 @@ function qtype_lti_build_content_item_selection_request($id, $course, moodle_url
     // Get base request parameters.
     $instance = new stdClass();
     $instance->course = $course->id;
-    $requestparams = qtype_lti_build_request($instance, $typeconfig, $course, $userid, $readonly, $questionmode,
-                                            $manuallygradedinmoodle, $extracodeexpertparams, $id, $islti2);
+    $requestparams = qtype_lti_build_request($instance, $typeconfig, $course, $id, $islti2, $userid, $readonly, $questionmode,
+                                            $manuallygradedinmoodle, $extracodeexpertparams);
 
     // Get LTI2-specific request parameters and merge to the request parameters if applicable.
     if ($islti2) {
@@ -796,8 +786,8 @@ function qtype_lti_build_content_item_selection_request($id, $course, moodle_url
 
     // Get standard request parameters and merge to the request parameters.
     $orgid = !empty($typeconfig['organizationid']) ? $typeconfig['organizationid'] : '';
-    $standardparams = qtype_lti_build_standard_request(null, $orgid, $islti2,
-                                                    $extracodeexpertparams, 'ContentItemSelectionRequest');
+    $standardparams = qtype_lti_build_standard_request(null, $orgid, $islti2, 'ContentItemSelectionRequest',
+                                                    $extracodeexpertparams);
 
     $requestparams = array_merge($requestparams, $standardparams);
 
@@ -1248,7 +1238,7 @@ function qtype_lti_get_enabled_capabilities($tool) {
  *        True if an LTI 2 tool is being launched
  * @return array of custom parameters
  */
-function qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $customstr, $userid, $islti2 = false) {
+function qtype_lti_split_custom_parameters($toolproxy, $tool, $params, $customstr, $islti2 = false, $userid) {
     $customstr = str_replace("\r\n", "\n", $customstr);
     $customstr = str_replace("\n\r", "\n", $customstr);
     $customstr = str_replace("\r", "\n", $customstr);
@@ -3226,7 +3216,7 @@ function qtype_lti_load_cartridge($url, $map, $propertiesmap = array()) {
 
     // TODO MDL-46023 Replace this code with a call to the new library.
     $origerrors = libxml_use_internal_errors(true);
-   // $origentity = libxml_disable_entity_loader(true);
+    $origentity = libxml_disable_entity_loader(true);
     libxml_clear_errors();
 
     $document = new DOMDocument();
@@ -3238,7 +3228,7 @@ function qtype_lti_load_cartridge($url, $map, $propertiesmap = array()) {
 
     libxml_clear_errors();
     libxml_use_internal_errors($origerrors);
-   // libxml_disable_entity_loader($origentity);
+    libxml_disable_entity_loader($origentity);
 
     if (count($errors) > 0) {
         $message = 'Failed to load cartridge.';
