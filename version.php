@@ -17,14 +17,14 @@
 /**
  *
  * @package qtype_lti
- * @author Amr Hourani amr.hourani@id.ethz.ch
+ * @author ETH Zurich moodle@id.ethz.ch
  * @copyright 2019 ETH Zurich
  */
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_lti';
-$plugin->version = 2024051800;
+$plugin->version = 2024100100;
 $plugin->requires = 2022041910; // Moodle 4.0.
 
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '4.4';
+$plugin->release = '4.5';

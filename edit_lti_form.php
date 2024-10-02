@@ -35,6 +35,7 @@ require_once($CFG->dirroot . '/question/engine/bank.php');
 class qtype_lti_edit_form extends question_edit_form {
     private $numberofrows;
     private $numberofcolumns;
+    public $typeid;
 
     /**
      * (non-PHPdoc).

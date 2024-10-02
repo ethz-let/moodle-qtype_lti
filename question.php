@@ -30,6 +30,28 @@ require_once($CFG->dirroot . '/question/type/questionbase.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_lti_question extends question_graded_automatically_with_countback {
+    public $questionid;
+    public $typeid;
+    public $toolurl;
+    public $securetoolurl;
+    public $instructorchoicesendname;
+    public $instructorchoicesendemailaddr;
+    public $instructorchoiceallowroster;
+    public $instructorchoiceallowsetting;
+    public $instructorcustomparameters;
+    public $instructorchoiceacceptgrades;
+    public $grade;
+    public $launchcontainer;
+    public $showtitlelaunch;
+    public $password;
+    public $debuglaunch;
+    public $showdescriptionlaunch;
+    public $servicesalt;
+    public $instancecode;
+    public $icon;
+    public $secureicon;
+    public $answers;
+    public $resourcekey;
 
     public function compute_final_grade($responses, $totaltries) {
         $totalstemscore = 0;
