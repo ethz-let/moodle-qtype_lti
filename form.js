@@ -223,7 +223,7 @@
                         && match[1].toLowerCase() === selectedOption
                                 .getAttribute('domain').toLowerCase()) {
                     automatchToolDisplay.set('innerHTML',
-                            '<img style="vertical-align:text-bottom" src="'
+                            '<img width="16" height="16" style="vertical-align:text-bottom" src="'
                                     + self.settings.green_check_icon_url
                                     + '" />'
                                     + M.util.get_string(
@@ -234,7 +234,7 @@
                     // The entered URL does not match the domain of the tool
                     // configuration.
                     automatchToolDisplay.set('innerHTML',
-                            '<img style="vertical-align:text-bottom" src="'
+                            '<img width="16" height="16" style="vertical-align:text-bottom" src="'
                                     + self.settings.warning_icon_url
                                     + '" />'
                                     + M.util.get_string('domain_mismatch',
@@ -250,7 +250,7 @@
             // tools may override privacy settings.
             if (key.get('value') !== '' && secret.get('value') !== '') {
                 automatchToolDisplay.set('innerHTML',
-                        '<img style="vertical-align:text-bottom" src="'
+                        '<img width="16" height="16" style="vertical-align:text-bottom" src="'
                                 + self.settings.green_check_icon_url
                                 + '" />'
                                 + M.util.get_string('custom_config',
@@ -273,7 +273,7 @@
                 // The tool configuration requires a certain url path which is not used.
                 if (toolInfo.toolname && toolurlVerified) {
                     automatchToolDisplay.set('innerHTML',
-                            '<img style="vertical-align:text-bottom" src="'
+                            '<img width="16" height="16" style="vertical-align:text-bottom" src="'
                                     + self.settings.warning_icon_url
                                     + '" />'
                                     + M.util.get_string(
@@ -285,7 +285,7 @@
                 // Tool configration is used. 
                 } else if (toolInfo.toolname) {
                     automatchToolDisplay.set('innerHTML',
-                            '<img style="vertical-align:text-bottom" src="'
+                            '<img width="16" height="16" style="vertical-align:text-bottom" src="'
                                     + self.settings.green_check_icon_url
                                     + '" />'
                                     + M.util.get_string(
@@ -296,7 +296,7 @@
                 } else if (!selectedToolType) {
                     if (key.get('value') === '' || secret.get('value') === '') {
                         automatchToolDisplay.set('innerHTML',
-                                '<img style="vertical-align:text-bottom" src="'
+                                '<img width="16" height="16" style="vertical-align:text-bottom" src="'
                                         + self.settings.warning_icon_url
                                         + '" />'
                                         + M.util.get_string(
@@ -307,7 +307,7 @@
 
                 if (toolInfo.cartridge) {
                     automatchToolDisplay.set('innerHTML',
-                            '<img style="vertical-align:text-bottom" src="'
+                            '<img width="16" height="16" style="vertical-align:text-bottom" src="'
                                     + self.settings.green_check_icon_url
                                     + '" />'
                                     + M.util.get_string('using_tool_cartridge',
@@ -322,7 +322,7 @@
 
                 if (duplicatesChecked) {
                     automatchToolDisplay.append(
-                                '<br><img style="vertical-align:text-bottom" src="'
+                                '<br><img width="16" height="16" style="vertical-align:text-bottom" src="'
                                         + self.settings.warning_icon_url
                                         + '" />'
                                         + M.util.get_string(
