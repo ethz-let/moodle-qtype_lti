@@ -97,17 +97,40 @@ switch ($action) {
                 $urlparts = gtype_lti_get_parsed_url($toolurl);
                 $toolurl = $urlparts['host'] . $urlparts['path'] . $urlparts['query'];
 
+                $versions = $DB->get_records_sql("
+                SELECT allversions.questionid as qids
+
+                  FROM {question_versions} allversions
+
+                 WHERE allversions.questionbankentryid = (
+                            SELECT givenversion.questionbankentryid
+                              FROM {question_versions} givenversion
+                             WHERE givenversion.questionid = ?
+                       )
+                   AND allversions.status <> ?
+
+              ORDER BY allversions.version DESC
+              ", [$questionid, 'draft']);
+               $versionids = [];
+               foreach ($versions as $version){
+                $versionids[] = $version->qids;
+               }
+                $questionids = implode(',', $versionids);
+                if(!$versions) {
+                    $questionids = 0;
+                }
+
                 $query = '
-                    SELECT toolurl
+                    SELECT *
                     FROM {qtype_lti_options}
                     WHERE 
                         LOWER(toolurl) LIKE LOWER(:toolurl)
                     AND 
-                        questionid <> :questionid
+                        questionid not in ('.$questionids.')
                 ';
-    
-                $results = $DB->get_records_sql($query, array('toolurl' => "%$toolurl", 'questionid' => $questionid));
+                $results = $DB->get_records_sql($query, array('toolurl' => "%$toolurl"));
                 $response->duplicates = count($results) ?: 0;
+                $response->questionid = $questionid;
             }
         }
 
