@@ -179,5 +179,22 @@ function xmldb_qtype_lti_upgrade($oldversion) {
         */
         upgrade_plugin_savepoint(true, 2021040801, 'qtype', 'lti');
     }
+    if ($oldversion < 2025020600) {
+        $table = new xmldb_table('qtype_lti_submission');
+        $index = new xmldb_index('mapped_lti_sub_ce', XMLDB_INDEX_NOTUNIQUE, ['username', 'linkid', 'resultid', 'ltiid', 'mattempt']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $index = new xmldb_index('mapped_lti_mattempt_ce', XMLDB_INDEX_NOTUNIQUE, ['mattempt']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $table = new xmldb_table('qtype_lti_usage');
+        $index = new xmldb_index('mapped_lti_usage_ce', XMLDB_INDEX_NOTUNIQUE, ['ltiid', 'mattemptid', 'instancecode', 'userid', 'questionid', 'courseid', 'quizid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        upgrade_plugin_savepoint(true, 2025020600, 'qtype', 'lti');
+    }
     return true;
 }
