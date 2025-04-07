@@ -328,4 +328,34 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
 
         return $response;
     }
+     /**
+     * Convert the backup structure of the LTI question type into a structure matching its
+     * question data. This data will then be used to produce an identity hash for comparison with
+     * questions in the database. We have to override the parent function, because we use a special
+     * structure during backup.
+     *
+     * @param array $backupdata
+     * @return stdClass
+     */
+    public static function convert_backup_to_questiondata(array $backupdata): stdClass {
+        // First, convert standard data via the parent function.
+        $questiondata = parent::convert_backup_to_questiondata($backupdata);
+        return $questiondata;
+    }
+
+    /**
+     * Return a list of paths to fields to be removed from questiondata before creating an identity hash.
+     * We have to remove the id and questionid property from all rows, columns and weights.
+     *
+     * @return array
+     */
+    protected function define_excluded_identity_hash_fields(): array {
+        return [
+            '/options/id',
+            '/options/questionid',
+        ];
+    }
+    public static function remove_excluded_question_data(stdClass $questiondata, array $excludefields = []): stdClass {
+        return parent::remove_excluded_question_data($questiondata, $excludefields);
+    }
 }
