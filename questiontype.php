@@ -41,10 +41,10 @@ class qtype_lti extends question_type {
 
     public function get_question_options($question) {
         global $DB;
-
-        $question->options = $DB->get_record('qtype_lti_options', array('questionid' => $question->id), '*', MUST_EXIST);
-        $question->questiontext = $question->name; // COD-4 for Import and Export title.
         parent::get_question_options($question);
+        $question->options = $DB->get_record('qtype_lti_options', array('questionid' => $question->id), '*', MUST_EXIST);
+      //  $question->questiontext = $question->name; // COD-4 for Import and Export title.
+        
     }
 
     public function save_question_options($question) {
@@ -138,7 +138,10 @@ class qtype_lti extends question_type {
         $question->instancecode = $questiondata->options->instancecode;
         $question->icon = $questiondata->options->icon;
         $question->secureicon = $questiondata->options->secureicon;
-        $question->answers = $questiondata->options->answers;
+        if(isset($questiondata->options->answers)){
+            $question->answers = $questiondata->options->answers;
+        }
+        
     }
 
     public function delete_question($questionid, $contextid) {
