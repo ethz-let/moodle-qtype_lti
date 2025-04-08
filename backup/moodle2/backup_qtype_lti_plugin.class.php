@@ -53,11 +53,11 @@ class backup_qtype_lti_plugin extends backup_qtype_plugin {
         // Define each element separated.
         $lti = new backup_nested_element('lti', array('id'),
                                         array('instancecode', 'course', 'cmid', 'questionid', 'typeid', 'toolurl', 'securetoolurl',
-                                            'launchcontainer', 'instructorchoicesendname',
-                                            'instructorchoicesendemailaddr', 'instructorchoiceacceptgrades',
-                                            'instructorchoiceallowroster', 'instructorchoiceallowsetting', 'grade',
-                                            'instructorcustomparameters', 'debuglaunch', 'showtitlelaunch', 'showdescriptionlaunch',
-                                            'icon', 'secureicon', 'resourcekey', 'password'));
+                                            'instructorchoicesendname', 'instructorchoicesendemailaddr',
+                                            'instructorchoiceallowroster', 'instructorchoiceallowsetting',
+                                            'instructorcustomparameters', 'instructorchoiceacceptgrades', 'grade',
+                                            'launchcontainer', 'resourcekey', 'password', 'debuglaunch',
+                                            'showtitlelaunch', 'showdescriptionlaunch', 'servicesalt', 'icon', 'secureicon'));
         // Now the qtype tree.
         $pluginwrapper->add_child($lti);
         // Define sources.
