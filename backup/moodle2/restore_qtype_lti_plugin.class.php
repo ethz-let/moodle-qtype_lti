@@ -63,9 +63,7 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         // See MDL-9367.
         // Grade used to be a float (whole numbers only), restore as int.
         $data->grade = (int)$data->grade;
-        $data->typeid = 0;
         $data->course = $this->task->get_courseid();
-        $data->servicesalt = uniqid('', true);
         // Try to get resourcekey and password. Null if not possible (DB default).
         $data->resourcekey = isset($data->resourcekey) ? $data->resourcekey : null;
         $data->password = isset($data->password) ? $data->password : null;
