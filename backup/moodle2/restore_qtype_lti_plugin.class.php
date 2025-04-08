@@ -49,7 +49,6 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
     }
     public function process_lti($data) {
         global $DB;
-
         $data = (object)$data;
         $oldid = $data->id;
 
@@ -94,6 +93,21 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         return $response;
     }
      /**
+     * Return the contents of this qtype to be processed by the links decoder
+     */
+    public static function define_decode_contents() {
+        $contents = [];
+
+        $contents[] = new restore_decode_content('qtype_lti_options', ['instancecode', 'course', 'cmid', 'questionid', 'typeid', 'toolurl', 'securetoolurl',
+                                            'launchcontainer', 'instructorchoicesendname',
+                                            'instructorchoicesendemailaddr', 'instructorchoiceacceptgrades',
+                                            'instructorchoiceallowroster', 'instructorchoiceallowsetting', 'grade',
+                                            'instructorcustomparameters', 'debuglaunch', 'showtitlelaunch', 'showdescriptionlaunch',
+                                            'icon', 'secureicon', 'resourcekey', 'password'], 'qtype_lti_options');
+
+        return $contents;
+    }
+     /**
      * Convert the backup structure of the LTI question type into a structure matching its
      * question data. This data will then be used to produce an identity hash for comparison with
      * questions in the database. We have to override the parent function, because we use a special
@@ -106,19 +120,33 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
     public static function convert_backup_to_questiondata(array $backupdata): stdClass {
         // First, convert standard data via the parent function.
         $questiondata = parent::convert_backup_to_questiondata($backupdata);
+        
+        if(is_null($questiondata->options->securetoolurl) || empty($questiondata->options->securetoolurl)){
+           $questiondata->options->securetoolurl = '';
+        }
+        if(is_null($questiondata->options->toolurl) || empty($questiondata->options->toolurl)){
+            $questiondata->options->toolurl = '';
+         }
+        if(is_null($questiondata->options->instructorcustomparameters) || empty($questiondata->options->instructorcustomparameters)){
+            $questiondata->options->instructorcustomparameters = '';
+        }
+        if(is_null($questiondata->options->icon) || empty($questiondata->options->icon)){
+            $questiondata->options->icon = '';
+        }
+        if(is_null($questiondata->options->secureicon) || empty($questiondata->options->secureicon)){
+            $questiondata->options->secureicon = '';
+        }
+        if(is_null($questiondata->options->resourcekey) || empty($questiondata->options->resourcekey)){
+            $questiondata->options->resourcekey = '';
+        }
+        if(is_null($questiondata->options->password) || empty($questiondata->options->password)){
+            $questiondata->options->password = '';
+        }
+        if(is_null($questiondata->options->servicesalt) || empty($questiondata->options->servicesalt)){
+            $questiondata->options->servicesalt = '';
+        }
 
-        if (isset($backupdata["plugin_qtype_lti_question"]['lti'])) {
-            $questiondata->options = (object) array_merge(
-                (array) $questiondata->options,
-                $backupdata["plugin_qtype_lti_question"]['lti'][0],
-            );
-        }
-        if (isset($backupdata["plugin_qtype_lti_question"]['lti']['answers'])) {
-            $questiondata->options->answers = array_map(
-                fn($answer) => (object) $answer,
-                $backupdata["plugin_qtype_lti_question"]['lti']['answers']['answer'],
-            );
-        }
+
         return $questiondata;
     }
 
@@ -136,11 +164,8 @@ class restore_qtype_lti_plugin extends restore_qtype_plugin {
         ];
      
     }
+    
     public static function remove_excluded_question_data(stdClass $questiondata, array $excludefields = []): stdClass {
-       
-        if (isset($questiondata->options->answers)) {
-            unset($questiondata->options->answers);
-        }
         return parent::remove_excluded_question_data($questiondata, $excludefields);
     }
 }
