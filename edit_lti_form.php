@@ -132,6 +132,8 @@ class qtype_lti_edit_form extends question_edit_form {
         $mform->setType('instancecode', PARAM_TEXT);
         if (!empty($this->question->options->instancecode)) {
             $instancecode = $this->question->options->instancecode;
+            $mform->addElement('hidden', 'currentdbtypeid', $this->question->options->typeid);
+            $mform->setType('currentdbtypeid', PARAM_INT);
         } else {
             $instancecode = uniqid('');
         }
