@@ -17,8 +17,8 @@
 /**
  *
  * @package qtype_lti
- * @author Amr Hourani amr.hourani@id.ethz.ch
- * @copyright ETHz 2016 amr.hourani@id.ethz.ch
+ * @author ETH Zurich
+ * @copyright ETHz 2016 moodle@ethz.ch
  */
 defined('MOODLE_INTERNAL') || die();
 
@@ -248,7 +248,7 @@ class qtype_lti_edit_form extends question_edit_form {
         }
 
         if (isset($this->question->id)) {
-            $mform->disabledIf('toolurl', null);
+            $mform->disabledIf('toolurl', 'unlockabletoolurl', 'notchecked');
         }
         if (isset(get_config('qtype_lti')->unlockabletoolurl)) {
             if (get_config('qtype_lti')->unlockabletoolurl == 0) {
